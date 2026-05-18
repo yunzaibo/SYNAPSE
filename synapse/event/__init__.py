@@ -22,6 +22,8 @@ if TYPE_CHECKING:
         ThemeDetector,
         CapitalFlowDetector,
         CorporateActionDetector,
+        PolicyChangeDetector,
+        MacroShiftDetector,
     )
     from synapse.event.dedup import DeduplicationEngine
     from synapse.event.taxonomy import (
@@ -46,6 +48,8 @@ __all__ = [
     "ThemeDetector",
     "CapitalFlowDetector",
     "CorporateActionDetector",
+    "PolicyChangeDetector",
+    "MacroShiftDetector",
     # Deduplication (IMPL-003)
     "DeduplicationEngine",
     # Taxonomy
@@ -79,6 +83,7 @@ def __getattr__(name: str):
     if name in (
         "EarningsDetector", "PolicyDetector", "SentimentDetector",
         "ThemeDetector", "CapitalFlowDetector", "CorporateActionDetector",
+        "PolicyChangeDetector", "MacroShiftDetector",
     ):
         from synapse.event import detectors
         return getattr(detectors, name)

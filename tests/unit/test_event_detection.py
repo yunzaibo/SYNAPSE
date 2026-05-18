@@ -23,6 +23,8 @@ from synapse.event.detectors import (
     ThemeDetector,
     CapitalFlowDetector,
     CorporateActionDetector,
+    PolicyChangeDetector,
+    MacroShiftDetector,
 )
 from synapse.event.dedup import DeduplicationEngine
 
@@ -175,10 +177,10 @@ class TestDetectorRegistry:
 # ---------------------------------------------------------------------------
 
 class TestEventTaxonomy:
-    def test_six_event_types_defined(self):
-        """EVENT_TYPES must define exactly 6 event types."""
-        assert len(EVENT_TYPES) == 6
-        expected = {"earnings", "policy", "sentiment", "theme", "capital_flow", "corporate_action"}
+    def test_event_types_defined(self):
+        """EVENT_TYPES must define all registered event types."""
+        assert len(EVENT_TYPES) == 8
+        expected = {"earnings", "policy", "sentiment", "theme", "capital_flow", "corporate_action", "policy_change", "macro_shift"}
         assert set(EVENT_TYPES.keys()) == expected
 
     def test_source_priority_is_ordered(self):
@@ -188,7 +190,7 @@ class TestEventTaxonomy:
         assert SOURCE_PRIORITY["cninfo"] < SOURCE_PRIORITY["manual"]
 
     def test_event_category_map_covers_all_types(self):
-        """EVENT_CATEGORY_MAP must cover all 6 event types."""
+        """EVENT_CATEGORY_MAP must cover all event types."""
         covered = set()
         for types in EVENT_CATEGORY_MAP.values():
             covered.update(types)
@@ -319,3 +321,57 @@ class TestDeduplication:
         # With equal confidence, first event in order wins (cninfo)
         merged = result[0]
         assert merged.confidence == 0.7
+
+
+# ---------------------------------------------------------------------------
+# TestPolicyChangeDetector (3 tests)
+# ---------------------------------------------------------------------------
+
+
+class TestPolicyChangeDetector:
+    def test_detect_fires_on_valid_data(self):
+        """PolicyChangeDetector detects valid policy change data."""
+        det = PolicyChangeDetector()
+        data = {"policy_change": True, "regulation_body": "csrc", "tickers": ["600519"]}
+        event = det.detect(data)
+        assert event is not None
+        assert event.event_type == EventType.POLICY_CHANGE
+        assert "csrc" in event.title
+
+    def test_detect_returns_none_on_non_matching(self):
+        """PolicyChangeDetector returns None when no triggers present."""
+        det = PolicyChangeDetector()
+        assert det.detect({}) is None
+        assert det.detect({"unrelated_key": True}) is None
+
+    def test_confidence_scoring(self):
+        """PolicyChangeDetector confidence combines flag + body + type."""
+        det = PolicyChangeDetector()
+        # All three triggers
+        score = det.confidence_score({
+            "policy_change": True,
+            "regulation_body": "pboc",
+            "announcement_type": "rate_change",
+        })
+        assert score == 1.0
+        # Only flag
+        score2 = det.confidence_score({"policy_change": True})
+        assert score2 == 0.4
+        # No triggers
+        assert det.confidence_score({}) == 0.0
+
+
+# ---------------------------------------------------------------------------
+# TestMacroShiftDetector (1 test)
+# ---------------------------------------------------------------------------
+
+
+class TestMacroShiftDetector:
+    def test_detect_fires_on_valid_data(self):
+        """MacroShiftDetector detects valid macro shift data."""
+        det = MacroShiftDetector()
+        data = {"macro_shift": True, "indicator": "gdp", "surprise_magnitude": 0.8}
+        event = det.detect(data)
+        assert event is not None
+        assert event.event_type == EventType.MACRO_SHIFT
+        assert "gdp" in event.title

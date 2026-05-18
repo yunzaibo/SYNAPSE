@@ -296,7 +296,9 @@ class PropagationGraph:
             n for n, s in self._node_states.items() if s == PS.EXPIRED
         )
 
-    def apply_decay_to_edges(self, days: float) -> dict[str, float]:
+    def apply_decay_to_edges(
+        self, days: float, event_type: Optional[str] = None
+    ) -> dict[str, float]:
         """Apply exponential decay to all edge weights (idempotent).
 
         Stores original weights on first call; subsequent calls recompute
@@ -304,10 +306,20 @@ class PropagationGraph:
 
         Args:
             days: Elapsed time in days.
+            event_type: Optional event type key. When provided, uses
+                per-type half-life from CATEGORY_HALF_LIVES instead of
+                each edge's own decay_rate.
 
         Returns:
             Dict of "{source_id}->{target_id}" -> decayed_weight.
         """
+        # Compute per-type decay rate if event_type provided
+        type_decay_rate: Optional[float] = None
+        if event_type is not None:
+            from synapse.event.lifecycle import CATEGORY_HALF_LIVES, DEFAULT_HALF_LIFE
+            half_life = CATEGORY_HALF_LIVES.get(event_type, DEFAULT_HALF_LIFE)
+            type_decay_rate = math.log(2) / half_life
+
         # Store original weights on first invocation (idempotency guard)
         for node_id, edges in self._adj.items():
             for edge in edges:
@@ -318,11 +330,45 @@ class PropagationGraph:
         for node_id, edges in self._adj.items():
             for edge in edges:
                 original = edge._original_weight  # type: ignore[attr-defined]
-                decayed = original * math.exp(-edge.decay_rate * days)
+                rate = type_decay_rate if type_decay_rate is not None else edge.decay_rate
+                decayed = original * math.exp(-rate * days)
                 edge.weight = decayed
                 edge_key = f"{edge.source_id}->{edge.target_id}"
                 results[edge_key] = decayed
         return results
+
+    def prune_weak_edges(self, threshold: float = 0.01) -> list[str]:
+        """Remove edges with weight below threshold.
+
+        Args:
+            threshold: Minimum weight to keep (default 0.01).
+
+        Returns:
+            List of removed edge keys ("{source}->{target}").
+        """
+        removed: list[str] = []
+        for source_id in list(self._adj.keys()):
+            edges = self._adj[source_id]
+            kept: list[PropagationEdge] = []
+            for edge in edges:
+                if edge.weight < threshold:
+                    key = f"{edge.source_id}->{edge.target_id}"
+                    removed.append(key)
+                    # Remove from reverse index
+                    if edge.target_id in self._in_edges:
+                        self._in_edges[edge.target_id] = [
+                            e for e in self._in_edges[edge.target_id]
+                            if e.source_id != source_id
+                        ]
+                        if not self._in_edges[edge.target_id]:
+                            del self._in_edges[edge.target_id]
+                else:
+                    kept.append(edge)
+            if kept:
+                self._adj[source_id] = kept
+            else:
+                del self._adj[source_id]
+        return removed
 
     # ------------------------------------------------------------------
     # Internal helpers

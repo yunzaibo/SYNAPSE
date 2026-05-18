@@ -11,7 +11,7 @@ from synapse.core.schemas.event import (
     EventSourceType,
     PropagationState,
 )
-from synapse.core.schemas.event_contract import EventContract
+from synapse.core.schemas.event_contract import EventContract, SettlementStatus
 from synapse.core.schemas.propagation_edge import PropagationEdge
 from synapse.core.temporal import CST
 
@@ -317,3 +317,59 @@ class TestConstraintValidation:
     def test_weight_out_of_range_raises(self):
         with pytest.raises(ValueError, match="weight must be in"):
             PropagationEdge(id="pe_bad", weight=1.5)
+
+
+# ---------------------------------------------------------------------------
+# TestSettlementLifecycle -- 5 tests
+# ---------------------------------------------------------------------------
+
+
+class TestSettlementLifecycle:
+    def test_default_status_pending(self):
+        """New EventContract defaults to PENDING status."""
+        c = EventContract(id="ec1", contract_id="c1", event_id="e1")
+        assert c.settlement_status == SettlementStatus.PENDING
+        assert c.settlement_result is None
+        assert c.settlement_metadata == {}
+
+    def test_settle_works(self):
+        """settle() sets status, result, metadata, and timestamp."""
+        c = EventContract(id="ec2", contract_id="c2", event_id="e2")
+        c.settle("impacted_theses", metadata={"decay_factor": 0.8, "affected_count": 3})
+        assert c.settlement_status == SettlementStatus.SETTLED
+        assert c.settlement_result == "impacted_theses"
+        assert c.settlement_metadata == {"decay_factor": 0.8, "affected_count": 3}
+        assert c.settled_at is not None
+
+    def test_expire_works(self):
+        """expire() sets status to EXPIRED and timestamps."""
+        c = EventContract(id="ec3", contract_id="c3", event_id="e3")
+        c.expire()
+        assert c.settlement_status == SettlementStatus.EXPIRED
+        assert c.settled_at is not None
+
+    def test_round_trip_serialization(self):
+        """to_dict/from_dict preserves all settlement fields."""
+        c = EventContract(id="ec4", contract_id="c4", event_id="e4")
+        c.settle("no_impact", metadata={"propagation_depth": 2})
+        d = c.to_dict()
+        c2 = EventContract.from_dict(d)
+        assert c2.settlement_status == SettlementStatus.SETTLED
+        assert c2.settlement_result == "no_impact"
+        assert c2.settlement_metadata == {"propagation_depth": 2}
+        assert c2.settled_at is not None
+
+    def test_lazy_upcast_backward_compatible(self):
+        """v1.0 dict without settlement fields creates valid EventContract."""
+        old_dict = {
+            "id": "ec5",
+            "contract_id": "c5",
+            "event_id": "e5",
+            "affected_theses": ["ths_1"],
+            "impact_scores": {"ths_1": 0.7},
+        }
+        c = EventContract.from_dict(old_dict)
+        assert c.settlement_status == SettlementStatus.PENDING
+        assert c.settlement_result is None
+        assert c.settlement_metadata == {}
+        assert c.settled_at is None

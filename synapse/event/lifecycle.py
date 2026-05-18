@@ -109,6 +109,8 @@ CATEGORY_HALF_LIVES: dict[str, float] = {
     "theme": 4.0,           # 3-5 days, midpoint 4.0
     "capital_flow": 2.0,    # 1-3 days, midpoint 2.0
     "corporate_action": 5.0,  # ~5 days
+    "policy_change": 2.5,    # 1-4 days, midpoint 2.5
+    "macro_shift": 3.0,      # 2-4 days, midpoint 3.0
 }
 
 DEFAULT_HALF_LIFE = 5.0
@@ -126,6 +128,37 @@ def compute_decay(impact_0: float, decay_rate: float, days: float) -> float:
         Decayed impact value.
     """
     return impact_0 * math.exp(-decay_rate * days)
+
+
+def auto_decay_on_transition(
+    graph: object,
+    event_id: str,
+    new_state: LifecycleState,
+    elapsed_days: float,
+) -> int:
+    """Trigger decay on all outgoing edges when a node transitions to SETTLED or EXPIRED.
+
+    Args:
+        graph: PropagationGraph instance (duck-typed to avoid circular import).
+        event_id: Node that transitioned.
+        new_state: The new lifecycle state.
+        elapsed_days: Days elapsed for decay computation.
+
+    Returns:
+        Number of edges decayed.
+    """
+    if new_state not in (LifecycleState.SETTLED, LifecycleState.EXPIRED):
+        return 0
+
+    if not hasattr(graph, "get_outgoing_edges") or not hasattr(graph, "apply_decay_to_edges"):
+        return 0
+
+    edges = graph.get_outgoing_edges(event_id)  # type: ignore[attr-defined]
+    if not edges:
+        return 0
+
+    graph.apply_decay_to_edges(elapsed_days)  # type: ignore[attr-defined]
+    return len(edges)
 
 
 def apply_category_decay(event_type: str, impact_0: float, days: float) -> float:
