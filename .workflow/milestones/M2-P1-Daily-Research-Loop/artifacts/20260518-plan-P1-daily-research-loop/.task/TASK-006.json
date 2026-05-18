@@ -1,0 +1,52 @@
+{
+  "id": "TASK-006",
+  "title": "China Market Semantics",
+  "type": "implement",
+  "wave": "W4",
+  "description": "实现 A-share 市场语义：交易日历、T+1 settlement、涨跌停、停牌处理、数据加载接口。",
+  "action": "创建 synapse/core/market/ 目录。创建 calendar.py（中国 A 股交易日历，含节假日）。创建 semantics.py（T+1、涨跌停 10%/20%/30%、停牌检测）。创建 data_loader.py（行情数据加载接口，P1 用本地 CSV/Parquet）。",
+  "implementation": [
+    "calendar.py: is_trading_day(date) → bool, next_trading_day(date) → date",
+    "calendar.py: trading_days_between(start, end) → list[date]",
+    "calendar.py: 中国法定节假日 2024-2026 硬编码（P1 不做 API 调用）",
+    "semantics.py: T+1 settlement validation",
+    "semantics.py: price_limit(symbol_type) → Decimal (主板 10%, 创业板/科创板 20%, ST 5%)",
+    "semantics.py: is_suspended(symbol, date) → bool",
+    "data_loader.py: load_daily(symbol, start, end) → DataFrame",
+    "data_loader.py: P1 支持本地 CSV/Parquet，接口预留 API 扩展",
+    "所有时间字段使用 ADR-008 Temporal Semantics"
+  ],
+  "read_first": [
+    "docs/05_governance/ADR/ADR-005-Initial-Market-Domain.md",
+    "docs/05_governance/ADR/ADR-006-Why-China-A-Shares-Event-Driven.md",
+    "docs/05_governance/ADR/ADR-008-Temporal-Semantics.md",
+    "synapse/core/temporal.py"
+  ],
+  "files": [
+    "synapse/core/market/__init__.py",
+    "synapse/core/market/calendar.py",
+    "synapse/core/market/semantics.py",
+    "synapse/core/market/data_loader.py",
+    "tests/unit/test_calendar.py",
+    "tests/unit/test_semantics.py",
+    "tests/unit/test_data_loader.py"
+  ],
+  "convergence.criteria": [
+    "synapse/core/market/calendar.py 存在且包含 is_trading_day()",
+    "is_trading_day(date(2026, 1, 1)) == False（元旦）",
+    "is_trading_day(date(2026, 1, 2)) == True（正常交易日）",
+    "synapse/core/market/semantics.py 存在且包含 price_limit()",
+    "price_limit('主板') == Decimal('0.10')",
+    "synapse/core/market/data_loader.py 存在且包含 load_daily()",
+    "tests/unit/test_calendar.py 存在且 pytest 通过",
+    "tests/unit/test_semantics.py 存在且 pytest 通过",
+    "tests/unit/test_data_loader.py 存在且 pytest 通过"
+  ],
+  "complexity": "medium",
+  "estimated_minutes": 40,
+  "depends_on": ["TASK-001"],
+  "tags": ["core", "market", "calendar", "a-share", "data"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:36:00+08:00",
+  "tests_passed": 39
+}

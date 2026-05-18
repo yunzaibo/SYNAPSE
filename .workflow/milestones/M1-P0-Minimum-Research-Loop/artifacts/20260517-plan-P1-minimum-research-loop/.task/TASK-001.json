@@ -1,0 +1,52 @@
+{
+  "task_id": "TASK-001",
+  "title": "Project Skeleton + Error Registry",
+  "type": "setup",
+  "epic": "EPIC-001",
+  "wave": 1,
+  "size": "M",
+  "description": "Initialize SYNAPSE Python project with standard directory structure, pyproject.toml, and centralized error code registry.",
+  "read_first": [
+    "docs/04_contracts/06_Error_Codes.md",
+    "docs/06_delivery/Tasks/TASK-001_Project_Skeleton.md"
+  ],
+  "files": [
+    "pyproject.toml",
+    "synapse/__init__.py",
+    "synapse/core/__init__.py",
+    "synapse/core/errors.py",
+    "synapse/core/config.py",
+    "synapse/core/workspace.py",
+    "data/sample/.gitkeep",
+    "factors/.gitkeep",
+    "experiments/.gitkeep",
+    "backtests/.gitkeep",
+    "reports/.gitkeep",
+    "artifacts/.gitkeep",
+    "configs/default.yaml",
+    "tests/__init__.py",
+    "tests/unit/__init__.py",
+    "tests/integration/__init__.py"
+  ],
+  "action": "Create synapse/ Python package with: (1) pyproject.toml with dependencies: pandas, numpy, pyyaml, pytest; (2) synapse/core/errors.py with error code classes: DATA_MISSING_FIELD, DATA_INVALID_TIME_RANGE, DATA_AVAILABLE_AT_MISSING, FACTOR_INVALID_SPEC, FACTOR_COMPUTE_FAILED, EXPERIMENT_RECORD_MISSING, BACKTEST_CONFIG_INVALID, GOVERNANCE_LEAKAGE_RISK, AGENT_ACTION_NOT_ALLOWED, REPORT_ARTIFACT_MISSING; (3) synapse/core/config.py with YAML config loader; (4) synapse/core/workspace.py with project directory initialization; (5) Standard directories: data/sample/, factors/, experiments/, backtests/, reports/, artifacts/, configs/; (6) configs/default.yaml with project metadata template.",
+  "implementation": [
+    "Create pyproject.toml: name='synapse', version='0.1.0', requires-python='>=3.11', dependencies=['pandas>=2.0', 'numpy>=1.24', 'pyyaml>=6.0', 'pytest>=7.0']",
+    "Create synapse/core/errors.py: define SynapseError base class, each error code as a subclass with code string and default message matching docs/04_contracts/06_Error_Codes.md",
+    "Create synapse/core/config.py: load_config(path) function that reads YAML and returns dict, validate_config(config) that checks required keys",
+    "Create synapse/core/workspace.py: init_workspace(path) that creates standard directories, check_workspace(path) that verifies structure exists",
+    "Create configs/default.yaml with fields: project_name, domain (cross_sectional_equity), created_at, data_dir, factor_dir, experiment_dir"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T19:10:00Z",
+  "convergence": {
+    "criteria": [
+      "pyproject.toml contains 'name = \"synapse\"' and 'requires-python = \">=3.11\"'",
+      "synapse/core/errors.py contains 'class DATA_MISSING_FIELD' and 'class FACTOR_INVALID_SPEC'",
+      "pip install -e . exits 0",
+      "python -c 'from synapse.core.errors import DATA_MISSING_FIELD; print(DATA_MISSING_FIELD.code)' outputs DATA_MISSING_FIELD",
+      "configs/default.yaml contains 'domain: cross_sectional_equity'"
+    ]
+  },
+  "depends_on": [],
+  "estimated_minutes": 30
+}

@@ -1,0 +1,53 @@
+{
+  "id": "TASK-008",
+  "title": "CLI Entry Point",
+  "type": "implement",
+  "wave": "W5",
+  "description": "实现 synapse CLI 命令行入口，作为 Core Runtime 的 thin wrapper。支持 workspace 管理、每日研究、decision 录入等核心命令。",
+  "action": "创建 synapse/cli/ 目录。创建 main.py（CLI 入口，argparse/click）。实现命令：synapse init（初始化 workspace）、synapse research daily（每日研究）、synapse decision record（录入决策）、synapse review submit（提交回顾）、synapse workspace list/switch（workspace 管理）。",
+  "implementation": [
+    "main.py: CLI entry point, 注册所有子命令",
+    "init: synapse init [path] → 创建 workspace 目录结构 + synapse.yaml",
+    "research: synapse research daily [--date] → 执行每日研究流程",
+    "decision: synapse decision record --symbol --type --thesis → 录入决策",
+    "review: synapse review submit --decision-id --outcome → 提交回顾",
+    "workspace: synapse workspace list → 列出所有 workspace",
+    "workspace: synapse workspace switch <name> → 切换 active workspace",
+    "CLI = thin wrapper，所有逻辑在 core/ 层实现",
+    "pyproject.toml 配置 console_scripts entry point"
+  ],
+  "read_first": [
+    "synapse/core/workspace.py",
+    "synapse/core/workflow/daily_research.py",
+    "synapse/core/workflow/decision_flow.py",
+    "pyproject.toml"
+  ],
+  "files": [
+    "synapse/cli/__init__.py",
+    "synapse/cli/main.py",
+    "synapse/cli/commands/__init__.py",
+    "synapse/cli/commands/init.py",
+    "synapse/cli/commands/research.py",
+    "synapse/cli/commands/decision.py",
+    "synapse/cli/commands/review.py",
+    "synapse/cli/commands/workspace.py",
+    "tests/unit/test_cli.py"
+  ],
+  "convergence.criteria": [
+    "synapse/cli/main.py 存在且可导入",
+    "synapse init --help 不报错",
+    "synapse research --help 不报错",
+    "synapse decision --help 不报错",
+    "synapse review --help 不报错",
+    "synapse workspace --help 不报错",
+    "pyproject.toml 包含 console_scripts 配置",
+    "tests/unit/test_cli.py 存在且 pytest 通过"
+  ],
+  "complexity": "medium",
+  "estimated_minutes": 35,
+  "depends_on": ["TASK-007"],
+  "tags": ["cli", "entry-point", "commands"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:45:00+08:00",
+  "tests_passed": 18
+}

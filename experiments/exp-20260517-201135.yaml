@@ -1,0 +1,15 @@
+artifacts: []
+completed_at: '2026-05-17T20:11:35.521389'
+created_by: ai
+data_version: sample-prices
+experiment_id: exp-20260517-201135
+factor_version: '1.0'
+model_version: ''
+name: Momentum-20d Backtest
+parameters:
+  slippage_bps: 5
+  transaction_cost_bps: 10
+research_task_id: ''
+split_method: ''
+started_at: '2026-05-17T20:11:35.517381'
+status: failed

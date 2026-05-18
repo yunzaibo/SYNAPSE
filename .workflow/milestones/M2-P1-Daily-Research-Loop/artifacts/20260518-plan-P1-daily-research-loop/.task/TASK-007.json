@@ -1,0 +1,48 @@
+{
+  "id": "TASK-007",
+  "title": "Research Workflow (Watchlist + Decision + Review)",
+  "type": "implement",
+  "wave": "W5",
+  "description": "实现研究工作流：每日 watchlist 生成流程、Decision 录入流程、Review 提交流程。串联 schemas + loader + projection + market semantics。",
+  "action": "创建 synapse/core/workflow/ 目录。创建 daily_research.py（每日研究流程编排）。创建 decision_flow.py（Decision 录入 → Position rebuild → Activity log）。创建 review_flow.py（Review 提交 → signal evaluation → Activity log）。创建 activity.py 完善（连接 workflow events）。",
+  "implementation": [
+    "daily_research.py: run_daily_research(date) → DailyResearchResult",
+    "daily_research.py: Step1: load events/signals → Step2: generate watchlist → Step3: index → Step4: log activity",
+    "decision_flow.py: record_decision(decision_data) → Decision",
+    "decision_flow.py: record_decision → validate → save → rebuild position → log activity",
+    "review_flow.py: submit_review(review_data) → Review",
+    "review_flow.py: submit_review → validate → save → log activity",
+    "activity_log: workflow 完成后写入 activity.jsonl (watchlist.generated / decision.recorded / review.completed)",
+    "所有 workflow 步骤通过 activity log 记录执行轨迹"
+  ],
+  "read_first": [
+    "docs/04_contracts/01_Research_Object_Schema.md",
+    "docs/05_governance/ADR/ADR-010-Activity-Taxonomy.md",
+    "synapse/core/activity.py",
+    "synapse/core/projection/position_rebuilder.py",
+    "synapse/core/projection/watchlist_generator.py"
+  ],
+  "files": [
+    "synapse/core/workflow/__init__.py",
+    "synapse/core/workflow/daily_research.py",
+    "synapse/core/workflow/decision_flow.py",
+    "synapse/core/workflow/review_flow.py",
+    "tests/unit/test_workflow.py"
+  ],
+  "convergence.criteria": [
+    "synapse/core/workflow/daily_research.py 存在且包含 run_daily_research()",
+    "run_daily_research() 调用 generate_daily() 生成 watchlist",
+    "synapse/core/workflow/decision_flow.py 存在且包含 record_decision()",
+    "record_decision() 触发 position rebuild",
+    "synapse/core/workflow/review_flow.py 存在且包含 submit_review()",
+    "所有 workflow 完成后写入 activity.jsonl",
+    "tests/unit/test_workflow.py 存在且 pytest 通过"
+  ],
+  "complexity": "high",
+  "estimated_minutes": 50,
+  "depends_on": ["TASK-003", "TASK-004", "TASK-005"],
+  "tags": ["core", "workflow", "daily-research", "decision", "review"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:40:00+08:00",
+  "tests_passed": 13
+}

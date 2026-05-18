@@ -1,0 +1,46 @@
+{
+  "id": "TASK-001",
+  "title": "Workspace + Storage 基础设施",
+  "type": "implement",
+  "wave": "W1",
+  "description": "建立 P1 workspace 目录结构、canonical storage rules、config 架构。包含 Workspace + Global Vault 混合模型的完整实现。",
+  "action": "创建 synapse/core/workspace_v2.py（或重构 workspace.py），实现：(1) System Layer ~/.synapse/ 目录初始化 (2) Workspace Layer 目录初始化（thesis/decisions/watchlists/positions/events/reports/artifacts/attachments/snapshots/.index/）(3) synapse.yaml workspace config 加载 (4) config.toml global config 加载 (5) workspace 列表和切换。同时创建 synapse/core/config_v2.py 支持 TOML 全局配置 + YAML workspace 配置。",
+  "implementation": [
+    "重构 synapse/core/workspace.py → workspace_v2.py，保留旧接口兼容",
+    "Workspace 目录结构：thesis/ decisions/ watchlists/ positions/ events/ reports/ artifacts/ attachments/ snapshots/ .index/",
+    "synapse.yaml 加载：schema_version, workspace_name, research_preferences, signal_preferences, ai_behavior",
+    "config.toml 加载：sidecar.path, sidecar.heartbeat_interval, logging.level, workspace.default_path",
+    "workspace 列表：扫描 ~/SYNAPSE-Workspaces/ 下所有包含 synapse.yaml 的目录",
+    "workspace 切换：设置 active workspace，更新 global config",
+    "TOML 用 tomli/tomllib（Python 3.11+ 内置 tomllib）",
+    "YAML 用现有 pyyaml"
+  ],
+  "read_first": [
+    "synapse/core/workspace.py",
+    "synapse/core/config.py",
+    "configs/default.yaml",
+    "docs/04_contracts/01_Research_Object_Schema.md"
+  ],
+  "files": [
+    "synapse/core/workspace_v2.py",
+    "synapse/core/config_v2.py",
+    "tests/unit/test_workspace_v2.py",
+    "tests/unit/test_config_v2.py"
+  ],
+  "convergence.criteria": [
+    "synapse/core/workspace_v2.py 存在且包含 class WorkspaceManager",
+    "WorkspaceManager.init_workspace() 创建 thesis/ decisions/ watchlists/ positions/ events/ reports/ artifacts/ attachments/ snapshots/ .index/ 目录",
+    "WorkspaceManager.load_workspace_config() 读取 synapse.yaml 并返回 dict",
+    "synapse/core/config_v2.py 存在且包含 class GlobalConfig",
+    "GlobalConfig.load() 读取 config.toml 并返回结构化对象",
+    "tests/unit/test_workspace_v2.py 存在且 pytest 通过",
+    "tests/unit/test_config_v2.py 存在且 pytest 通过"
+  ],
+  "complexity": "medium",
+  "estimated_minutes": 45,
+  "depends_on": [],
+  "tags": ["core", "storage", "config"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:02:00+08:00",
+  "tests_passed": 19
+}

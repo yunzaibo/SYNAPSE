@@ -1,0 +1,140 @@
+{
+  "version": "2.0",
+  "project_name": "SYNAPSE",
+  "status": "completed",
+  "current_milestone": null,
+  "current_task_id": null,
+  "milestones": [
+    {
+      "id": "M1-P0-Minimum-Research-Loop",
+      "name": "P0 Minimum Research Loop",
+      "phases": [
+        {
+          "id": 1,
+          "name": "P0 Minimum Research Loop",
+          "status": "completed",
+          "epics": ["EPIC-001", "EPIC-002", "EPIC-003", "EPIC-004", "EPIC-005", "EPIC-006", "EPIC-007"]
+        }
+      ]
+    },
+    {
+      "id": "M2-P1-Daily-Research-Loop",
+      "name": "P1 Daily Research Loop",
+      "phases": [
+        {
+          "id": 1,
+          "name": "P1 Daily Research Loop",
+          "status": "completed",
+          "epics": ["EPIC-008", "EPIC-009", "EPIC-010"]
+        }
+      ]
+    }
+  ],
+  "artifacts": [],
+  "last_updated": "2026-05-18T13:00:00+08:00",
+  "accumulated_context": {
+    "key_decisions": [
+      "ADR-001: Research-first instead of Agent-first",
+      "ADR-002: Initial Alpha Domain = Cross-sectional Equity Factors",
+      "ADR-003: Build From Scratch vs Fork PnLClaw",
+      "ADR-004: Research Governance Is First-class",
+      "ADR-005: Initial Market Domain = China A-Shares (Accepted 2026-05-17)",
+      "ADR-006: Why SYNAPSE Chooses China A-Shares + Event-driven (Accepted 2026-05-17)",
+      "ADR-007: Security Identity (Accepted 2026-05-18)",
+      "ADR-008: Temporal Semantics (Accepted 2026-05-18)",
+      "ADR-009: Projection Rebuild Rules (Accepted 2026-05-18)",
+      "ADR-010: Activity Taxonomy (Accepted 2026-05-18)",
+      "ADR-011: AI Mutation Boundaries (Accepted 2026-05-18)"
+    ],
+    "blockers": [],
+    "deferred": [
+      "Real trading / broker integration",
+      "Multi-agent orchestration (P4)",
+      "Full web UI",
+      "RAG system (P3)",
+      "Cloud backend",
+      "NLP system (P3)",
+      "News crawler (out of scope)",
+      "Knowledge graph (out of scope)",
+      "Purging/embarkment",
+      "Walk-forward validation",
+      "Mutual information",
+      "SHAP consistency",
+      "Factor library",
+      "Research memory"
+    ]
+  },
+  "transition_history": [],
+  "milestone_history": [
+    {
+      "id": "M1-P0-Minimum-Research-Loop",
+      "name": "P0 Minimum Research Loop",
+      "status": "completed",
+      "completed_at": "2026-05-17T20:50:00Z",
+      "archive_path": ".workflow/milestones/M1-P0-Minimum-Research-Loop/",
+      "archived_artifacts": [
+        {
+          "type": "PLN",
+          "id": "PLN-001",
+          "name": "P1 Minimum Research Loop Plan",
+          "path": ".workflow/scratch/20260517-plan-P1-minimum-research-loop/plan.json",
+          "phase": 1,
+          "created_at": "2026-05-17T18:40:00Z",
+          "status": "approved"
+        },
+        {
+          "type": "EXC",
+          "id": "EXC-001",
+          "name": "P1 Execution Complete",
+          "phase": 1,
+          "path": ".workflow/scratch/20260517-plan-P1-minimum-research-loop",
+          "status": "completed",
+          "depends_on": "PLN-001",
+          "created_at": "2026-05-17T20:35:00Z",
+          "completed_at": "2026-05-17T20:35:00Z"
+        }
+      ]
+    },
+    {
+      "id": "M2-P1-Daily-Research-Loop",
+      "name": "P1 Daily Research Loop",
+      "status": "completed",
+      "completed_at": "2026-05-18T13:00:00+08:00",
+      "archive_path": ".workflow/milestones/M2-P1-Daily-Research-Loop/",
+      "archived_artifacts": [
+        {
+          "type": "PLN",
+          "id": "PLN-P1-001",
+          "name": "P1 Daily Research Loop Plan",
+          "path": ".workflow/scratch/20260518-plan-P1-daily-research-loop/plan.json",
+          "phase": 1,
+          "created_at": "2026-05-18T11:53:00+08:00",
+          "status": "approved"
+        },
+        {
+          "type": "EXC",
+          "id": "EXC-P1-001",
+          "name": "P1 Execution Complete",
+          "path": ".workflow/scratch/20260518-plan-P1-daily-research-loop",
+          "phase": 1,
+          "status": "completed",
+          "depends_on": "PLN-P1-001",
+          "created_at": "2026-05-18T12:45:00+08:00",
+          "completed_at": "2026-05-18T12:45:00+08:00",
+          "tests_passed": 369
+        },
+        {
+          "type": "VRF",
+          "id": "VRF-P1-001",
+          "name": "P1 Verification Complete",
+          "path": ".workflow/scratch/20260518-plan-P1-daily-research-loop/verification.json",
+          "phase": 1,
+          "status": "passed",
+          "depends_on": "EXC-P1-001",
+          "created_at": "2026-05-18T12:50:00+08:00",
+          "coverage_score": "100%"
+        }
+      ]
+    }
+  ]
+}

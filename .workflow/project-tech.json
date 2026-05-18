@@ -1,0 +1,127 @@
+{
+  "project_name": "SYNAPSE",
+  "initialized_at": "2026-05-18T14:00:00Z",
+  "overview": {
+    "description": "AI-native Quant Research OS for cross-sectional equity factor research",
+    "technology_stack": {
+      "languages": [
+        {
+          "name": "Python",
+          "file_count": 97,
+          "primary": true
+        }
+      ],
+      "frameworks": [
+        "pandas",
+        "numpy",
+        "pyyaml",
+        "scipy"
+      ],
+      "build_tools": [
+        "pip",
+        "setuptools",
+        "pyproject.toml"
+      ],
+      "test_frameworks": [
+        "pytest",
+        "pytest-cov"
+      ]
+    },
+    "architecture": {
+      "style": "Layered",
+      "layers": [
+        "core",
+        "schemas",
+        "projection",
+        "market",
+        "workflow",
+        "cli"
+      ],
+      "patterns": [
+        "dataclass",
+        "YAML round-trip",
+        "projection rebuild"
+      ]
+    },
+    "key_components": [
+      {
+        "name": "core.schemas",
+        "path": "synapse/core/schemas",
+        "description": "Data models for 9 research objects (Thesis, Decision, Review, Event, Position, Signal, Watchlist, Topic, Risk)",
+        "importance": "high"
+      },
+      {
+        "name": "core.projection",
+        "path": "synapse/core/projection",
+        "description": "Timeline, watchlist generation, position rebuilder, index manager for fast queries",
+        "importance": "high"
+      },
+      {
+        "name": "core.workflow",
+        "path": "synapse/core/workflow",
+        "description": "Daily research loop, decision flow, review flow orchestration",
+        "importance": "high"
+      },
+      {
+        "name": "factor",
+        "path": "synapse/factor",
+        "description": "Factor specification, compute engine, IC/RankIC audit",
+        "importance": "high"
+      },
+      {
+        "name": "backtest",
+        "path": "synapse/backtest",
+        "description": "Long-short quintile backtest engine with 8 metrics",
+        "importance": "high"
+      },
+      {
+        "name": "experiment",
+        "path": "synapse/experiment",
+        "description": "Experiment records with state machine lifecycle",
+        "importance": "high"
+      },
+      {
+        "name": "report",
+        "path": "synapse/report",
+        "description": "Markdown research report generator (10 sections)",
+        "importance": "medium"
+      },
+      {
+        "name": "cli",
+        "path": "synapse/cli",
+        "description": "CLI entry point with init, research, decision, review, workspace commands",
+        "importance": "medium"
+      },
+      {
+        "name": "core.market",
+        "path": "synapse/core/market",
+        "description": "Market calendar, data loader, semantics for A-share market",
+        "importance": "medium"
+      },
+      {
+        "name": "data",
+        "path": "synapse/data",
+        "description": "Dataset metadata, CSV/Parquet loader, validator",
+        "importance": "medium"
+      }
+    ]
+  },
+  "features": [],
+  "development_index": {
+    "feature": [],
+    "enhancement": [],
+    "bugfix": [],
+    "refactor": [],
+    "docs": []
+  },
+  "statistics": {
+    "total_features": 0,
+    "total_sessions": 0,
+    "last_updated": "2026-05-18T14:00:00Z"
+  },
+  "_metadata": {
+    "initialized_by": "cli-explore-agent",
+    "analysis_timestamp": "2026-05-18T14:00:00Z",
+    "analysis_mode": "deep-scan"
+  }
+}

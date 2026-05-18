@@ -1,0 +1,46 @@
+{
+  "id": "TASK-004",
+  "title": "File Naming + Revision Mechanism",
+  "type": "implement",
+  "wave": "W2",
+  "description": "实现文件命名规范、Thesis append-only revision 机制、object ID 生成。",
+  "action": "创建 synapse/core/naming.py 实现文件命名规则和 ID 生成。创建 synapse/core/revision.py 实现 Thesis append-only revision 管理（rev-001.md → rev-002.md）。确保文件路径用于导航，metadata 用于语义。",
+  "implementation": [
+    "naming.py: generate_id(prefix) → str (prefix + 6-char hex hash)",
+    "naming.py: thesis_dir(id, slug) → str, decision_dir(date, action, symbol) → str",
+    "naming.py: watchlist_filename(symbol, reason) → str, position_filename(market, symbol) → str",
+    "revision.py: create_revision(thesis_id, content) → RevisionResult",
+    "revision.py: get_current_revision(thesis_id) → RevisionInfo",
+    "revision.py: list_revisions(thesis_id) → list[RevisionInfo]",
+    "revision 文件命名: rev-001.md, rev-002.md... (append-only, never overwrite)",
+    "meta.yaml 始终指向最新版本 (current_revision: N)",
+    "ID 生成规则: 前缀 + 6位 hex (如 ths_7f8c91, dec_b4c5d6)"
+  ],
+  "read_first": [
+    "docs/04_contracts/01_Research_Object_Schema.md",
+    "docs/05_governance/ADR/ADR-011-AI-Mutation-Boundaries.md",
+    "synapse/core/workspace.py"
+  ],
+  "files": [
+    "synapse/core/naming.py",
+    "synapse/core/revision.py",
+    "tests/unit/test_naming.py",
+    "tests/unit/test_revision.py"
+  ],
+  "convergence.criteria": [
+    "synapse/core/naming.py 存在且包含 generate_id() 函数",
+    "generate_id('ths') 返回以 'ths_' 开头、总长度 10 的字符串",
+    "thesis_dir('ths_7f8c91', 'consumer-recovery') 返回 'ths_7f8c91_consumer-recovery'",
+    "synapse/core/revision.py 存在且包含 create_revision() 函数",
+    "create_revision() 创建 rev-001.md 文件并更新 meta.yaml",
+    "tests/unit/test_naming.py 存在且 pytest 通过",
+    "tests/unit/test_revision.py 存在且 pytest 通过"
+  ],
+  "complexity": "medium",
+  "estimated_minutes": 30,
+  "depends_on": ["TASK-001", "TASK-002"],
+  "tags": ["core", "naming", "revision", "file-system"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:30:00+08:00",
+  "tests_passed": 31
+}

@@ -1,0 +1,9 @@
+project_name: synapse
+domain: cross_sectional_equity
+created_at: "2026-01-01"
+data_dir: data/
+factor_dir: factors/
+experiment_dir: experiments/
+backtest_dir: backtests/
+report_dir: reports/
+artifact_dir: artifacts/

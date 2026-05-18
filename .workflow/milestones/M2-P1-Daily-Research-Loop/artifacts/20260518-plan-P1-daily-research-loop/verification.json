@@ -1,0 +1,87 @@
+{
+  "plan_id": "PLN-P1-001",
+  "verified_at": "2026-05-18T12:50:00+08:00",
+  "verifier": "workflow-verifier",
+  "status": "passed",
+  "must_haves": {
+    "truths": [
+      {"claim": "WorkspaceManager creates 10 standard directories", "status": "verified", "evidence": "test_workspace_v2.py:13 tests pass"},
+      {"claim": "GlobalConfig loads TOML config", "status": "verified", "evidence": "test_config_v2.py:6 tests pass"},
+      {"claim": "SecurityIdentity format cn.sh.600519", "status": "verified", "evidence": "test_identity.py:10 tests pass"},
+      {"claim": "TemporalContext with event/market/processing time", "status": "verified", "evidence": "test_temporal.py:11 tests pass"},
+      {"claim": "ActivityLog writes JSONL with forbidden type check", "status": "verified", "evidence": "test_activity.py:20 tests pass"},
+      {"claim": "9 research object schemas as dataclasses", "status": "verified", "evidence": "test_schemas.py:26 tests pass"},
+      {"claim": "YAML loader with auto-detection", "status": "verified", "evidence": "test_loader.py:25 tests pass"},
+      {"claim": "Schema validation for required fields", "status": "verified", "evidence": "test_validation.py:14 tests pass"},
+      {"claim": "File naming: ths_<id>_<slug>, dec_<date>_<action>_<symbol>", "status": "verified", "evidence": "test_naming.py:14 tests pass"},
+      {"claim": "Thesis append-only revision (rev-001.md → rev-002.md)", "status": "verified", "evidence": "test_revision.py:17 tests pass"},
+      {"claim": "Position rebuild from Decision changes", "status": "verified", "evidence": "test_projection.py:23 tests pass"},
+      {"claim": "Watchlist daily regeneration (not incremental)", "status": "verified", "evidence": "test_projection.py:TestWatchlistGenerator::test_daily_fresh_not_incremental PASSED"},
+      {"claim": "Timeline append-only rendering", "status": "verified", "evidence": "test_projection.py:TestTimeline tests pass"},
+      {"claim": "SQLite index for object queries", "status": "verified", "evidence": "test_projection.py:TestIndexManager tests pass"},
+      {"claim": "China A-share trading calendar with holidays 2024-2026", "status": "verified", "evidence": "test_calendar.py:17 tests pass"},
+      {"claim": "Price limits: main 10%, GEM/STAR 20%, ST 5%", "status": "verified", "evidence": "test_semantics.py:16 tests pass"},
+      {"claim": "T+1 settlement validation", "status": "verified", "evidence": "test_semantics.py:TestT1Settlement tests pass"},
+      {"claim": "Local CSV/Parquet data loading", "status": "verified", "evidence": "test_data_loader.py:6 tests pass"},
+      {"claim": "Daily research workflow with activity logging", "status": "verified", "evidence": "test_workflow.py:13 tests pass"},
+      {"claim": "Decision recording triggers position rebuild", "status": "verified", "evidence": "test_workflow.py:TestDecisionFlow tests pass"},
+      {"claim": "Review submission with signal evaluation", "status": "verified", "evidence": "test_workflow.py:TestReviewFlow tests pass"},
+      {"claim": "CLI: synapse init/research/decision/review/workspace", "status": "verified", "evidence": "test_cli.py:18 tests pass"}
+    ],
+    "artifacts": [
+      {"path": "synapse/core/workspace_v2.py", "status": "exists", "substantive": true, "size": "3807 bytes"},
+      {"path": "synapse/core/config_v2.py", "status": "exists", "substantive": true, "size": "1910 bytes"},
+      {"path": "synapse/core/identity.py", "status": "exists", "substantive": true, "size": "1810 bytes"},
+      {"path": "synapse/core/temporal.py", "status": "exists", "substantive": true, "size": "4071 bytes"},
+      {"path": "synapse/core/activity.py", "status": "exists", "substantive": true, "size": "4759 bytes"},
+      {"path": "synapse/core/schemas/base.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/schemas/thesis.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/loader.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/validation.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/naming.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/revision.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/projection/position_rebuilder.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/projection/watchlist_generator.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/projection/timeline.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/projection/index_manager.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/market/calendar.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/market/semantics.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/market/data_loader.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/workflow/daily_research.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/workflow/decision_flow.py", "status": "exists", "substantive": true},
+      {"path": "synapse/core/workflow/review_flow.py", "status": "exists", "substantive": true},
+      {"path": "synapse/cli/main.py", "status": "exists", "substantive": true}
+    ],
+    "key_links": [
+      {"from": "workflow/daily_research -> watchlist_generator", "status": "wired"},
+      {"from": "workflow/decision_flow -> position_rebuilder", "status": "wired"},
+      {"from": "workflow/review_flow -> activity", "status": "wired"},
+      {"from": "projection/position_rebuilder -> schemas/decision", "status": "wired"},
+      {"from": "projection/watchlist_generator -> schemas/watchlist", "status": "wired"},
+      {"from": "loader -> schemas", "status": "wired"},
+      {"from": "cli/main -> commands", "status": "wired"},
+      {"from": "cli/commands/research -> workflow", "status": "wired"},
+      {"from": "cli/commands/decision -> workflow", "status": "wired"}
+    ]
+  },
+  "gaps": [],
+  "constraint_violations": [],
+  "antipatterns": [
+    {
+      "type": "placeholder_docstring",
+      "file": "synapse/core/market/data_loader.py",
+      "line": 82,
+      "description": "API loading function has 'placeholder' in docstring — by design (P1 uses local CSV/Parquet, API deferred)",
+      "severity": "info"
+    }
+  ],
+  "fix_plans": [],
+  "coverage_score": "100%",
+  "test_summary": {
+    "total_tests": 361,
+    "passed": 361,
+    "failed": 0,
+    "new_tests_p1": 249,
+    "pre_existing_tests": 112
+  }
+}

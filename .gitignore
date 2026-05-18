@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Workflow internal (keep structure, exclude active/scratch)
+.workflow/active/
+.workflow/scratch/
+.workflow/.spec/
+.workflow/milestones/
+.spec-workflow/
+tmp.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.key

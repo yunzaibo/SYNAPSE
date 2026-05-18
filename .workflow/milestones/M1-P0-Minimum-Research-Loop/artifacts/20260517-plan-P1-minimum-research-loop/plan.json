@@ -1,0 +1,58 @@
+{
+  "plan_id": "PLN-001",
+  "phase": 1,
+  "phase_name": "P0 Minimum Research Loop",
+  "milestone": "M1-P0-Minimum-Research-Loop",
+  "created_at": "2026-05-17T18:40:00Z",
+  "status": "planning",
+  "summary": "Complete factor research pipeline: project setup → data loading → factor definition/audit → experiment tracking → backtest → report → AI templates. 8 tasks in 4 waves, linear pipeline with governance-first design.",
+  "approach": "Incremental build following research lifecycle order. Each wave produces testable artifacts. Governance constraints (time-aware metadata, experiment preservation, explicit assumptions) embedded from Wave 1.",
+  "task_ids": ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005", "TASK-006", "TASK-007", "TASK-008"],
+  "task_count": 8,
+  "complexity": "moderate",
+  "waves": [
+    {
+      "wave": 1,
+      "label": "Foundation",
+      "task_ids": ["TASK-001"],
+      "goal": "Project skeleton + error registry",
+      "depends_on": []
+    },
+    {
+      "wave": 2,
+      "label": "Data Plane",
+      "task_ids": ["TASK-002"],
+      "goal": "Data loading with time-aware metadata validation",
+      "depends_on": [1]
+    },
+    {
+      "wave": 3,
+      "label": "Factor + Experiment",
+      "task_ids": ["TASK-003", "TASK-004"],
+      "goal": "Factor definition/audit + experiment tracking (parallel, no cross-dependency)",
+      "depends_on": [2]
+    },
+    {
+      "wave": 4,
+      "label": "Backtest + Report + AI",
+      "task_ids": ["TASK-005", "TASK-006", "TASK-007", "TASK-008"],
+      "goal": "Backtest engine, report generation, sample data/factor, AI templates (sequential chain: 005→006→008, 007 at end)",
+      "depends_on": [3]
+    }
+  ],
+  "confidence": {
+    "overall": 85,
+    "dimensions": {
+      "requirements_coverage": 90,
+      "task_quality": 85,
+      "dependency_correctness": 95,
+      "estimation_accuracy": 80,
+      "collision_safety": 100
+    },
+    "pressure_pass": "TASK-005 (Backtest) has highest complexity — verified read_first includes config model + metrics spec, convergence criteria are grep-verifiable, action includes concrete metric names",
+    "residual_risks": [
+      "IC/RankIC computation accuracy not validated against known benchmarks",
+      "Backtest engine is single-pass, not event-driven — may need re architecture in P1"
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "task_id": "TASK-007",
+  "title": "Sample Data + Factor + End-to-End Pipeline",
+  "type": "integration",
+  "epic": "EPIC-003",
+  "wave": 4,
+  "size": "M",
+  "description": "Create sample data, sample factor, and wire up the complete end-to-end pipeline: load data → define factor → audit → experiment → backtest → report.",
+  "read_first": [
+    "docs/02_product/03_MVP_Scope.md",
+    "docs/06_delivery/Test_Plans/P0_Test_Plan.md",
+    "synapse/data/loader.py",
+    "synapse/factor/compute.py",
+    "synapse/factor/audit.py",
+    "synapse/experiment/tracker.py",
+    "synapse/backtest/engine.py",
+    "synapse/report/generator.py"
+  ],
+  "files": [
+    "examples/run_sample_research.py",
+    "tests/integration/test_full_pipeline.py",
+    "data/sample/sample_prices.csv (reuse from TASK-002)",
+    "data/sample/sample_prices.yaml (reuse from TASK-002)",
+    "factors/sample_momentum.yaml (reuse from TASK-003)"
+  ],
+  "action": "Create examples/run_sample_research.py that demonstrates the complete P0 research loop: (1) load sample_prices.csv with metadata; (2) compute momentum-20d factor; (3) audit factor; (4) create experiment record; (5) run backtest with explicit costs (10 bps transaction, 5 bps slippage); (6) generate report.md; (7) print summary. Also create integration test that runs the same pipeline and verifies all artifacts exist.",
+  "implementation": [
+    "Create examples/run_sample_research.py: import all modules, follow the 7-step pipeline, save report to reports/sample-research-report.md",
+    "Create tests/integration/test_full_pipeline.py: test that runs full pipeline, asserts report exists, asserts experiment record exists, asserts backtest metrics are computed",
+    "Ensure data/sample/ files are complete and valid (reuse from TASK-002 if already created)",
+    "Ensure factors/sample_momentum.yaml is complete (reuse from TASK-003 if already created)"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T20:35:00Z",
+  "convergence": {
+    "criteria": [
+      "examples/run_sample_research.py exists and is executable",
+      "python examples/run_sample_research.py exits 0",
+      "reports/sample-research-report.md exists after running examples/run_sample_research.py",
+      "reports/sample-research-report.md contains '## Hypothesis' and '## Results' and '## Conclusion'",
+      "tests/integration/test_full_pipeline.py passes (pytest tests/integration/test_full_pipeline.py -v)"
+    ]
+  },
+  "depends_on": ["TASK-003", "TASK-004", "TASK-005", "TASK-006"],
+  "estimated_minutes": 45
+}

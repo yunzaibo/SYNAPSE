@@ -1,0 +1,61 @@
+{
+  "id": "TASK-003",
+  "title": "9 Research Object Schemas + Loaders + Validation",
+  "type": "implement",
+  "wave": "W2",
+  "description": "实现 9 个研究对象的 Python dataclass 定义、YAML loader/saver、schema validation。基于 01_Research_Object_Schema.md 中的完整 YAML schema。",
+  "action": "创建 synapse/core/schemas/ 目录，每个研究对象一个模块：watchlist.py, thesis.py, decision.py, review.py, position.py, signal.py, risk.py, event.py, topic.py。创建 synapse/core/schemas/base.py 定义公共字段和 lifecycle mixin。创建 synapse/core/loader.py 统一 YAML load/save。创建 synapse/core/validation.py 实现 schema validation。",
+  "implementation": [
+    "base.py: BaseSchema dataclass (id, schema_version, status, created_at, updated_at, source_type, created_by, market_context)",
+    "market_context: MarketContext dataclass (research_date, market_date, trading_session)",
+    "每个对象模块: 独立 dataclass，继承 BaseSchema，包含对象特有字段",
+    "loader.py: load_object(path) → BaseSchema, save_object(obj, path) → None, auto-detect type",
+    "validation.py: validate_object(obj) → ValidationResult, 必填字段检查, enum 值范围检查",
+    "Weak Schema + Lazy Upcast: schema_version 用于兼容性检查，不做全局 migration",
+    "所有 YAML 文件格式: UTF-8, YAML 1.2, 2-space indent",
+    "文件命名按 ADR 规则: ths_<id>_<slug>/, dec_<date>_<action>_<symbol>/, wl_<symbol>_<reason>.yaml"
+  ],
+  "read_first": [
+    "docs/04_contracts/01_Research_Object_Schema.md",
+    "docs/05_governance/ADR/ADR-007-Security-Identity.md",
+    "docs/05_governance/ADR/ADR-008-Temporal-Semantics.md",
+    "synapse/core/workspace.py"
+  ],
+  "files": [
+    "synapse/core/schemas/__init__.py",
+    "synapse/core/schemas/base.py",
+    "synapse/core/schemas/watchlist.py",
+    "synapse/core/schemas/thesis.py",
+    "synapse/core/schemas/decision.py",
+    "synapse/core/schemas/review.py",
+    "synapse/core/schemas/position.py",
+    "synapse/core/schemas/signal.py",
+    "synapse/core/schemas/risk.py",
+    "synapse/core/schemas/event.py",
+    "synapse/core/schemas/topic.py",
+    "synapse/core/loader.py",
+    "synapse/core/validation.py",
+    "tests/unit/test_schemas.py",
+    "tests/unit/test_loader.py",
+    "tests/unit/test_validation.py"
+  ],
+  "convergence.criteria": [
+    "synapse/core/schemas/base.py 存在且包含 class BaseSchema",
+    "synapse/core/schemas/thesis.py 存在且包含 class Thesis(BaseSchema)",
+    "Thesis dataclass 包含 title, thesis_statement, related_securities, evidence, confidence, parent_thesis_id, revision 字段",
+    "Decision dataclass 包含 ticker, decision_type, thesis, linked_thesis_id, key_risk, time_horizon 字段",
+    "synapse/core/loader.py 存在且包含 load_object() 和 save_object() 函数",
+    "synapse/core/validation.py 存在且包含 validate_object() 函数",
+    "所有 9 个对象模块存在且可导入",
+    "tests/unit/test_schemas.py 存在且 pytest 通过",
+    "tests/unit/test_loader.py 存在且 pytest 通过",
+    "tests/unit/test_validation.py 存在且 pytest 通过"
+  ],
+  "complexity": "high",
+  "estimated_minutes": 60,
+  "depends_on": ["TASK-001", "TASK-002"],
+  "tags": ["core", "schemas", "validation", "yaml"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:32:00+08:00",
+  "tests_passed": 65
+}

@@ -1,0 +1,41 @@
+{
+  "task_id": "TASK-004",
+  "title": "Experiment Plane — Record + Tracker + State Machine",
+  "type": "feature",
+  "epic": "EPIC-004",
+  "wave": 3,
+  "size": "M",
+  "description": "Implement experiment record tracking with full lineage. Records cannot be deleted, parameter changes create new records, AI changes are marked.",
+  "read_first": [
+    "docs/04_contracts/02_Experiment_Contract.md",
+    "docs/03_architecture/04_State_Machine.md",
+    "synapse/core/errors.py"
+  ],
+  "files": [
+    "synapse/experiment/__init__.py",
+    "synapse/experiment/record.py",
+    "synapse/experiment/tracker.py",
+    "tests/unit/test_experiment_record.py",
+    "tests/unit/test_experiment_tracker.py"
+  ],
+  "action": "Create synapse/experiment/ module: (1) ExperimentRecord dataclass with fields: experiment_id, name, research_task_id, data_version, factor_version, model_version, split_method, parameters, started_at, completed_at, status (draft/running/succeeded/failed), artifacts, created_by; (2) ExperimentTracker that creates records, updates status, prevents deletion (raises EXPERIMENT_DELETE_NOT_ALLOWED from error registry), creates new record on parameter change; (3) State machine for research task lifecycle.",
+  "implementation": [
+    "Create synapse/experiment/record.py: @dataclass ExperimentRecord with all contract fields, @dataclass ResearchTask with state machine (draft->planned->data_ready->factor_defined->audited->backtested->risk_reviewed->reported->archived), from_yaml/to_yaml",
+    "Create synapse/experiment/tracker.py: create_experiment(name, data_version, factor_version, parameters) -> ExperimentRecord, update_status(experiment_id, new_status, triggered_by), list_experiments(), delete_experiment() raises error (govanance: cannot delete)",
+    "Implement state machine transitions: validate_transition(current_state, new_state) using allowed_transitions dict",
+    "created_by field: support 'human', 'ai', 'mixed' values",
+    "Write tests: test_experiment_record.py (create, serialize, status tracking), test_experiment_tracker.py (create, update status, verify cannot delete)"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T19:45:00Z",
+  "convergence": {
+    "criteria": [
+      "synapse/experiment/record.py contains 'class ExperimentRecord' and 'class ResearchTask'",
+      "synapse/experiment/tracker.py contains 'def create_experiment(' and 'def update_status('",
+      "synapse/experiment/tracker.py contains 'delete_experiment' that raises error or returns error code",
+      "pytest tests/unit/test_experiment_record.py tests/unit/test_experiment_tracker.py both pass"
+    ]
+  },
+  "depends_on": ["TASK-002"],
+  "estimated_minutes": 45
+}

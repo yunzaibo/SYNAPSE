@@ -1,0 +1,49 @@
+{
+  "id": "TASK-002",
+  "title": "Security Identity + Temporal Semantics + Activity Log",
+  "type": "implement",
+  "wave": "W1",
+  "description": "实现 Composite Security Identity（cn.sse.600519 格式）、Temporal Semantics（event/processing/market time）、Activity Taxonomy（activity.jsonl）。",
+  "action": "创建 synapse/core/identity.py 实现 SecurityIdentity 数据类（security_id, ticker, symbol, exchange, market），支持格式 cn.{exchange}.{ticker}。创建 synapse/core/temporal.py 实现 TemporalContext 数据类（event_time, event_timezone, market_date, market_session, created_at, available_at, as_of_date, observed_at, ingested_at）。创建 synapse/core/activity.py 实现 ActivityLog 类，支持 append-only JSONL 写入，预定义 ActivityType 枚举。",
+  "implementation": [
+    "SecurityIdentity: security_id = f\"{market}.{exchange}.{ticker}\"，from_ticker() 工厂方法",
+    "TemporalContext: 所有时间字段，event_timezone 默认 Asia/Shanghai",
+    "ActivityLog: append(filename, type, obj_id, actor, summary)，JSONL 格式",
+    "ActivityType 枚举: thesis.created, thesis.revised, decision.recorded, review.completed, watchlist.generated, position.opened, position.closed, projection.rebuilt, workspace.indexed",
+    "Forbidden 类型检查: token.stream, llm.raw.reasoning, debug.spam 拒绝写入",
+    "所有 datetime 用 ISO 8601 格式"
+  ],
+  "read_first": [
+    "docs/05_governance/ADR/ADR-007-Security-Identity.md",
+    "docs/05_governance/ADR/ADR-008-Temporal-Semantics.md",
+    "docs/05_governance/ADR/ADR-010-Activity-Taxonomy.md",
+    "docs/04_contracts/01_Research_Object_Schema.md"
+  ],
+  "files": [
+    "synapse/core/identity.py",
+    "synapse/core/temporal.py",
+    "synapse/core/activity.py",
+    "tests/unit/test_identity.py",
+    "tests/unit/test_temporal.py",
+    "tests/unit/test_activity.py"
+  ],
+  "convergence.criteria": [
+    "synapse/core/identity.py 存在且包含 class SecurityIdentity",
+    "SecurityIdentity(\"CN_A\", \"SH\", \"600519\").security_id == \"cn.sh.600519\"",
+    "synapse/core/temporal.py 存在且包含 class TemporalContext",
+    "TemporalContext 包含 event_time, market_date, market_session, event_timezone 字段",
+    "synapse/core/activity.py 存在且包含 class ActivityLog",
+    "ActivityLog.append() 写入 JSONL 格式",
+    "ActivityType 枚举包含 thesis.created, decision.recorded, review.completed",
+    "tests/unit/test_identity.py 存在且 pytest 通过",
+    "tests/unit/test_temporal.py 存在且 pytest 通过",
+    "tests/unit/test_activity.py 存在且 pytest 通过"
+  ],
+  "complexity": "medium",
+  "estimated_minutes": 40,
+  "depends_on": [],
+  "tags": ["core", "identity", "temporal", "activity"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:06:00+08:00",
+  "tests_passed": 41
+}

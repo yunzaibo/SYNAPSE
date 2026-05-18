@@ -1,0 +1,47 @@
+{
+  "task_id": "TASK-003",
+  "title": "Factor Plane — Spec + Compute + Audit",
+  "type": "feature",
+  "epic": "EPIC-003",
+  "wave": 3,
+  "size": "L",
+  "description": "Implement factor definition, computation, and audit. Factor spec as YAML, compute factor values from data, audit with IC/RankIC/coverage/leakage risk.",
+  "read_first": [
+    "docs/04_contracts/03_Factor_Contract.md",
+    "docs/06_delivery/Tasks/TASK-004_Factor_Audit_MVP.md",
+    "docs/01_vision/02_Research_Philosophy.md",
+    "synapse/data/metadata.py"
+  ],
+  "files": [
+    "synapse/factor/__init__.py",
+    "synapse/factor/spec.py",
+    "synapse/factor/compute.py",
+    "synapse/factor/audit.py",
+    "factors/sample_momentum.yaml",
+    "tests/unit/test_factor_spec.py",
+    "tests/unit/test_factor_compute.py",
+    "tests/unit/test_factor_audit.py"
+  ],
+  "action": "Create synapse/factor/ module: (1) FactorSpec dataclass with fields: factor_id, name, description, domain, inputs, formula, frequency, direction, universe, created_by, version; (2) compute_factor(spec, data) that executes formula against DataFrame; (3) audit_factor(factor_values, returns) that computes coverage, missing_rate, IC, RankIC, leakage_risk; (4) Sample factor: factors/sample_momentum.yaml defining a simple 20-day momentum factor.",
+  "implementation": [
+    "Create synapse/factor/spec.py: @dataclass FactorSpec with all contract fields, from_yaml(path), to_yaml(path), compute_next_version(spec) that increments version",
+    "Create synapse/factor/compute.py: compute_factor(spec: FactorSpec, data: pd.DataFrame) -> pd.Series that evaluates spec.formula against data, handles missing values",
+    "Create synapse/factor/audit.py: audit_factor(factor_values: pd.Series, forward_returns: pd.Series) -> FactorAuditResult dataclass with: coverage, missing_rate, ic, rank_ic, leakage_risk, distribution_summary; use scipy.stats.spearmanr for RankIC, numpy corrcoef for IC",
+    "Create factors/sample_momentum.yaml: factor_id='momentum-20d', name='20-Day Momentum', formula='close / close.shift(20) - 1', frequency='daily', direction='positive'",
+    "Write tests: test_factor_spec.py (YAML roundtrip, version increment), test_factor_compute.py (compute against sample data), test_factor_audit.py (audit returns valid metrics)"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T19:45:00Z",
+  "convergence": {
+    "criteria": [
+      "synapse/factor/spec.py contains 'class FactorSpec'",
+      "synapse/factor/compute.py contains 'def compute_factor('",
+      "synapse/factor/audit.py contains 'def audit_factor(' and 'RankIC' or 'rank_ic'",
+      "synapse/factor/audit.py imports 'from scipy.stats import spearmanr' or uses equivalent rank correlation",
+      "factors/sample_momentum.yaml contains 'formula:' and 'direction:'",
+      "pytest tests/unit/test_factor_spec.py tests/unit/test_factor_compute.py tests/unit/test_factor_audit.py all pass"
+    ]
+  },
+  "depends_on": ["TASK-002"],
+  "estimated_minutes": 60
+}

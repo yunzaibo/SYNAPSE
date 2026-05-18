@@ -1,0 +1,41 @@
+{
+  "task_id": "TASK-006",
+  "title": "Report Plane — Markdown Generator",
+  "type": "feature",
+  "epic": "EPIC-006",
+  "wave": 4,
+  "size": "S",
+  "description": "Generate markdown research reports traceable to experiment artifacts. Report must link to all artifacts and include risk checklist.",
+  "read_first": [
+    "docs/04_contracts/05_Report_Contract.md",
+    "docs/06_delivery/Tasks/TASK-003_Backtest_MVP.md",
+    "synapse/experiment/record.py",
+    "synapse/backtest/metrics.py"
+  ],
+  "files": [
+    "synapse/report/__init__.py",
+    "synapse/report/generator.py",
+    "tests/unit/test_report_generator.py"
+  ],
+  "action": "Create synapse/report/generator.py: generate_report(experiment_record, factor_spec, audit_result, backtest_result) -> str (markdown). Report must include all 10 sections from contract: title, hypothesis, data, factor definition, validation method, experiment setup, results, risk review, conclusion, next experiments. Conclusion must use format: promising/weak/rejected/inconclusive with evidence, risks, next steps. Must link to artifact files.",
+  "implementation": [
+    "Create synapse/report/generator.py: generate_report() function that takes experiment, factor_spec, audit_result, backtest_result as inputs, returns markdown string",
+    "Report template: use f-strings or string.Template to build markdown sections",
+    "Risk review section: checklist of governance items (look-ahead bias, survivorship bias, transaction costs, etc.)",
+    "Artifact links: use relative paths to experiment/factor/backtest artifacts",
+    "Conclusion section: structured format with Evidence, Risks, Next steps, Human review required fields",
+    "Write test_report_generator.py: generate report from mock data, verify all sections present, verify artifact links"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T20:15:00Z",
+  "convergence": {
+    "criteria": [
+      "synapse/report/generator.py contains 'def generate_report('",
+      "python -c \"from synapse.report.generator import generate_report; print(generate_report(None, None, None, None))\" contains '## Hypothesis' and '## Results' and '## Risk Review' and '## Conclusion'",
+      "synapse/report/generator.py conclusion contains 'promising' or 'weak' or 'rejected' or 'inconclusive'",
+      "pytest tests/unit/test_report_generator.py passes"
+    ]
+  },
+  "depends_on": ["TASK-005"],
+  "estimated_minutes": 30
+}

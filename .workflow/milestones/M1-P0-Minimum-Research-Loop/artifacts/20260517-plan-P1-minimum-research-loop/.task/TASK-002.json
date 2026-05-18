@@ -1,0 +1,47 @@
+{
+  "task_id": "TASK-002",
+  "title": "Data Plane — Metadata Model + Loader + Validator",
+  "type": "feature",
+  "epic": "EPIC-002",
+  "wave": 2,
+  "size": "M",
+  "description": "Implement data loading with time-aware metadata validation. Load CSV/Parquet, validate against data contract, record available_at/as_of_date/revision_timestamp.",
+  "read_first": [
+    "docs/04_contracts/01_Data_Contract.md",
+    "docs/06_delivery/Tasks/TASK-002_Data_Plane_MVP.md",
+    "synapse/core/errors.py"
+  ],
+  "files": [
+    "synapse/data/__init__.py",
+    "synapse/data/metadata.py",
+    "synapse/data/loader.py",
+    "synapse/data/validator.py",
+    "tests/unit/test_data_metadata.py",
+    "tests/unit/test_data_loader.py",
+    "tests/unit/test_data_validator.py",
+    "data/sample/sample_prices.csv",
+    "data/sample/sample_prices.yaml"
+  ],
+  "action": "Create synapse/data/ module: (1) DatasetMetadata pydantic-like model (use dataclass) with fields: dataset_id, name, source, asset_class, frequency, start_date, end_date, timezone, available_at_policy, adjustment_policy, survivorship_policy, missing_value_policy, created_at; (2) load_dataset(data_path, metadata_path) that reads CSV/Parquet + YAML metadata; (3) validate_dataset(metadata) that checks required fields, returns list of errors; (4) Sample data: create data/sample/sample_prices.csv with 100 rows of fake stock data (date, ticker, close, volume) and matching YAML metadata.",
+  "implementation": [
+    "Create synapse/data/metadata.py: @dataclass DatasetMetadata with all contract fields, from_yaml(path) classmethod, to_yaml(path) method",
+    "Create synapse/data/loader.py: load_csv(path) -> DataFrame, load_parquet(path) -> DataFrame, load_dataset(data_path, metadata_path) -> tuple[DataFrame, DatasetMetadata]",
+    "Create synapse/data/validator.py: validate_metadata(metadata: DatasetMetadata) -> list[str] checking required fields, time range consistency",
+    "Create data/sample/sample_prices.csv: 100 rows, columns: date (2024-01-01 to 2024-05-10), ticker (AAPL/MSFT/GOOGL), close (random 100-200), volume (random 1M-10M)",
+    "Create data/sample/sample_prices.yaml: dataset_id='sample-prices', name='Sample Daily Prices', source='synthetic', asset_class='equity', frequency='daily', start_date='2024-01-01', end_date='2024-05-10', available_at_policy='end-of-day'"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T19:25:00Z",
+  "convergence": {
+    "criteria": [
+      "synapse/data/metadata.py contains 'class DatasetMetadata'",
+      "synapse/data/loader.py contains 'def load_dataset('",
+      "synapse/data/validator.py contains 'def validate_metadata('",
+      "python -c 'from synapse.data.metadata import DatasetMetadata; m = DatasetMetadata(dataset_id=\"test\", name=\"test\", source=\"test\", asset_class=\"equity\", frequency=\"daily\", start_date=\"2024-01-01\", end_date=\"2024-12-31\", timezone=\"UTC\", available_at_policy=\"eod\", adjustment_policy=\"none\", survivorship_policy=\"none\", missing_value_policy=\"drop\", created_at=\"2024-01-01\"); print(m.dataset_id)' outputs 'test'",
+      "python -c 'from synapse.data.loader import load_dataset; df, meta = load_dataset(\"data/sample/sample_prices.csv\", \"data/sample/sample_prices.yaml\"); print(len(df))' outputs '100'",
+      "tests/unit/test_data_metadata.py passes (pytest tests/unit/test_data_metadata.py -v)"
+    ]
+  },
+  "depends_on": ["TASK-001"],
+  "estimated_minutes": 45
+}

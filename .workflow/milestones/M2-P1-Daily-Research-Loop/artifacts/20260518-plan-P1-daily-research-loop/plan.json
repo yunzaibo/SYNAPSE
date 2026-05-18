@@ -1,0 +1,67 @@
+{
+  "id": "PLN-P1-001",
+  "phase": "P1",
+  "name": "P1 Daily Research Loop",
+  "slug": "daily-research-loop",
+  "created_at": "2026-05-18T00:00:00+08:00",
+  "summary": "从 factor research tool 转变为 daily investment research system。实现 9 个研究对象的完整 schema、存储层、投影引擎、市场语义、研究工作流。UI 部分等待设计后单独执行。",
+  "approach": "Wave-based: 先建存储基础（canonical rules + security identity + temporal），再建对象层（schema + loader + validation），再建投影层（position rebuild + watchlist + timeline），再建市场语义（calendar + data），最后建工作流（watchlist generation + decision recording）。GUI 延后。",
+  "task_ids": ["TASK-001", "TASK-002", "TASK-003", "TASK-004", "TASK-005", "TASK-006", "TASK-007", "TASK-008"],
+  "task_count": 8,
+  "complexity": "high",
+  "waves": [
+    {
+      "id": "W1",
+      "label": "Canonical Storage Layer",
+      "task_ids": ["TASK-001", "TASK-002"]
+    },
+    {
+      "id": "W2",
+      "label": "Object Schema + Loaders",
+      "task_ids": ["TASK-003", "TASK-004"]
+    },
+    {
+      "id": "W3",
+      "label": "Projection Engine + Index",
+      "task_ids": ["TASK-005"]
+    },
+    {
+      "id": "W4",
+      "label": "Market Semantics + Data",
+      "task_ids": ["TASK-006"]
+    },
+    {
+      "id": "W5",
+      "label": "Research Workflow + CLI",
+      "task_ids": ["TASK-007", "TASK-008"]
+    }
+  ],
+  "dependencies": {
+    "TASK-003": ["TASK-001", "TASK-002"],
+    "TASK-004": ["TASK-001", "TASK-002"],
+    "TASK-005": ["TASK-003", "TASK-004"],
+    "TASK-006": ["TASK-001"],
+    "TASK-007": ["TASK-003", "TASK-004", "TASK-005"],
+    "TASK-008": ["TASK-007"]
+  },
+  "excluded": [
+    "Tauri GUI frontend (pending UI design flow)",
+    "GenericAgent sidecar integration (P1 backend only, sidecar integration later)",
+    "Feishu/WeChat Bot (P2+)"
+  ],
+  "confidence": {
+    "overall": 0.78,
+    "dimensions": {
+      "requirements_coverage": 0.85,
+      "task_quality": 0.80,
+      "dependency_correctness": 0.90,
+      "estimation_accuracy": 0.70,
+      "collision_safety": 0.95
+    },
+    "pressure_pass": {
+      "task": "TASK-003",
+      "result": "pass",
+      "notes": "9 object schemas with full YAML definitions already documented in 01_Research_Object_Schema.md"
+    }
+  }
+}

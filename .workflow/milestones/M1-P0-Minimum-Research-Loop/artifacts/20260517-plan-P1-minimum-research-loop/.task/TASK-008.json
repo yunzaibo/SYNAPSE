@@ -1,0 +1,39 @@
+{
+  "task_id": "TASK-008",
+  "title": "AI Assistant — Prompt Templates",
+  "type": "feature",
+  "epic": "EPIC-007",
+  "wave": 4,
+  "size": "S",
+  "description": "Create prompt templates for research plan drafting, result explanation, report generation, and risk checklist. All templates respect agent boundary.",
+  "read_first": [
+    "docs/01_vision/02_Research_Philosophy.md",
+    "docs/03_architecture/02_Boundary.md",
+    "synapse/report/generator.py"
+  ],
+  "files": [
+    "synapse/agent/__init__.py",
+    "synapse/agent/prompts.py",
+    "tests/unit/test_prompts.py"
+  ],
+  "action": "Create synapse/agent/prompts.py with 4 prompt template functions: (1) draft_research_plan(hypothesis) -> str; (2) explain_results(experiment_record, audit_result, backtest_result) -> str; (3) draft_report(factor_spec, audit_result, backtest_result) -> str; (4) generate_risk_checklist(experiment_record) -> str. All outputs must include created_by: ai metadata note. Templates must NOT include trade execution, silent modification, or governance bypass instructions.",
+  "implementation": [
+    "Create synapse/agent/prompts.py: four functions returning formatted prompt strings",
+    "Each prompt includes context injection points (f-strings with experiment/factor/backtest data)",
+    "Each prompt includes system instruction: 'You are a research assistant. You must not execute trades, modify experiment records, or bypass governance checks.'",
+    "Risk checklist prompt covers: look-ahead bias, survivorship bias, transaction costs, overfitting, regime dependency, sample size",
+    "Write test_prompts.py: verify each function returns non-empty string, verify agent boundary instructions present"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T20:25:00Z",
+  "convergence": {
+    "criteria": [
+      "synapse/agent/prompts.py contains 'def draft_research_plan(' and 'def explain_results(' and 'def draft_report(' and 'def generate_risk_checklist('",
+      "synapse/agent/prompts.py contains 'must not execute trades' or 'must not modify experiment records'",
+      "synapse/agent/prompts.py contains 'created_by' and 'ai' in each template output",
+      "pytest tests/unit/test_prompts.py passes"
+    ]
+  },
+  "depends_on": ["TASK-006"],
+  "estimated_minutes": 20
+}

@@ -1,0 +1,48 @@
+{
+  "id": "TASK-005",
+  "title": "Projection Engine",
+  "type": "implement",
+  "wave": "W3",
+  "description": "实现 Position rebuild、Watchlist generation、Timeline rendering、SQLite index。Projections 从 canonical artifacts 计算，不手工编辑。",
+  "action": "创建 synapse/core/projection/ 目录。创建 position_rebuilder.py（event-triggered rebuild）。创建 watchlist_generator.py（daily regeneration）。创建 timeline.py（append-only rendering）。创建 index_manager.py（SQLite index，FileWatcher + lazy rebuild）。",
+  "implementation": [
+    "position_rebuilder.py: rebuild_from_decisions(decisions) → list[Position]",
+    "position_rebuilder.py: Decision.recorded → create/update Position; Decision.sold → close Position",
+    "watchlist_generator.py: generate_daily(events, signals, positions) → list[WatchlistEntry]",
+    "watchlist_generator.py: 每日重新生成（不增量更新）",
+    "timeline.py: render_timeline(thesis, decisions, reviews) → TimelineView",
+    "timeline.py: append-only rendering，不修改已有 timeline entries",
+    "index_manager.py: SQLite index at workspace/.index/workspace.db",
+    "index_manager.py: index_object(obj) → None, query_objects(filters) → list",
+    "所有 projections 从 canonical 计算，可删除重建（是 cache 不是 truth）"
+  ],
+  "read_first": [
+    "docs/05_governance/ADR/ADR-009-Projection-Rebuild-Rules.md",
+    "docs/04_contracts/01_Research_Object_Schema.md",
+    "synapse/core/workspace.py"
+  ],
+  "files": [
+    "synapse/core/projection/__init__.py",
+    "synapse/core/projection/position_rebuilder.py",
+    "synapse/core/projection/watchlist_generator.py",
+    "synapse/core/projection/timeline.py",
+    "synapse/core/projection/index_manager.py",
+    "tests/unit/test_projection.py"
+  ],
+  "convergence.criteria": [
+    "synapse/core/projection/position_rebuilder.py 存在且包含 rebuild_from_decisions()",
+    "synapse/core/projection/watchlist_generator.py 存在且包含 generate_daily()",
+    "synapse/core/projection/timeline.py 存在且包含 render_timeline()",
+    "synapse/core/projection/index_manager.py 存在且包含 SQLite 操作",
+    "Position rebuild 在 Decision 变化时触发",
+    "Watchlist 每日重新生成（不增量）",
+    "tests/unit/test_projection.py 存在且 pytest 通过"
+  ],
+  "complexity": "high",
+  "estimated_minutes": 60,
+  "depends_on": ["TASK-003", "TASK-004"],
+  "tags": ["core", "projection", "position", "watchlist", "timeline", "sqlite"],
+  "status": "completed",
+  "completed_at": "2026-05-18T12:35:00+08:00",
+  "tests_passed": 23
+}

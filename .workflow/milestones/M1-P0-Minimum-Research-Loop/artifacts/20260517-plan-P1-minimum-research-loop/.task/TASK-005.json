@@ -1,0 +1,45 @@
+{
+  "task_id": "TASK-005",
+  "title": "Backtest Plane — Config + Engine + Metrics",
+  "type": "feature",
+  "epic": "EPIC-005",
+  "wave": 4,
+  "size": "L",
+  "description": "Implement simple backtest with explicit cost assumptions and performance metrics. Single-pass simulation, not event-driven.",
+  "read_first": [
+    "docs/04_contracts/04_Backtest_Contract.md",
+    "docs/06_delivery/Tasks/TASK-003_Backtest_MVP.md",
+    "synapse/core/errors.py",
+    "synapse/factor/compute.py"
+  ],
+  "files": [
+    "synapse/backtest/__init__.py",
+    "synapse/backtest/config.py",
+    "synapse/backtest/engine.py",
+    "synapse/backtest/metrics.py",
+    "tests/unit/test_backtest_config.py",
+    "tests/unit/test_backtest_engine.py",
+    "tests/unit/test_backtest_metrics.py"
+  ],
+  "action": "Create synapse/backtest/ module: (1) BacktestConfig dataclass: universe, benchmark, start_date, end_date, rebalance_frequency, transaction_cost_bps (required), slippage_bps (required), position_limit; (2) BacktestEngine: run_backtest(factor_values, returns, config) -> BacktestResult; (3) BacktestMetrics: compute all 8 metrics from contract. Transaction cost must be explicit, not default to zero.",
+  "implementation": [
+    "Create synapse/backtest/config.py: @dataclass BacktestConfig with all contract fields, validate_config() that checks transaction_cost_bps is not None/zero without explicit setting",
+    "Create synapse/backtest/engine.py: BacktestEngine class with run_backtest(factor_values, forward_returns, config) -> BacktestResult; simple long-short portfolio: top quintile long, bottom quintile short, equal weight, monthly rebalance",
+    "Create synapse/backtest/metrics.py: compute_metrics(portfolio_returns, benchmark_returns) -> BacktestMetrics dataclass with: annual_return, volatility, sharpe (rf=0), max_drawdown, turnover, win_rate, excess_return, information_ratio",
+    "BacktestResult dataclass: config, metrics, trades, status (running/succeeded/failed)",
+    "Write tests for all three modules"
+  ],
+  "status": "completed",
+  "completed_at": "2026-05-17T20:05:00Z",
+  "convergence": {
+    "criteria": [
+      "synapse/backtest/config.py contains 'class BacktestConfig' and 'transaction_cost_bps'",
+      "synapse/backtest/engine.py contains 'def run_backtest(' or 'class BacktestEngine'",
+      "synapse/backtest/metrics.py contains 'def compute_metrics(' and 'sharpe' and 'max_drawdown' and 'turnover'",
+      "python -c 'from synapse.backtest.metrics import compute_metrics; import numpy as np; m = compute_metrics(np.random.randn(252)*0.01, np.random.randn(252)*0.005); print(m.sharpe)' runs without error",
+      "pytest tests/unit/test_backtest_config.py tests/unit/test_backtest_engine.py tests/unit/test_backtest_metrics.py all pass"
+    ]
+  },
+  "depends_on": ["TASK-003"],
+  "estimated_minutes": 60
+}

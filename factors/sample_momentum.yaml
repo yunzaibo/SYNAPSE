@@ -1,0 +1,12 @@
+factor_id: momentum-20d
+name: 20-Day Momentum
+description: Price momentum over the last 20 trading days
+domain: cross_sectional_equity
+inputs:
+  - close
+formula: "close / close.shift(20) - 1"
+frequency: daily
+direction: positive
+universe: sample-equity
+created_by: human
+version: "1.0"
