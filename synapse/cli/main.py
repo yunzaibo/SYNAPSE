@@ -8,7 +8,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from synapse.cli.commands import init, research, decision, review, workspace, analytics
+from synapse.cli.commands import init, research, decision, review, workspace, analytics, event
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -26,6 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     review.register(subparsers)
     workspace.register(subparsers)
     analytics.register(subparsers)
+    event.register(subparsers)
 
     return parser
 

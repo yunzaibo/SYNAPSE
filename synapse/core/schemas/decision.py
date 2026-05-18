@@ -76,6 +76,10 @@ class Decision(BaseSchema):
     # --- Signals ---
     signals: list[DecisionSignal] = field(default_factory=list)
 
+    # --- Event Reference (IMPL-007) ---
+    event_trigger_id: Optional[str] = None
+    event_influence_score: float = 0.0
+
     def to_dict(self) -> dict:
         d = super().to_dict()
         d.update({
@@ -90,6 +94,9 @@ class Decision(BaseSchema):
             "attention_origin": self.attention_origin.value,
             "linked_position_id": self.linked_position_id,
             "signals": [s.to_dict() for s in self.signals],
+            # Event reference fields
+            "event_trigger_id": self.event_trigger_id,
+            "event_influence_score": self.event_influence_score,
         })
         return d
 
@@ -109,4 +116,7 @@ class Decision(BaseSchema):
             attention_origin=AttentionOrigin(data.get("attention_origin", "event_attention")),
             linked_position_id=data.get("linked_position_id"),
             signals=[DecisionSignal.from_dict(s) for s in data.get("signals", [])],
+            # Event reference fields — Lazy Upcast defaults
+            event_trigger_id=data.get("event_trigger_id"),
+            event_influence_score=float(data.get("event_influence_score", 0.0)),
         )
