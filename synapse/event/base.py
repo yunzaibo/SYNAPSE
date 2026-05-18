@@ -17,7 +17,8 @@ class BaseDetector(ABC):
 
     Subclasses must implement:
     - detect(data) -> Optional[Event]
-    - event_type() -> str
+    - event_type() -> str (instance method)
+    - event_type(cls) -> str (classmethod)
     - confidence_score(data) -> float
     """
 
@@ -35,8 +36,9 @@ class BaseDetector(ABC):
         Event or None
         """
 
+    @classmethod
     @abstractmethod
-    def event_type(self) -> str:
+    def event_type(cls) -> str:
         """Return the event type string this detector handles.
 
         Must match one of the values in synapse.event.taxonomy.EVENT_TYPES.

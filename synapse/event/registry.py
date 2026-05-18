@@ -30,7 +30,7 @@ class DetectorRegistry:
     # ------------------------------------------------------------------
 
     def register(self, detector_cls: type[BaseDetector]) -> None:
-        """Register *detector_cls* by calling its event_type() on a dummy instance.
+        """Register *detector_cls* using its classmethod event_type().
 
         Parameters
         ----------
@@ -48,8 +48,7 @@ class DetectorRegistry:
             raise TypeError(
                 f"{detector_cls!r} is not a subclass of BaseDetector"
             )
-        instance = detector_cls()
-        etype = instance.event_type()
+        etype = detector_cls.event_type()
         if not etype:
             raise ValueError(
                 f"{detector_cls.__name__}.event_type() returned an empty string"

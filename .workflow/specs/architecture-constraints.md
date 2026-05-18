@@ -57,6 +57,11 @@ keywords:
 - [rule:doc] 复杂业务逻辑注释"为什么"而非"做什么"（Why-only 注释）
 - [rule:doc] 每个主要模块有自己的 README
 
+## Design Decisions (P3 Hardening)
+
+- [decision:abc] ABC 使用 @classmethod @abstractmethod 实现零成本类级别注册（避免创建临时实例）
+- [rule:cli] CLI 命令必须尽早验证目录/路径存在性（fail-fast 模式）
+
 ## Entries
 
 <spec-entry category="arch" keywords="ADR-005,ADR-006,China-A-shares,event-driven,sentiment,market-domain,roadmap" date="2026-05-17">

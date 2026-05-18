@@ -185,6 +185,10 @@ def run_detect(args: argparse.Namespace) -> int:
     """Execute event detection command."""
     data_dir = Path(args.data_dir)
 
+    if not data_dir.is_dir():
+        print(f"Error: data directory does not exist: {data_dir}", file=sys.stderr)
+        return 1
+
     # Build registry with all 6 detectors
     registry = DetectorRegistry()
     for cls in [
@@ -199,15 +203,14 @@ def run_detect(args: argparse.Namespace) -> int:
 
     # Load data files
     raw_objects: list[dict] = []
-    if data_dir.is_dir():
-        for yml_file in sorted(data_dir.glob("*.yaml")):
-            try:
-                with open(yml_file, encoding="utf-8") as f:
-                    data = yaml.safe_load(f)
-                if isinstance(data, dict):
-                    raw_objects.append(data)
-            except Exception:
-                continue
+    for yml_file in sorted(data_dir.glob("*.yaml")):
+        try:
+            with open(yml_file, encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+            if isinstance(data, dict):
+                raw_objects.append(data)
+        except Exception:
+            continue
 
     # Run detection
     all_events: list[Event] = []
@@ -244,7 +247,12 @@ def run_impact(args: argparse.Namespace) -> int:
         print(f"Error: Event {args.event_id} not found", file=sys.stderr)
         return 1
 
-    # Build a simple graph from events
+    # NOTE: Naive graph model -- this is a simplified placeholder, not a
+    # real persistence-backed graph.  Every event of the same type (e.g.
+    # two "earnings" events) will share the *same* synthetic thesis node
+    # (thesis_earnings), which collapses them onto a single downstream
+    # path.  A production implementation should resolve per-event thesis
+    # nodes from stored graph data rather than synthesising them here.
     graph = PropagationGraph()
     for event in events:
         graph.add_edge(

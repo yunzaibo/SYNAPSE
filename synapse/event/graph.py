@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from synapse.event.lifecycle import LifecycleState
+    from synapse.core.schemas.event import PropagationState
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ class PropagationGraph:
         self._in_edges: dict[str, list[PropagationEdge]] = {}
         self._nodes: set[str] = set()
         self._rejected_edges: list[tuple[str, str, str]] = []
-        self._node_states: dict[str, LifecycleState] = {}
+        self._node_states: dict[str, PropagationState] = {}
 
     # ------------------------------------------------------------------
     # Public API
@@ -270,12 +270,12 @@ class PropagationGraph:
     # Lifecycle state tracking
     # ------------------------------------------------------------------
 
-    def update_node_state(self, node_id: str, new_state: LifecycleState) -> None:
+    def update_node_state(self, node_id: str, new_state: PropagationState) -> None:
         """Update the lifecycle state of a node.
 
         Args:
             node_id: Node to update.
-            new_state: New LifecycleState value.
+            new_state: New PropagationState value.
 
         Raises:
             ValueError: If node_id is not in the graph.
@@ -284,16 +284,16 @@ class PropagationGraph:
             raise ValueError(f"Node {node_id!r} not in graph")
         self._node_states[node_id] = new_state
 
-    def get_node_state(self, node_id: str) -> Optional[LifecycleState]:
+    def get_node_state(self, node_id: str) -> Optional[PropagationState]:
         """Return lifecycle state of a node, or None if not tracked."""
         return self._node_states.get(node_id)
 
     def get_expired_nodes(self) -> list[str]:
         """Return sorted list of nodes in EXPIRED state."""
-        from synapse.event.lifecycle import LifecycleState as LS
+        from synapse.core.schemas.event import PropagationState as PS
 
         return sorted(
-            n for n, s in self._node_states.items() if s == LS.EXPIRED
+            n for n, s in self._node_states.items() if s == PS.EXPIRED
         )
 
     def apply_decay_to_edges(self, days: float) -> dict[str, float]:
@@ -359,8 +359,12 @@ class PropagationGraph:
     def _sorted_insert(queue: deque[str], value: str) -> None:
         """Insert value into a deque maintaining sorted order (for determinism).
 
-        Since deque doesn't support binary search, we linearly scan. The queue
-        is typically small (graph nodes), so this is acceptable.
+        Complexity: O(n) per call due to linear scan of the deque.  In the
+        topological-sort context the queue never exceeds the number of graph
+        nodes with zero in-degree, so linear insertion is acceptable for
+        typical graph sizes (< 10k nodes).  For very large graphs, consider
+        replacing the deque with a sorted container (e.g. ``sortedcontainers.SortedList``)
+        to achieve O(log n) insertion.
         """
         inserted = False
         temp: list[str] = []

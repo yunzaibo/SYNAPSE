@@ -44,7 +44,8 @@ class _EarningsDetector(BaseDetector):
             return _make_event(EventType.EARNINGS, "Earnings detected")
         return None
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "earnings"
 
     def confidence_score(self, data: dict) -> float:
@@ -59,7 +60,8 @@ class _PolicyDetector(BaseDetector):
             return _make_event(EventType.POLICY, "Policy detected")
         return None
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "policy"
 
     def confidence_score(self, data: dict) -> float:
@@ -74,7 +76,8 @@ class _SentimentDetector(BaseDetector):
             return _make_event(EventType.SENTIMENT, "Sentiment detected")
         return None
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "sentiment"
 
     def confidence_score(self, data: dict) -> float:
@@ -243,6 +246,20 @@ class TestConcreteDetectors:
         event = detector.detect({"mainforce_flow": 1_500_000.0})
         assert event is not None
         assert event.event_type == EventType.CAPITAL_FLOW
+
+    def test_corporate_action_detector_fires(self):
+        """CorporateActionDetector returns Event when action_type is 'dividend'."""
+        detector = CorporateActionDetector()
+        event = detector.detect({"action_type": "dividend"})
+        assert event is not None
+        assert event.event_type == EventType.CORPORATE_ACTION
+        assert "dividend" in event.title
+        assert event.confidence == 0.85
+
+    def test_corporate_action_detector_none(self):
+        """CorporateActionDetector returns None for unrelated data."""
+        detector = CorporateActionDetector()
+        assert detector.detect({"foo": "bar"}) is None
 
 
 # ---------------------------------------------------------------------------

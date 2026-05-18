@@ -39,7 +39,8 @@ class EarningsDetector(BaseDetector):
 
     _REPORT_TYPES = {"Q1", "Q2", "Q3", "Q4"}
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "earnings"
 
     def detect(self, data: dict) -> Optional[Event]:
@@ -101,7 +102,8 @@ class PolicyDetector(BaseDetector):
         "fiscal_stimulus", "csrc_rule",
     }
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "policy"
 
     def detect(self, data: dict) -> Optional[Event]:
@@ -149,7 +151,8 @@ class SentimentDetector(BaseDetector):
     - dragon_tiger_count (int > 0)
     """
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "sentiment"
 
     def detect(self, data: dict) -> Optional[Event]:
@@ -203,7 +206,8 @@ class ThemeDetector(BaseDetector):
     - concept_sector (non-empty string)
     """
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "theme"
 
     def detect(self, data: dict) -> Optional[Event]:
@@ -253,7 +257,8 @@ class CapitalFlowDetector(BaseDetector):
     - etf_net_inflow (float, non-zero)
     """
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "capital_flow"
 
     def detect(self, data: dict) -> Optional[Event]:
@@ -309,7 +314,8 @@ class CorporateActionDetector(BaseDetector):
         "ma_restructuring", "buyback",
     }
 
-    def event_type(self) -> str:
+    @classmethod
+    def event_type(cls) -> str:
         return "corporate_action"
 
     def detect(self, data: dict) -> Optional[Event]:
@@ -347,7 +353,7 @@ def _extract_date(data: dict) -> Optional[date]:
         if isinstance(val, str):
             try:
                 return date.fromisoformat(val)
-            except (ValueError, TypeError):
+            except ValueError:
                 continue
         if isinstance(val, date):
             return val

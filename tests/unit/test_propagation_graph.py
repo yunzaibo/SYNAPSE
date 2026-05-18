@@ -250,41 +250,41 @@ class TestDeterminism:
 class TestLifecycle:
     def test_valid_transition(self):
         """DETECTED -> PROPAGATING -> SETTLED is a valid path."""
-        from synapse.event.lifecycle import LifecycleState, PropagationLifecycle
+        from synapse.event.lifecycle import PropagationState, PropagationLifecycle
 
         lc = PropagationLifecycle("evt-1")
-        assert lc.get_state() == LifecycleState.DETECTED
+        assert lc.get_state() == PropagationState.DETECTED
 
-        lc.transition(LifecycleState.PROPAGATING)
-        assert lc.get_state() == LifecycleState.PROPAGATING
+        lc.transition(PropagationState.PROPAGATING)
+        assert lc.get_state() == PropagationState.PROPAGATING
 
-        lc.transition(LifecycleState.SETTLED)
-        assert lc.get_state() == LifecycleState.SETTLED
+        lc.transition(PropagationState.SETTLED)
+        assert lc.get_state() == PropagationState.SETTLED
 
     def test_invalid_transition_raises(self):
         """DETECTED -> SETTLED is not allowed; must go through PROPAGATING."""
-        from synapse.event.lifecycle import LifecycleState, PropagationLifecycle
+        from synapse.event.lifecycle import PropagationState, PropagationLifecycle
 
         lc = PropagationLifecycle("evt-2")
         with pytest.raises(ValueError, match="Invalid transition"):
-            lc.transition(LifecycleState.SETTLED)
+            lc.transition(PropagationState.SETTLED)
 
     def test_state_history_tracked(self):
         """After 3 transitions, history contains 3 entries (plus the initial)."""
-        from synapse.event.lifecycle import LifecycleState, PropagationLifecycle
+        from synapse.event.lifecycle import PropagationState, PropagationLifecycle
 
         lc = PropagationLifecycle("evt-3")
-        lc.transition(LifecycleState.PROPAGATING)
-        lc.transition(LifecycleState.SETTLED)
-        lc.transition(LifecycleState.EXPIRED)
+        lc.transition(PropagationState.PROPAGATING)
+        lc.transition(PropagationState.SETTLED)
+        lc.transition(PropagationState.EXPIRED)
 
         history = lc.get_state_history()
         # Initial DETECTED + 3 transitions = 4 entries
         assert len(history) == 4
-        assert history[0][0] == LifecycleState.DETECTED
-        assert history[1][0] == LifecycleState.PROPAGATING
-        assert history[2][0] == LifecycleState.SETTLED
-        assert history[3][0] == LifecycleState.EXPIRED
+        assert history[0][0] == PropagationState.DETECTED
+        assert history[1][0] == PropagationState.PROPAGATING
+        assert history[2][0] == PropagationState.SETTLED
+        assert history[3][0] == PropagationState.EXPIRED
 
 
 # ------------------------------------------------------------------
@@ -348,12 +348,12 @@ class TestStuckProtection:
         """is_stuck() returns True when PROPAGATING for > 7 days."""
         from datetime import datetime, timedelta
         from synapse.event.lifecycle import (
-            LifecycleState,
+            PropagationState,
             PropagationLifecycle,
             STUCK_TIMEOUT_DAYS,
         )
 
-        lc = PropagationLifecycle("evt-stuck", initial_state=LifecycleState.PROPAGATING)
+        lc = PropagationLifecycle("evt-stuck", initial_state=PropagationState.PROPAGATING)
         # Simulate that propagation started 8 days ago
         lc._propagating_since = datetime.now() - timedelta(days=8)
 
@@ -364,5 +364,5 @@ class TestStuckProtection:
         assert lc.is_stuck() is False
 
         # Not stuck if not in PROPAGATING state
-        lc._state = LifecycleState.SETTLED
+        lc._state = PropagationState.SETTLED
         assert lc.is_stuck() is False

@@ -37,6 +37,12 @@ keywords:
 - [rule:pattern] 优先使用纯函数、列表推导，避免可变状态（Functional style）
 - [rule:pattern] dataclass 用于数据建模，纯函数用于计算逻辑
 
+## Patterns (P3 Hardening)
+
+- [pattern:enum] 枚举合并使用向后兼容别名：`NewEnum = OldEnum` 保留旧导入，移除重复定义
+- [pattern:exception] 异常收窄：只捕获 API 实际抛出的异常（如 `date.fromisoformat()` 仅抛 ValueError）
+- [pattern:integration] 集成测试覆盖跨模块流水线（如 detection → dedup）
+
 ## Entries
 
 <spec-entry category="coding" keywords="type-hints,functional,pep8,early-return" date="2026-05-18">
