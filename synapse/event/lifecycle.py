@@ -16,22 +16,12 @@ from __future__ import annotations
 
 import math
 from datetime import datetime, timedelta
-from enum import Enum
 from typing import Optional
 
+from synapse.core.schemas.event import PropagationState
 
-# ---------------------------------------------------------------------------
-# State Machine
-# ---------------------------------------------------------------------------
-
-
-class LifecycleState(str, Enum):
-    """Lifecycle states for event propagation."""
-
-    DETECTED = "detected"
-    PROPAGATING = "propagating"
-    SETTLED = "settled"
-    EXPIRED = "expired"
+# Backward-compatible alias: LifecycleState is now PropagationState.
+LifecycleState = PropagationState
 
 
 # Valid transitions: frozenset of (from_state, to_state)

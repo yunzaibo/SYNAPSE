@@ -24,6 +24,11 @@ keywords:
 - [rule:quality] 所有代码必须通过 linter 检查（pre-commit 强制）
 - [rule:quality] 类型检查必须通过（mypy --strict）
 
+## Testing Patterns (P3 Hardening)
+
+- [rule:testing] ABC 的所有具体实现必须有正向和反向单元测试
+- [pattern:debt] 技术债务用内联注释记录：说明当前限制和未来改进路径
+
 ## Entries
 
 <spec-entry category="quality" keywords="coverage,skip-test,lint,type-check" date="2026-05-18">

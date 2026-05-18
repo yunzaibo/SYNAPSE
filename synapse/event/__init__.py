@@ -56,6 +56,7 @@ __all__ = [
     # Lifecycle + Decay (IMPL-005)
     "PropagationLifecycle",
     "LifecycleState",
+    "PropagationState",
     "compute_decay",
     "apply_category_decay",
     "CATEGORY_HALF_LIVES",
@@ -87,7 +88,7 @@ def __getattr__(name: str):
     if name in ("EVENT_TYPES", "SOURCE_PRIORITY", "EVENT_CATEGORY_MAP", "PRIORITY_LEVELS"):
         from synapse.event import taxonomy
         return getattr(taxonomy, name)
-    if name in ("PropagationLifecycle", "LifecycleState", "compute_decay", "apply_category_decay", "CATEGORY_HALF_LIVES"):
+    if name in ("PropagationLifecycle", "LifecycleState", "PropagationState", "compute_decay", "apply_category_decay", "CATEGORY_HALF_LIVES"):
         from synapse.event import lifecycle
         return getattr(lifecycle, name)
     if name in ("ImpactAnalyzer", "ImpactReport"):

@@ -103,6 +103,12 @@
         "path": "synapse/data",
         "description": "Dataset metadata, CSV/Parquet loader, validator",
         "importance": "medium"
+      },
+      {
+        "name": "event",
+        "path": "synapse/event",
+        "description": "Event detection framework: BaseDetector ABC, 6 concrete detectors, dedup, propagation graph, impact analysis",
+        "importance": "high"
       }
     ]
   },
@@ -110,14 +116,23 @@
   "development_index": {
     "feature": [],
     "enhancement": [],
-    "bugfix": [],
+    "bugfix": [
+      {
+        "title": "P3 Quality Hardening — 6 MEDIUM + 2 LOW findings fixed",
+        "sub_feature": "event",
+        "date": "2026-05-18",
+        "description": "Fix quality review findings: enum consolidation, classmethod registry, CLI dir check, test coverage, exception narrowing",
+        "status": "completed",
+        "session_id": "WFS-p3-hardening"
+      }
+    ],
     "refactor": [],
     "docs": []
   },
   "statistics": {
     "total_features": 0,
-    "total_sessions": 0,
-    "last_updated": "2026-05-18T14:00:00Z"
+    "total_sessions": 1,
+    "last_updated": "2026-05-18T18:00:00Z"
   },
   "_metadata": {
     "initialized_by": "cli-explore-agent",
