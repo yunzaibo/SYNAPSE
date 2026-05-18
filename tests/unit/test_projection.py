@@ -181,7 +181,7 @@ class TestWatchlistGenerator:
     def test_generates_from_events(self):
         """Events generate watchlist entries."""
         event = _make_event(related_tickers=["600519", "000858"])
-        entries = generate_daily(events=[event], signals=[], positions=[])
+        entries = generate_daily(events=[event], signals=[], positions=[], target_date=date(2026, 5, 18))
 
         assert len(entries) == 2
         tickers = {e.ticker for e in entries}
@@ -207,8 +207,8 @@ class TestWatchlistGenerator:
     def test_daily_fresh_not_incremental(self):
         """Each call generates a fresh watchlist (not incremental)."""
         event = _make_event()
-        entries1 = generate_daily(events=[event], signals=[], positions=[])
-        entries2 = generate_daily(events=[event], signals=[], positions=[])
+        entries1 = generate_daily(events=[event], signals=[], positions=[], target_date=date(2026, 5, 18))
+        entries2 = generate_daily(events=[event], signals=[], positions=[], target_date=date(2026, 5, 18))
 
         # Same content, different entry IDs
         assert len(entries1) == len(entries2)
