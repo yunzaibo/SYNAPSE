@@ -473,7 +473,7 @@ class TestEventV2Roundtrip:
             calibration_score=0.85,
         )
         d = evt.to_dict()
-        assert d["schema_version"] == "2.0"
+        assert d["schema_version"] == "3.0"
         assert len(d["outcome_tracking"]) == 1
         assert d["outcome_tracking"][0]["review_id"] == "rev_001"
         assert d["linked_review_ids"] == ["rev_001"]

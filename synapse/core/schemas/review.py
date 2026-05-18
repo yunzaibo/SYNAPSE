@@ -86,6 +86,10 @@ class Review(BaseSchema):
     # --- Risk Evaluation ---
     risk_evaluations: list[RiskEvaluation] = field(default_factory=list)
 
+    # --- Event Reference (IMPL-007) ---
+    event_id: Optional[str] = None
+    event_trigger_type: Optional[str] = None  # "direct" | "propagated" | "manual"
+
     def to_dict(self) -> dict:
         d = super().to_dict()
         d.update({
@@ -95,6 +99,9 @@ class Review(BaseSchema):
             "review_note": self.review_note,
             "signal_evaluations": [se.to_dict() for se in self.signal_evaluations],
             "risk_evaluations": [re.to_dict() for re in self.risk_evaluations],
+            # Event reference fields
+            "event_id": self.event_id,
+            "event_trigger_type": self.event_trigger_type,
         })
         return d
 
@@ -109,4 +116,7 @@ class Review(BaseSchema):
             review_note=data.get("review_note", ""),
             signal_evaluations=[SignalEvaluation.from_dict(se) for se in data.get("signal_evaluations", [])],
             risk_evaluations=[RiskEvaluation.from_dict(re) for re in data.get("risk_evaluations", [])],
+            # Event reference fields — Lazy Upcast defaults
+            event_id=data.get("event_id"),
+            event_trigger_type=data.get("event_trigger_type"),
         )

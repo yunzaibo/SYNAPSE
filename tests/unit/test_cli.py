@@ -145,3 +145,48 @@ class TestWorkspaceHelp:
         """synapse workspace switch with nonexistent name returns error."""
         code, out = run_cli("workspace", "switch", "nonexistent")
         assert code == 1
+
+
+class TestEventCLI:
+    def test_event_help(self):
+        """synapse event --help should succeed."""
+        code, out = run_cli("event", "--help")
+        assert code == 0
+        assert "Event" in out
+
+    def test_event_detect_args(self):
+        """synapse event detect --help should show all args."""
+        code, out = run_cli("event", "detect", "--help")
+        assert code == 0
+        assert "--data-dir" in out
+        assert "--type" in out
+        assert "--min-confidence" in out
+
+    def test_event_impact_args(self):
+        """synapse event impact --help should show all args."""
+        code, out = run_cli("event", "impact", "--help")
+        assert code == 0
+        assert "--event-id" in out
+        assert "--depth" in out
+        assert "--format" in out
+
+    def test_event_graph_args(self):
+        """synapse event graph --help should show all args."""
+        code, out = run_cli("event", "graph", "--help")
+        assert code == 0
+        assert "--direction" in out
+        assert "--max-depth" in out
+
+    def test_event_list_args(self):
+        """synapse event list --help should show all args."""
+        code, out = run_cli("event", "list", "--help")
+        assert code == 0
+        assert "--state" in out
+        assert "--from-date" in out
+        assert "--to-date" in out
+
+    def test_event_help_text(self):
+        """All event subcommands generate help without error."""
+        for subcmd in ["detect", "impact", "graph", "list"]:
+            code, out = run_cli("event", subcmd, "--help")
+            assert code == 0, f"event {subcmd} --help failed"

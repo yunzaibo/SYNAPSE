@@ -112,6 +112,10 @@ class Thesis(BaseSchema):
     revision: int = 1
     previous_revision: Optional[str] = None
 
+    # --- Event Reference (IMPL-007) ---
+    event_influences: list[str] = field(default_factory=list)  # event IDs
+    event_influence_weight: float = 0.0
+
     def to_dict(self) -> dict:
         d = super().to_dict()
         d.update({
@@ -126,6 +130,9 @@ class Thesis(BaseSchema):
             "parent_thesis_id": self.parent_thesis_id,
             "revision": self.revision,
             "previous_revision": self.previous_revision,
+            # Event reference fields
+            "event_influences": self.event_influences,
+            "event_influence_weight": self.event_influence_weight,
         })
         return d
 
@@ -145,4 +152,7 @@ class Thesis(BaseSchema):
             parent_thesis_id=data.get("parent_thesis_id"),
             revision=data.get("revision", 1),
             previous_revision=data.get("previous_revision"),
+            # Event reference fields — Lazy Upcast defaults
+            event_influences=data.get("event_influences", []),
+            event_influence_weight=float(data.get("event_influence_weight", 0.0)),
         )

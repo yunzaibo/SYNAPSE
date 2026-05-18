@@ -11,7 +11,11 @@ from synapse.core.schemas.review import Review, ReviewOutcome, SignalEvaluation,
 from synapse.core.schemas.position import Position, ResearchState, ThesisStatus, AttentionState
 from synapse.core.schemas.signal import Signal, SignalType, SignalStrength
 from synapse.core.schemas.risk import Risk, RiskType, Severity
-from synapse.core.schemas.event import Event, EventType, ImpactLevel
+from synapse.core.schemas.event import (
+    Event, EventType, ImpactLevel, EventSourceType, PropagationState,
+)
+from synapse.core.schemas.event_contract import EventContract
+from synapse.core.schemas.propagation_edge import PropagationEdge
 from synapse.core.schemas.topic import ResearchTopic
 
 __all__ = [
@@ -57,6 +61,12 @@ __all__ = [
     "Event",
     "EventType",
     "ImpactLevel",
+    "EventSourceType",
+    "PropagationState",
+    # EventContract
+    "EventContract",
+    # PropagationEdge
+    "PropagationEdge",
     # ResearchTopic
     "ResearchTopic",
 ]
