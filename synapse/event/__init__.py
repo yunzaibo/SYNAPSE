@@ -69,6 +69,14 @@ __all__ = [
     "ImpactReport",
     # Integration (IMPL-007)
     "EventReviewIntegrator",
+    # Social media sentiment (P4)
+    "SocialMediaSignal",
+    "LexiconAnalyzer",
+    "collect_from_source",
+    # Streaming ingestion (P4)
+    "PollingSource",
+    "StreamBuffer",
+    "StreamingIngestion",
 ]
 
 
@@ -102,4 +110,10 @@ def __getattr__(name: str):
     if name in ("EventReviewIntegrator",):
         from synapse.event.integration import EventReviewIntegrator
         return EventReviewIntegrator
+    if name in ("SocialMediaSignal", "LexiconAnalyzer", "collect_from_source"):
+        from synapse.event import social
+        return getattr(social, name)
+    if name in ("PollingSource", "StreamBuffer", "StreamingIngestion"):
+        from synapse.event import streaming
+        return getattr(streaming, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

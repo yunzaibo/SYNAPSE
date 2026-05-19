@@ -20,6 +20,7 @@ EVENT_TYPES: dict[str, str] = {
     "corporate_action": "Secondary offerings, rights issues, dividends, equity incentives, M&A, buybacks",
     "policy_change": "Regulatory policy changes, CSRC/PBOC announcements, sector-specific regulations",
     "macro_shift": "Macroeconomic regime shifts, GDP/CPI/PMI trend changes, rate cycle transitions",
+    "social_sentiment": "Social media sentiment signals — Weibo, Xueqiu, Eastmoney guba, news comment sentiment",
 }
 
 
@@ -48,6 +49,7 @@ EVENT_CATEGORY_MAP: dict[str, list[str]] = {
     "financial": ["earnings", "corporate_action"],
     "regulatory": ["policy", "policy_change"],
     "market_data": ["sentiment", "capital_flow", "macro_shift"],
+    "social": ["social_sentiment"],
     "thematic": ["theme"],
 }
 

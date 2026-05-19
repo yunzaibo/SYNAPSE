@@ -87,7 +87,7 @@ class EventCorrelation:
 
 
 # ---------------------------------------------------------------------------
-# Event Type Affinity Matrix (8x8)
+# Event Type Affinity Matrix (9x9)
 # ---------------------------------------------------------------------------
 
 # Event type constants (string-based to avoid hard dependency on EventType enum)
@@ -99,6 +99,7 @@ TYPE_SENTIMENT = "MARKET_SENTIMENT"
 TYPE_GEO = "GEOPOLITICAL"
 TYPE_SECTOR = "SECTOR_ROTATION"
 TYPE_MACRO = "MACRO_SHIFT"
+TYPE_SOCIAL = "SOCIAL_SENTIMENT"
 
 EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
     TYPE_EARNINGS: {
@@ -110,6 +111,7 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 0.1,
         TYPE_SECTOR: 0.4,
         TYPE_MACRO: 0.3,
+        TYPE_SOCIAL: 0.4,
     },
     TYPE_POLICY: {
         TYPE_EARNINGS: 0.3,
@@ -120,6 +122,7 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 0.3,
         TYPE_SECTOR: 0.6,
         TYPE_MACRO: 0.5,
+        TYPE_SOCIAL: 0.5,
     },
     TYPE_REGULATORY: {
         TYPE_EARNINGS: 0.2,
@@ -130,6 +133,7 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 0.2,
         TYPE_SECTOR: 0.5,
         TYPE_MACRO: 0.4,
+        TYPE_SOCIAL: 0.4,
     },
     TYPE_CAPITAL: {
         TYPE_EARNINGS: 0.4,
@@ -140,6 +144,7 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 0.2,
         TYPE_SECTOR: 0.4,
         TYPE_MACRO: 0.5,
+        TYPE_SOCIAL: 0.6,
     },
     TYPE_SENTIMENT: {
         TYPE_EARNINGS: 0.5,
@@ -150,6 +155,7 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 0.3,
         TYPE_SECTOR: 0.5,
         TYPE_MACRO: 0.4,
+        TYPE_SOCIAL: 0.8,
     },
     TYPE_GEO: {
         TYPE_EARNINGS: 0.1,
@@ -160,6 +166,7 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 1.0,
         TYPE_SECTOR: 0.4,
         TYPE_MACRO: 0.6,
+        TYPE_SOCIAL: 0.3,
     },
     TYPE_SECTOR: {
         TYPE_EARNINGS: 0.4,
@@ -170,6 +177,7 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 0.4,
         TYPE_SECTOR: 1.0,
         TYPE_MACRO: 0.3,
+        TYPE_SOCIAL: 0.5,
     },
     TYPE_MACRO: {
         TYPE_EARNINGS: 0.3,
@@ -180,6 +188,18 @@ EVENT_TYPE_AFFINITY: dict[str, dict[str, float]] = {
         TYPE_GEO: 0.6,
         TYPE_SECTOR: 0.3,
         TYPE_MACRO: 1.0,
+        TYPE_SOCIAL: 0.4,
+    },
+    TYPE_SOCIAL: {
+        TYPE_EARNINGS: 0.4,
+        TYPE_POLICY: 0.5,
+        TYPE_REGULATORY: 0.4,
+        TYPE_CAPITAL: 0.6,
+        TYPE_SENTIMENT: 0.8,
+        TYPE_GEO: 0.3,
+        TYPE_SECTOR: 0.5,
+        TYPE_MACRO: 0.4,
+        TYPE_SOCIAL: 1.0,
     },
 }
 

@@ -111,6 +111,7 @@ CATEGORY_HALF_LIVES: dict[str, float] = {
     "corporate_action": 5.0,  # ~5 days
     "policy_change": 2.5,    # 1-4 days, midpoint 2.5
     "macro_shift": 3.0,      # 2-4 days, midpoint 3.0
+    "social_sentiment": 0.5,  # 0.5-1 day, social media decays fast
 }
 
 DEFAULT_HALF_LIFE = 5.0

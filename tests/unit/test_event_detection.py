@@ -179,8 +179,8 @@ class TestDetectorRegistry:
 class TestEventTaxonomy:
     def test_event_types_defined(self):
         """EVENT_TYPES must define all registered event types."""
-        assert len(EVENT_TYPES) == 8
-        expected = {"earnings", "policy", "sentiment", "theme", "capital_flow", "corporate_action", "policy_change", "macro_shift"}
+        assert len(EVENT_TYPES) == 9
+        expected = {"earnings", "policy", "sentiment", "theme", "capital_flow", "corporate_action", "policy_change", "macro_shift", "social_sentiment"}
         assert set(EVENT_TYPES.keys()) == expected
 
     def test_source_priority_is_ordered(self):
