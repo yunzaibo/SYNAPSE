@@ -1,0 +1,227 @@
+{
+  "id": "IMPL-001",
+  "title": "Quintile Portfolio Sorter and Data Models",
+  "description": "Implement frozen dataclass data models (QuintilePortfolio, PerformanceMetrics, ICAnalysisResult, AttributionResult, BacktestResult) and QuintileSorter for 5-group equal-weight portfolio sorting with configurable rebalancing.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/backtest",
+  "action": "Implement",
+  "depends_on": [],
+  "focus_paths": [
+    "synapse/backtest/result.py",
+    "synapse/backtest/quintile.py",
+    "tests/unit/test_quintile_sorter.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "5 frozen dataclasses created: verify by grep -c 'frozen=True' synapse/backtest/result.py >= 5",
+      "QuintileSorter produces 5 equal-weight groups: verify by py -m pytest tests/unit/test_quintile_sorter.py -p no:asyncio (exit code 0)",
+      "Edge cases handled (all NaN, <5 stocks): verify by test_quintile_sorter.py edge case tests",
+      "Quintile weights sum to 1.0 within each group: verify by assertion in tests"
+    ],
+    "verification": "py -m pytest tests/unit/test_quintile_sorter.py -p no:asyncio && grep -c 'frozen=True' synapse/backtest/result.py",
+    "definition_of_done": "Data models defined and quintile sorting produces correct 5-group equal-weight portfolios"
+  },
+  "files": [
+    {
+      "path": "synapse/backtest/result.py",
+      "action": "create",
+      "change": "Frozen dataclasses: QuintilePortfolio, PerformanceMetrics, ICAnalysisResult, AttributionResult, BacktestResult"
+    },
+    {
+      "path": "synapse/backtest/quintile.py",
+      "action": "create",
+      "change": "QuintileSorter class with sort() and sort_timeseries() methods"
+    },
+    {
+      "path": "synapse/backtest/__init__.py",
+      "action": "modify",
+      "change": "Export new data models and QuintileSorter"
+    },
+    {
+      "path": "tests/unit/test_quintile_sorter.py",
+      "action": "create",
+      "change": "Unit tests for QuintileSorter: normal, edge cases, frozen dataclass validation"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create frozen dataclass data models",
+      "description": "Create synapse/backtest/result.py with 5 frozen dataclasses following P1 patterns (frozen=True, slots=True). Models: QuintilePortfolio (quintile_id, tickers, weights, factor_id, sort_date), PerformanceMetrics (14 fields with defaults), ICAnalysisResult (factor_id, ic_series, rank_ic_series, ic_mean, ic_std, icir, rank_ic_mean, rank_ic_std, rank_icir, rolling_ic, ic_positive_ratio), AttributionResult (factor_returns, residual_returns, total_factor_return, residual_return, r_squared), BacktestResult (id, schema_version, config, run_timestamp, start_date, end_date, factor_id, quintile_portfolios, quintile_returns, long_short_returns, benchmark_returns, performance, ic_analysis, attribution, status, error). Each model includes to_dict() and from_dict() methods.",
+      "modification_points": [
+        "Create 5 frozen dataclasses in result.py: QuintilePortfolio, PerformanceMetrics, ICAnalysisResult, AttributionResult, BacktestResult",
+        "Each dataclass must have frozen=True, slots=True",
+        "Each dataclass must implement to_dict() and from_dict() class methods",
+        "PerformanceMetrics must have 14 fields with default values for backward compatibility"
+      ],
+      "logic_flow": [
+        "Define QuintilePortfolio with quintile_id (1-5), tickers tuple, weights dict, factor_id, sort_date, total_value",
+        "Define PerformanceMetrics with 14 fields: annual_return, volatility, sharpe, max_drawdown, turnover, win_rate, excess_return, information_ratio, calmar, profit_loss_ratio, long_short_spread, max_drawdown_duration, skewness, kurtosis",
+        "Define ICAnalysisResult with ic_series, rank_ic_series, statistics, rolling_ic",
+        "Define AttributionResult with factor_returns dict, residual_returns tuple, r_squared",
+        "Define BacktestResult as top-level container with all sub-models",
+        "Implement to_dict() and from_dict() for each model"
+      ],
+      "depends_on": [],
+      "output": "synapse/backtest/result.py"
+    },
+    {
+      "step": 2,
+      "title": "Implement QuintileSorter",
+      "description": "Create synapse/backtest/quintile.py with QuintileSorter class. Methods: sort(factor_values: pd.Series, target_date: date, n_quintiles: int = 5) -> QuintilePortfolio for single-date sorting, and sort_timeseries(factor_values: pd.DataFrame, rebalance_dates: list[date]) -> dict[date, QuintilePortfolio] for multi-date sorting. Use pd.qcut() for efficient quintile assignment. Handle edge cases: all NaN factors, fewer than 5 stocks, ties in ranking.",
+      "modification_points": [
+        "Create QuintileSorter class in quintile.py",
+        "Implement sort() method: extract factor values at target_date, rank with method='first', assign to n_quintiles groups using pd.qcut, create QuintilePortfolio with equal weights",
+        "Implement sort_timeseries() method: iterate rebalance_dates, call sort() for each, return dict",
+        "Handle edge cases: skip dates with < n_quintiles valid stocks, skip all-NaN dates, use method='first' for deterministic ties"
+      ],
+      "logic_flow": [
+        "Extract factor values for target_date from MultiIndex DataFrame",
+        "Drop NaN values, validate >= n_quintiles stocks available",
+        "Rank stocks using pd.Series.rank(method='first', ascending=False)",
+        "Assign quintile labels using pd.qcut(ranked, q=n_quintiles, labels=range(1, n_quintiles+1))",
+        "Compute equal weights: 1/count for each stock in each quintile",
+        "Return frozen QuintilePortfolio with quintile labels and weights"
+      ],
+      "depends_on": [
+        0
+      ],
+      "output": "synapse/backtest/quintile.py"
+    },
+    {
+      "step": 3,
+      "title": "Write unit tests for QuintileSorter",
+      "description": "Create tests/unit/test_quintile_sorter.py with tests covering: normal 5-quintile sorting, equal-weight verification, missing factor handling, edge cases (all NaN, single stock, exactly 5 stocks), frozen dataclass immutability, sort_timeseries multi-date consistency.",
+      "modification_points": [
+        "Create test_quintile_sorter.py with 8+ test cases",
+        "Test normal sorting: 100 stocks -> 5 groups of 20",
+        "Test weights sum to 1.0 within each quintile",
+        "Test missing factor values excluded from sorting",
+        "Test edge case: fewer than 5 stocks returns empty/skips",
+        "Test edge case: all NaN factors returns empty/skips",
+        "Test frozen dataclass: assignment to fields raises FrozenInstanceError",
+        "Test sort_timeseries produces correct dict of QuintilePortfolio objects"
+      ],
+      "logic_flow": [
+        "Create synthetic factor DataFrame with MultiIndex(date, ticker)",
+        "Sort into quintiles and verify group sizes approximately equal",
+        "Verify weights sum to 1.0 for each quintile",
+        "Verify QuintilePortfolio is immutable (frozen=True)",
+        "Test edge cases with sparse/empty data",
+        "Verify deterministic sorting with method='first'"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "tests/unit/test_quintile_sorter.py"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package for artifact paths",
+      "commands": [
+        "Read({{context_package_path}})"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature specs for F-029 quintile sorting and system-architect analysis",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-029-quintile-portfolio-sorting.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/system-architect/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_backtest",
+      "action": "Analyze existing backtest module structure and data patterns",
+      "commands": [
+        "Read(synapse/backtest/engine.py)",
+        "Read(synapse/backtest/metrics.py)",
+        "Read(synapse/backtest/config.py)",
+        "Read(synapse/backtest/__init__.py)"
+      ],
+      "output_to": "existing_code",
+      "on_error": "fail"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-029-quintile-portfolio-sorting.md",
+      "feature_id": "F-029",
+      "priority": "highest",
+      "usage": "QuintilePortfolio data model and QuintileSorter implementation specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/system-architect/analysis.md",
+      "priority": "high",
+      "usage": "System architecture interfaces (QuintileSorter, QuintilePortfolio) and module structure"
+    }
+  ],
+  "inherited": {},
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-001",
+    "strategy": "new"
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "p1_pattern": "synapse/core/schemas/base.py (BaseSchema frozen dataclass pattern)",
+    "p6_pattern": "synapse/factor/engine.py (FactorEngine.compute_batch output format)"
+  },
+  "rationale": {
+    "why_first": "All other components depend on the data models (QuintilePortfolio, PerformanceMetrics, etc.) defined in this task",
+    "why_frozen": "Thread safety, immutability consistency with P1 AdjustmentEvent pattern",
+    "why_equal_weight": "Standard academic approach, avoids secondary factor biases"
+  },
+  "risks": [
+    {
+      "risk": "pd.qcut edge cases with non-unique quantiles",
+      "mitigation": "Use rank-based approach with method='first' for deterministic assignment"
+    },
+    {
+      "risk": "Frozen dataclass serialization complexity",
+      "mitigation": "Implement to_dict/from_dict using dataclasses.asdict() with tuple conversion"
+    }
+  ],
+  "test": {
+    "reusable_tools": [
+      "tests/helpers/"
+    ],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_quintile_sorter.py -p no:asyncio",
+      "run_coverage": "py -m pytest tests/unit/test_quintile_sorter.py -p no:asyncio --cov=synapse/backtest/quintile --cov-report=term-missing"
+    }
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T19:52:12.592627"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T19:54:54.108486"
+    }
+  ]
+}

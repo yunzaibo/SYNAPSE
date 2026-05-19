@@ -1,0 +1,38 @@
+{
+  "summary": "P4 Chinese Financial NLP Layer — 8 features across 4 execution waves: Foundation (NER + Lexicon), Core NLP (Announcement Parser + Sentiment Classifier + Event Extractor), Advanced (Report Summarizer + Policy Understander), Integration (P3 Event Engine connectors)",
+  "approach": "Layered NLP architecture: Wave 1 builds foundation (NER engine + sentiment lexicon), Wave 2 builds core NLP tasks that consume foundation, Wave 3 builds advanced analysis on core NLP, Wave 4 integrates all NLP outputs into P3 event engine via BaseDetector ABC. All NLP modules in synapse/nlp/ package, integration via synapse/event/nlp_detectors.py. All frozen dataclasses use frozen=True, slots=True. All tests use py -m pytest -p no:asyncio.",
+  "task_ids": ["IMPL-001", "IMPL-002", "IMPL-003", "IMPL-004", "IMPL-005", "IMPL-006", "IMPL-007", "IMPL-008"],
+  "task_count": 8,
+  "complexity": "High",
+  "estimated_time": "8-12 implementation sessions",
+  "recommended_execution": "Phased — 4 waves with parallel tasks within each wave",
+  "shared_context": {
+    "tech_stack": ["Python 3.11+", "pandas>=2.0", "numpy>=1.24", "pyyaml>=6.0", "scipy>=1.10", "jieba>=0.42 (new)"],
+    "conventions": [
+      "Frozen dataclasses with slots=True",
+      "to_dict()/from_dict() round-trip serialization",
+      "BaseDetector ABC for event detectors",
+      "DetectorRegistry for pluggable detection",
+      "Graceful degradation (return None, no exceptions)",
+      "Test command: py -m pytest -p no:asyncio",
+      "snake_case modules, PascalCase classes"
+    ],
+    "test_command": "py -m pytest tests/ -p no:asyncio -q",
+    "nlp_package": "synapse/nlp/",
+    "integration_package": "synapse/event/"
+  },
+  "_metadata": {
+    "timestamp": "2026-05-19T23:30:00+08:00",
+    "source": "action-planning-agent",
+    "planning_mode": "agent-based",
+    "plan_type": "feature",
+    "schema_version": "2.0",
+    "session_id": "WFS-synapse-p4-nlp",
+    "wave_structure": {
+      "wave_1": {"name": "Foundation", "tasks": ["IMPL-001", "IMPL-002"], "parallel": true},
+      "wave_2": {"name": "Core NLP", "tasks": ["IMPL-003", "IMPL-004", "IMPL-005"], "parallel": true},
+      "wave_3": {"name": "Advanced", "tasks": ["IMPL-006", "IMPL-007"], "parallel": true},
+      "wave_4": {"name": "Integration", "tasks": ["IMPL-008"], "parallel": false}
+    }
+  }
+}

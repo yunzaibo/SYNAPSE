@@ -34,3 +34,6 @@ Thumbs.db
 # Secrets
 .env
 *.key
+
+# Temporary planning notes
+1.md

@@ -1,0 +1,179 @@
+{
+  "id": "IMPL-002",
+  "title": "Performance Metrics Calculator (8 Core Metrics Single Pass)",
+  "description": "Implement MetricsCalculator that computes all 8 core performance metrics in a single pass through the return series, with stateful accumulation. Extend existing compute_metrics() and preserve backward compatibility.",
+  "status": "pending",
+  "type": "feature",
+  "scope": "synapse/backtest",
+  "action": "Implement",
+  "depends_on": ["IMPL-001"],
+  "focus_paths": ["synapse/backtest/metrics.py", "tests/unit/test_metrics_calculator.py"],
+
+  "convergence": {
+    "criteria": [
+      "MetricsCalculator computes 8 core metrics: verify by py -m pytest tests/unit/test_metrics_calculator.py -p no:asyncio (exit code 0)",
+      "Single-pass computation verified: verify by metrics accumulator pattern in code",
+      "Backward compatibility: existing compute_metrics() still works: verify by py -m pytest tests/unit/test_backtest_metrics.py -p no:asyncio (exit code 0)",
+      "Edge cases handled (zero vol, single period, negative returns): verify by edge case tests"
+    ],
+    "verification": "py -m pytest tests/unit/test_metrics_calculator.py tests/unit/test_backtest_metrics.py -p no:asyncio",
+    "definition_of_done": "MetricsCalculator computes all 8 metrics correctly with single-pass efficiency and backward compatibility"
+  },
+
+  "files": [
+    {"path": "synapse/backtest/metrics.py", "action": "modify", "change": "Add MetricsCalculator class with compute() method, preserve existing compute_metrics() and BacktestMetrics"},
+    {"path": "tests/unit/test_metrics_calculator.py", "action": "create", "change": "Unit tests for MetricsCalculator: 8 metrics correctness, single-pass verification, edge cases, backward compatibility"}
+  ],
+
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Implement MetricsCalculator class",
+      "description": "Add MetricsCalculator class to synapse/backtest/metrics.py. Constructor accepts risk_free_rate, annualization_factor, and optional benchmark_returns. The compute() method takes a numpy array of portfolio returns and returns a frozen PerformanceMetrics dataclass. Uses stateful accumulation pattern: initialize counters (cum_return, peak, wins, losses, win_sum, loss_sum, running_sum, running_sq), iterate once through returns updating all counters, then compute all 8 metrics from accumulated state.",
+      "modification_points": [
+        "Add MetricsCalculator class to metrics.py with __init__(risk_free_rate, annualization_factor, benchmark)",
+        "Add compute() method: takes np.ndarray returns, returns frozen PerformanceMetrics",
+        "Implement single-pass accumulation: cum_return, peak, drawdown tracking, win/loss counters, running stats",
+        "Compute from state: annual_return=(1+total)^(252/n)-1, volatility=std*sqrt(252), sharpe=mean_excess/std_excess*sqrt(252), max_drawdown from cumulative peak, win_rate=count(positive)/total, profit_loss_ratio=mean_positive/abs(mean_negative), calmar=annual_return/abs(max_drawdown), information_ratio=excess/tracking_error*sqrt(252), turnover from portfolio weights"
+      ],
+      "logic_flow": [
+        "Initialize accumulation state: cum_return=1.0, peak=1.0, wins=0, losses=0, win_sum=0.0, loss_sum=0.0, running_sum=0.0, running_sq=0.0",
+        "For each return r(t): update cum_return *= (1+r), peak = max(peak, cum_return), dd = (peak-cum_return)/peak, track max_drawdown, update win/loss counters, update running stats",
+        "Finalize: compute all 8 metrics from accumulated state",
+        "Return frozen PerformanceMetrics dataclass"
+      ],
+      "depends_on": [0],
+      "output": "MetricsCalculator.compute() method"
+    },
+    {
+      "step": 2,
+      "title": "Preserve backward compatibility",
+      "description": "Ensure existing compute_metrics() function and BacktestMetrics dataclass remain unchanged. Add compute_legacy() static method to MetricsCalculator that wraps the existing function for backward compatibility.",
+      "modification_points": [
+        "Keep existing compute_metrics() function unchanged",
+        "Keep existing BacktestMetrics dataclass unchanged",
+        "Add MetricsCalculator.compute_legacy() static method wrapping compute_metrics()"
+      ],
+      "logic_flow": [
+        "Verify existing compute_metrics() signature is preserved",
+        "Add compute_legacy() as static method that delegates to compute_metrics()",
+        "Ensure no breaking changes to existing callers"
+      ],
+      "depends_on": [0],
+      "output": "Backward-compatible metrics module"
+    },
+    {
+      "step": 3,
+      "title": "Write unit tests for MetricsCalculator",
+      "description": "Create tests/unit/test_metrics_calculator.py with 10+ test cases covering: all 8 metrics correctness against known values, single-pass verification (same result as multi-pass), edge cases (empty returns, single period, all positive, all negative, zero volatility), backward compatibility with existing compute_metrics().",
+      "modification_points": [
+        "Test annualized return with known return series",
+        "Test Sharpe ratio with known mean and std",
+        "Test max drawdown with known cumulative path",
+        "Test win rate with known positive/negative counts",
+        "Test profit/loss ratio with known win/loss magnitudes",
+        "Test Calmar ratio = annual_return / abs(max_drawdown)",
+        "Test information ratio with known excess returns",
+        "Test edge case: empty returns -> all metrics = 0.0",
+        "Test edge case: single period return",
+        "Test backward compatibility: MetricsCalculator.compute_legacy() matches compute_metrics()"
+      ],
+      "logic_flow": [
+        "Create synthetic return arrays with known properties",
+        "Compute metrics and verify each matches expected value within tolerance",
+        "Test edge cases produce safe defaults (no division by zero)",
+        "Verify single-pass and multi-pass produce identical results"
+      ],
+      "depends_on": [1],
+      "output": "tests/unit/test_metrics_calculator.py"
+    }
+  ],
+
+  "pre_analysis": [
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature spec for F-031 performance metrics",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-031-performance-metrics.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_metrics",
+      "action": "Analyze existing metrics.py for backward compatibility requirements",
+      "commands": [
+        "Read(synapse/backtest/metrics.py)",
+        "Read(synapse/backtest/__init__.py)"
+      ],
+      "output_to": "existing_metrics",
+      "on_error": "fail"
+    }
+  ],
+
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-031-performance-metrics.md",
+      "feature_id": "F-031",
+      "priority": "highest",
+      "usage": "8 core metrics formulas and PerformanceMetrics data model specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md",
+      "priority": "high",
+      "usage": "Detailed metric definitions, formulas, thresholds, and MetricsCalculator implementation pattern (Section 2)"
+    }
+  ],
+
+  "inherited": {
+    "from": "IMPL-001",
+    "context": ["PerformanceMetrics frozen dataclass from result.py"]
+  },
+
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-002",
+    "strategy": "resume",
+    "resume_from": "WFS-synapse-p2-backtest-IMPL-001"
+  },
+
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+
+  "reference": {
+    "existing_function": "synapse/backtest/metrics.py:compute_metrics() - must preserve",
+    "existing_dataclass": "synapse/backtest/metrics.py:BacktestMetrics - must preserve"
+  },
+
+  "rationale": {
+    "why_single_pass": "Guidance specification MUST: compute all 8 metrics in single pass to avoid redundant iteration",
+    "why_backward_compat": "Existing callers of compute_metrics() and BacktestMetrics must not break"
+  },
+
+  "risks": [
+    {"risk": "Floating-point precision in metric calculations", "mitigation": "Use round() for final values, tolerate 1e-6 differences in tests"},
+    {"risk": "Zero volatility division in Sharpe ratio", "mitigation": "Guard with std > 1e-10 check, return 0.0 for zero-vol cases"}
+  ],
+
+  "test": {
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_metrics_calculator.py -p no:asyncio",
+      "run_coverage": "py -m pytest tests/unit/test_metrics_calculator.py -p no:asyncio --cov=synapse/backtest/metrics --cov-report=term-missing"
+    }
+  }
+}

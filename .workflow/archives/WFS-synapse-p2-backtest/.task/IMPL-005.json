@@ -1,0 +1,151 @@
+{
+  "id": "IMPL-005",
+  "title": "Return Attribution Engine (Barra-style Decomposition)",
+  "description": "Implement AttributionEngine for Barra-style factor model return attribution, decomposing portfolio returns into factor exposure and residual components. Support single-factor (P2) and multi-factor (future) attribution.",
+  "status": "pending",
+  "type": "feature",
+  "scope": "synapse/backtest",
+  "action": "Implement",
+  "depends_on": ["IMPL-001"],
+  "focus_paths": ["synapse/backtest/attribution.py", "tests/unit/test_attribution_engine.py"],
+
+  "convergence": {
+    "criteria": [
+      "AttributionEngine computes factor and residual decomposition: verify by py -m pytest tests/unit/test_attribution_engine.py -p no:asyncio (exit code 0)",
+      "R-squared indicates model fit: verify by assertion in tests",
+      "Factor exposure computed correctly: verify by known-input test",
+      "Frozen AttributionResult returned: verify by frozen dataclass test"
+    ],
+    "verification": "py -m pytest tests/unit/test_attribution_engine.py -p no:asyncio",
+    "definition_of_done": "AttributionEngine correctly decomposes returns into factor and residual components with R-squared"
+  },
+
+  "files": [
+    {"path": "synapse/backtest/attribution.py", "action": "create", "change": "AttributionEngine class with compute() method for Barra-style decomposition"},
+    {"path": "tests/unit/test_attribution_engine.py", "action": "create", "change": "Unit tests for AttributionEngine: decomposition correctness, R-squared, edge cases"}
+  ],
+
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Implement AttributionEngine class",
+      "description": "Create synapse/backtest/attribution.py with AttributionEngine class. compute() takes portfolio_returns (pd.Series), factor_returns (pd.DataFrame columns=factor_ids), and factor_exposures (pd.DataFrame). Uses OLS regression: R_portfolio = sum(beta_k * F_k) + epsilon. Returns frozen AttributionResult with factor_returns dict, residual_returns tuple, total_factor_return, residual_return, r_squared. For single-factor P2: beta is approximately 1.0 for Q5 and -1.0 for Q1 (by construction).",
+      "modification_points": [
+        "Create AttributionEngine class in attribution.py",
+        "Implement compute() method: OLS regression of portfolio returns on factor returns",
+        "Compute factor_exposure_return = beta * factor_return for each factor",
+        "Compute residual_return = total_return - factor_contribution",
+        "Compute r_squared = variance(factor_contribution) / variance(total_return)",
+        "Return frozen AttributionResult"
+      ],
+      "logic_flow": [
+        "Align portfolio_returns and factor_returns on common dates",
+        "Compute factor loadings via OLS: np.linalg.lstsq(factor_returns, portfolio_returns)",
+        "Compute factor_exposure_return = factor_returns @ loadings",
+        "Compute residual_return = portfolio_returns - factor_exposure_return",
+        "Compute r_squared from explained vs total variance",
+        "Return frozen AttributionResult with all components"
+      ],
+      "depends_on": [0],
+      "output": "AttributionEngine class"
+    },
+    {
+      "step": 2,
+      "title": "Write unit tests for AttributionEngine",
+      "description": "Create tests/unit/test_attribution_engine.py with 6+ test cases: decomposition correctness (factor + residual = total), R-squared computation, single-factor attribution, edge cases (empty returns, zero factor returns), frozen dataclass.",
+      "modification_points": [
+        "Test factor + residual = total return (within tolerance)",
+        "Test R-squared computation with known variance",
+        "Test single-factor attribution matches expected beta",
+        "Test edge case: empty returns -> all zeros",
+        "Test edge case: zero factor returns -> R-squared = 0",
+        "Test frozen dataclass immutability"
+      ],
+      "logic_flow": [
+        "Create synthetic portfolio and factor returns with known relationship",
+        "Verify attribution decomposition: factor_contribution + residual = total",
+        "Verify R-squared matches manual calculation",
+        "Test edge cases produce safe defaults"
+      ],
+      "depends_on": [1],
+      "output": "tests/unit/test_attribution_engine.py"
+    }
+  ],
+
+  "pre_analysis": [
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature spec for F-033 return attribution and SME analysis",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-033-return-attribution.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-033-return-attribution.md",
+      "feature_id": "F-033",
+      "priority": "medium",
+      "usage": "AttributionResult data model and Barra-style decomposition specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md",
+      "priority": "high",
+      "usage": "Barra-style factor model, attribution formula, factor exposure computation (Section 4)"
+    }
+  ],
+
+  "inherited": {
+    "from": "IMPL-001",
+    "context": ["AttributionResult frozen dataclass from result.py"]
+  },
+
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-005",
+    "strategy": "resume",
+    "resume_from": "WFS-synapse-p2-backtest-IMPL-001"
+  },
+
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+
+  "reference": {
+    "formula": "R_portfolio = alpha + sum(beta_k * F_k) + epsilon",
+    "method": "OLS regression for factor model estimation"
+  },
+
+  "rationale": {
+    "why_barra": "Standard industry approach for factor attribution, compatible with multi-factor extension",
+    "why_single_factor_p2": "P2 focuses on single-factor evaluation; multi-factor deferred to future iteration"
+  },
+
+  "risks": [
+    {"risk": "OLS numerical instability with collinear factors", "mitigation": "Use np.linalg.lstsq with rcond parameter for numerical stability"},
+    {"risk": "Insufficient data points for regression", "mitigation": "Check len(data) > n_factors before regression, return zero attribution if insufficient"}
+  ],
+
+  "test": {
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_attribution_engine.py -p no:asyncio"
+    }
+  }
+}

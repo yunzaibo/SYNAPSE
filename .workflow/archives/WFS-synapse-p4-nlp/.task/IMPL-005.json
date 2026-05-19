@@ -1,0 +1,193 @@
+{
+  "id": "IMPL-005",
+  "title": "Event Extraction Engine — 事件抽取引擎",
+  "description": "Implement structured event extraction from unstructured Chinese financial text. The engine MUST classify event types (EARNINGS_FORECAST, MERGER_ACQUISITION, EQUITY_CHANGE, POLICY_CHANGE, DIVIDEND), extract trigger phrases with character offsets, identify participants, and map to P3 EventType taxonomy. Depends on F-041 NER Engine for entity recognition.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/nlp/",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-001"
+  ],
+  "focus_paths": [
+    "synapse/nlp/event_extractor.py",
+    "tests/unit/test_event_extractor.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "5 event types extracted: [EARNINGS_FORECAST, MERGER_ACQUISITION, EQUITY_CHANGE, POLICY_CHANGE, DIVIDEND]",
+      "EventExtractionResult frozen dataclass with 2 fields: [events tuple, processing_time_ms]",
+      "ExtractedEvent frozen dataclass with 7 fields: [event_type, trigger_phrase, participants, amount, date, confidence, entity_spans]",
+      "Trigger phrase extraction with character offsets",
+      "14+ unit tests pass: verify by py -m pytest tests/unit/test_event_extractor.py -p no:asyncio -q (exit code 0)",
+      "All frozen dataclasses use frozen=True, slots=True pattern"
+    ],
+    "verification": "py -m pytest tests/unit/test_event_extractor.py -p no:asyncio -q",
+    "definition_of_done": "Event extractor classifies 5 event types from Chinese financial text with trigger phrases and entity linking"
+  },
+  "files": [
+    {
+      "path": "synapse/nlp/event_extractor.py",
+      "action": "create",
+      "change": "EventExtractor class with extract() method, event type classification, trigger phrase extraction"
+    },
+    {
+      "path": "synapse/nlp/event_patterns.py",
+      "action": "create",
+      "change": "30+ trigger patterns for 5 event types with regex matching"
+    },
+    {
+      "path": "tests/unit/test_event_extractor.py",
+      "action": "create",
+      "change": "14+ tests covering: 5 event types, trigger phrases, participants, multi-event docs, edge cases"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create event trigger patterns",
+      "description": "Create synapse/nlp/event_patterns.py with 30+ trigger patterns for 5 event types. Each event type has 6+ trigger phrases: EARNINGS_FORECAST (预计/业绩预增/业绩预亏/扭亏为盈), MERGER_ACQUISITION (收购/合并/并购/重组), EQUITY_CHANGE (增持/减持/回购/质押), POLICY_CHANGE (发布/实施/调整/修改), DIVIDEND (分红/派息/高送转).",
+      "modification_points": [
+        "Create 1 new file with 30+ trigger patterns",
+        "5 event types × 6+ patterns each"
+      ],
+      "logic_flow": [
+        "Define EVENT_TRIGGER_PATTERNS dict mapping event_type→list of (pattern, groups) tuples",
+        "Each pattern captures trigger phrase + optional amount/date/parties",
+        "Define EVENT_TYPE_KEYWORDS for classification"
+      ],
+      "depends_on": [],
+      "output": "event_patterns"
+    },
+    {
+      "step": 2,
+      "title": "Implement EventExtractor",
+      "description": "Create synapse/nlp/event_extractor.py with EventExtractor.extract(text: TextDocument) -> EventExtractionResult. Pipeline: (1) TextPreprocessor, (2) NEREngine for entity recognition, (3) Pattern matching for event triggers, (4) Event type classification, (5) Detail extraction (amount, date, parties), (6) Map to P3 EventType.",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/event_extractor.py",
+        "EventExtractor.extract() pipeline",
+        "EventExtractionResult and ExtractedEvent frozen dataclasses"
+      ],
+      "logic_flow": [
+        "Preprocess text",
+        "Run NER for entity recognition",
+        "Match trigger patterns",
+        "Classify event type from triggers",
+        "Extract details (amount, date, parties)",
+        "Map to P3 EventType string"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "event_extractor"
+    },
+    {
+      "step": 3,
+      "title": "Write event extractor tests",
+      "description": "Create tests/unit/test_event_extractor.py with 14+ tests: earnings forecast extraction, M&A extraction, equity change, policy change, dividend, multi-event documents, trigger phrase offsets, edge cases, frozen dataclass.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_event_extractor.py",
+        "14+ test methods"
+      ],
+      "logic_flow": [
+        "Test earnings forecast: '预计2026年净利润增长50%'→EARNINGS_FORECAST",
+        "Test M&A: '公司拟收购目标公司100%股权'→MERGER_ACQUISITION",
+        "Test equity change: '控股股东增持100万股'→EQUITY_CHANGE",
+        "Test multi-event: document with 2+ events"
+      ],
+      "depends_on": [
+        2
+      ],
+      "output": "event_extractor_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-042 event extraction feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-042-event-extraction-engine.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_p3_event_types",
+      "action": "Study P3 EventType taxonomy for mapping consistency",
+      "commands": [
+        "Read(synapse/core/schemas/event.py)",
+        "Read(synapse/event/taxonomy.py)"
+      ],
+      "output_to": "p3_event_analysis"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-042-event-extraction-engine.md",
+      "feature_id": "F-042",
+      "priority": "highest",
+      "usage": "Event extraction requirements: 5 event types, trigger phrases, P3 mapping"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-001",
+    "context": [
+      "NEREngine for entity recognition"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-005",
+    "strategy": "fork",
+    "resume_from": "WFS-synapse-p4-nlp-IMPL-001",
+    "merge_from": []
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave2-core-nlp",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "feature_spec": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-042-event-extraction-engine.md",
+    "p3_event_types": "synapse/core/schemas/event.py",
+    "p3_taxonomy": "synapse/event/taxonomy.py"
+  },
+  "rationale": {
+    "priority": "Wave 2 Core NLP — Depends on NER Engine (Wave 1)",
+    "approach": "Pattern matching + NER entity linking, map to P3 EventType"
+  },
+  "risks": [
+    "Pattern coverage may be incomplete for edge cases — mitigate with extensible pattern registry",
+    "Multi-event document parsing complexity — mitigate with sentence-level segmentation"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_event_extractor.py -p no:asyncio -q"
+    }
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "completed",
+      "changed_at": "2026-05-19T22:16:59.523424"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "summary": "P2 Long-Short Quintile Backtest Engine: 8 implementation tasks covering quintile sorting, metrics, IC analysis, long-short spread, attribution, engine orchestration, persistence, and integration tests",
+  "approach": "Build from bottom up: data models first (IMPL-001), then independent computation modules (IMPL-002 through IMPL-005 can run in parallel after IMPL-001), then orchestration engine (IMPL-006 depends on all), then persistence (IMPL-007), and finally integration tests (IMPL-008). All components use frozen dataclasses for immutability and dependency injection for testability.",
+  "task_ids": [
+    "IMPL-001",
+    "IMPL-002",
+    "IMPL-003",
+    "IMPL-004",
+    "IMPL-005",
+    "IMPL-006",
+    "IMPL-007",
+    "IMPL-008"
+  ],
+  "task_count": 8,
+  "complexity": "Medium",
+  "estimated_time": "3-5 days",
+  "recommended_execution": "Phased",
+  "shared_context": {
+    "tech_stack": ["Python 3.10+", "pandas", "numpy", "scipy", "pyarrow", "pytest"],
+    "conventions": [
+      "Frozen dataclasses with slots=True for immutability",
+      "to_dict()/from_dict() serialization pattern",
+      "pytest with -p no:asyncio for SYNAPSE",
+      "Parquet for columnar storage",
+      "DataFrame MultiIndex (date, ticker) as data contract"
+    ]
+  },
+  "_metadata": {
+    "timestamp": "2026-05-19T23:50:00+08:00",
+    "source": "action-planning-agent",
+    "planning_mode": "agent-based",
+    "plan_type": "feature",
+    "schema_version": "2.0"
+  }
+}

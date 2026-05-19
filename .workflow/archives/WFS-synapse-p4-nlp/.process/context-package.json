@@ -1,0 +1,387 @@
+{
+  "metadata": {
+    "task_description": "P4 Chinese Financial NLP Layer — 中文金融NLP层：财报解析、研报摘要、新闻情感分析、政策文本理解、金融实体识别、事件抽取、与P3事件引擎集成",
+    "timestamp": "2026-05-19T22:00:00+08:00",
+    "keywords": ["NLP", "chinese-financial", "sentiment-analysis", "entity-recognition", "event-extraction", "announcement-parsing", "policy-understanding", "financial-text"],
+    "complexity": "high",
+    "session_id": "WFS-synapse-p4-nlp"
+  },
+  "project_context": {
+    "architecture_patterns": [
+      "5-layer research platform",
+      "Pluggable detector framework (BaseDetector ABC + DetectorRegistry)",
+      "DAG-based event propagation graph",
+      "Weak Schema + Lazy Upcast",
+      "Protocol-based components (DataSource ABC)",
+      "File-based YAML storage with SQLite index",
+      "Duck-typing for cross-module graph operations"
+    ],
+    "coding_conventions": {
+      "naming": {
+        "modules": "snake_case",
+        "classes": "PascalCase",
+        "functions": "snake_case",
+        "constants": "UPPER_SNAKE_CASE"
+      },
+      "error_handling": {
+        "pattern": "ValueError for domain validation, logging for non-critical errors, graceful degradation",
+        "validation": "range checks in __post_init__ or _validate_range static method"
+      },
+      "async_patterns": {
+        "current": "synchronous (MVP scope, no async/WebSocket yet)",
+        "future": "async support planned for streaming"
+      },
+      "schema_pattern": {
+        "base": "BaseSchema with id, schema_version, status, created_at, updated_at, source_type, created_by, market_context",
+        "serialization": "to_dict() + from_dict() round-trip",
+        "evolution": "Lazy Upcast with schema_version field"
+      },
+      "test_patterns": {
+        "framework": "pytest (py -m pytest -p no:asyncio)",
+        "structure": "class-based test grouping, descriptive method names",
+        "mocking": "Duck-typed mocks (MockGraph, MockEvent), unittest.mock for HTTP",
+        "convention": "test_<feature>_<scenario> naming"
+      }
+    },
+    "tech_stack": {
+      "language": "python 3.11+",
+      "frameworks": [],
+      "libraries": ["pandas>=2.0", "numpy>=1.24", "pyyaml>=6.0", "scipy>=1.10"],
+      "build_system": "setuptools>=68.0",
+      "test_framework": "pytest>=7.0, pytest-cov>=4.0",
+      "nlp_dependencies": "NONE YET — P4 will introduce jieba, transformers (optional), or rule-based NLP"
+    }
+  },
+  "assets": {
+    "documentation": [
+      {
+        "path": "Docs/03_architecture/01_Architecture_Overview.md",
+        "scope": "architecture",
+        "contains": ["system layers", "research object model", "agent boundary", "external tool relationships"],
+        "relevance_score": 0.95
+      },
+      {
+        "path": "Docs/03_architecture/06_China_Market_Semantics.md",
+        "scope": "domain",
+        "contains": ["A-share semantic primitives", "announcement availability", "event timestamp semantics"],
+        "relevance_score": 0.92
+      },
+      {
+        "path": "Docs/03_architecture/02_Boundary.md",
+        "scope": "governance",
+        "contains": ["core boundary", "agent boundary", "data boundary"],
+        "relevance_score": 0.88
+      },
+      {
+        "path": ".workflow/roadmap.md",
+        "scope": "planning",
+        "contains": ["P4 scope definition", "P4 constraints", "phase boundaries"],
+        "relevance_score": 0.97
+      },
+      {
+        "path": "README.md",
+        "scope": "overview",
+        "contains": ["project status", "P3 completed", "architecture summary"],
+        "relevance_score": 0.85
+      }
+    ],
+    "source_code": [
+      {
+        "path": "synapse/event/base.py",
+        "role": "core-abstract",
+        "exports": ["BaseDetector"],
+        "description": "ABC for pluggable event detectors — detect(), event_type(), confidence_score()",
+        "relevance_score": 0.99
+      },
+      {
+        "path": "synapse/event/registry.py",
+        "role": "core-framework",
+        "exports": ["DetectorRegistry"],
+        "description": "Registration and lookup for pluggable event detectors, detect_all() for bulk detection",
+        "relevance_score": 0.97
+      },
+      {
+        "path": "synapse/event/detectors.py",
+        "role": "core-implementations",
+        "exports": ["EarningsDetector", "PolicyDetector", "SentimentDetector", "ThemeDetector", "CapitalFlowDetector", "CorporateActionDetector", "PolicyChangeDetector", "MacroShiftDetector"],
+        "description": "8 concrete detectors — pattern for new NLP detectors to follow",
+        "relevance_score": 0.96
+      },
+      {
+        "path": "synapse/event/social.py",
+        "role": "existing-nlp",
+        "exports": ["SocialMediaSignal", "LexiconAnalyzer", "collect_from_source", "POSITIVE_LEXICON", "NEGATIVE_LEXICON"],
+        "description": "Lexicon-based Chinese financial sentiment — 100+ domain terms, formula: (pos-neg)/(pos-neg+1)",
+        "relevance_score": 0.99
+      },
+      {
+        "path": "synapse/event/sentiment.py",
+        "role": "existing-sentiment",
+        "exports": ["SentimentPropagation", "compute_viral_coefficient", "detect_cascade", "build_sentiment_propagation"],
+        "description": "Sentiment propagation R0 + cascade detection — P4 NLP feeds into this",
+        "relevance_score": 0.94
+      },
+      {
+        "path": "synapse/event/graph.py",
+        "role": "core-infrastructure",
+        "exports": ["PropagationGraph", "PropagationEdge", "TraversalNode"],
+        "description": "DAG with cycle detection, topological sort, BFS traversal, edge decay",
+        "relevance_score": 0.93
+      },
+      {
+        "path": "synapse/event/lifecycle.py",
+        "role": "core-infrastructure",
+        "exports": ["PropagationLifecycle", "LifecycleState", "compute_decay", "apply_category_decay", "CATEGORY_HALF_LIVES"],
+        "description": "4-state lifecycle + exponential decay with category-specific half-lives (social_sentiment: 0.5 days)",
+        "relevance_score": 0.90
+      },
+      {
+        "path": "synapse/event/impact.py",
+        "role": "core-infrastructure",
+        "exports": ["ImpactAnalyzer", "ImpactReport"],
+        "description": "Impact = severity * confidence * decay_factor * path_weight — NLP events feed into this",
+        "relevance_score": 0.88
+      },
+      {
+        "path": "synapse/event/dedup.py",
+        "role": "core-infrastructure",
+        "exports": ["DeduplicationEngine"],
+        "description": "SHA-256 dedup keys, merge_events by confidence, resolve_conflicts",
+        "relevance_score": 0.87
+      },
+      {
+        "path": "synapse/event/correlation.py",
+        "role": "core-infrastructure",
+        "exports": ["EventCorrelation", "EVENT_TYPE_AFFINITY", "compute_correlation_score", "find_correlations", "add_correlation_edges"],
+        "description": "9x9 affinity matrix, pairwise correlation, amplification/dampening classification",
+        "relevance_score": 0.85
+      },
+      {
+        "path": "synapse/event/streaming.py",
+        "role": "existing-pipeline",
+        "exports": ["PollingSource", "StreamBuffer", "StreamingIngestion"],
+        "description": "Poll-based streaming pipeline with bounded buffer — NLP could use this for real-time processing",
+        "relevance_score": 0.82
+      },
+      {
+        "path": "synapse/event/datasource.py",
+        "role": "adapter-protocol",
+        "exports": ["DataSource", "MarketData"],
+        "description": "DataSource ABC for pluggable data providers — NLP adapters could implement this",
+        "relevance_score": 0.83
+      },
+      {
+        "path": "synapse/event/integration.py",
+        "role": "integration",
+        "exports": ["EventReviewIntegrator"],
+        "description": "Bidirectional event-review linkage — NLP events need review integration",
+        "relevance_score": 0.80
+      },
+      {
+        "path": "synapse/event/taxonomy.py",
+        "role": "domain-constants",
+        "exports": ["EVENT_TYPES", "SOURCE_PRIORITY", "EVENT_CATEGORY_MAP", "PRIORITY_LEVELS"],
+        "description": "9 event types, source priority ordering, category map — P4 adds NLP source types",
+        "relevance_score": 0.95
+      },
+      {
+        "path": "synapse/core/schemas/event.py",
+        "role": "core-schema",
+        "exports": ["Event", "EventType", "EventSourceType", "PropagationState", "ImpactLevel"],
+        "description": "Event schema v3.0 — SOCIAL_SENTIMENT type already defined for P4",
+        "relevance_score": 0.98
+      },
+      {
+        "path": "synapse/core/schemas/base.py",
+        "role": "core-schema",
+        "exports": ["BaseSchema", "MarketContext", "ObjectStatus", "SourceType"],
+        "description": "Foundation for all 9 research objects — schema evolution pattern",
+        "relevance_score": 0.85
+      },
+      {
+        "path": "synapse/core/schemas/signal.py",
+        "role": "core-schema",
+        "exports": ["Signal", "SignalType", "SignalStrength"],
+        "description": "Signal record — NLP outputs may generate signals",
+        "relevance_score": 0.82
+      },
+      {
+        "path": "synapse/data/loader.py",
+        "role": "data-layer",
+        "exports": ["load_csv", "load_parquet", "load_dataset"],
+        "description": "Dataset loading with metadata — NLP data may use similar patterns",
+        "relevance_score": 0.70
+      }
+    ],
+    "config": [
+      {
+        "path": "pyproject.toml",
+        "relevance_score": 0.90,
+        "description": "Current deps: pandas, numpy, pyyaml, scipy — P4 needs NLP deps added"
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/unit/test_event_detection.py",
+        "relevance_score": 0.95,
+        "description": "Detector ABC tests, registry tests, concrete detector tests — pattern for NLP detector tests"
+      },
+      {
+        "path": "tests/unit/test_social.py",
+        "relevance_score": 0.98,
+        "description": "LexiconAnalyzer tests, collect_from_source tests — existing NLP test patterns"
+      },
+      {
+        "path": "tests/unit/test_sentiment_propagation.py",
+        "relevance_score": 0.88,
+        "description": "R0 + cascade detection tests — downstream consumer of NLP sentiment"
+      },
+      {
+        "path": "tests/unit/test_streaming.py",
+        "relevance_score": 0.80,
+        "description": "StreamBuffer + StreamingIngestion tests — mock-based testing patterns"
+      },
+      {
+        "path": "tests/unit/test_datasource.py",
+        "relevance_score": 0.78,
+        "description": "DataSource ABC contract tests — pattern for NLP adapter tests"
+      },
+      {
+        "path": "tests/unit/test_correlation.py",
+        "relevance_score": 0.75,
+        "description": "Cross-event correlation tests — NLP events need correlation support"
+      },
+      {
+        "path": "tests/unit/test_dedup.py",
+        "relevance_score": 0.75,
+        "description": "Deduplication tests — NLP events need dedup support"
+      },
+      {
+        "path": "tests/integration/test_event_pipeline.py",
+        "relevance_score": 0.85,
+        "description": "End-to-end event pipeline — NLP integration test pattern"
+      }
+    ]
+  },
+  "dependencies": {
+    "internal": [
+      {
+        "from": "NLP Detectors (future)",
+        "to": "BaseDetector (synapse/event/base.py)",
+        "type": "inheritance"
+      },
+      {
+        "from": "NLP Detectors (future)",
+        "to": "Event (synapse/core/schemas/event.py)",
+        "type": "produces"
+      },
+      {
+        "from": "NLP Detectors (future)",
+        "to": "DetectorRegistry (synapse/event/registry.py)",
+        "type": "registers-with"
+      },
+      {
+        "from": "NLP Sentiment Output",
+        "to": "SentimentPropagation (synapse/event/sentiment.py)",
+        "type": "feeds-into"
+      },
+      {
+        "from": "NLP Event Output",
+        "to": "PropagationGraph (synapse/event/graph.py)",
+        "type": "feeds-into"
+      },
+      {
+        "from": "NLP Event Output",
+        "to": "ImpactAnalyzer (synapse/event/impact.py)",
+        "type": "feeds-into"
+      },
+      {
+        "from": "NLP Event Output",
+        "to": "DeduplicationEngine (synapse/event/dedup.py)",
+        "type": "feeds-into"
+      },
+      {
+        "from": "NLP Event Output",
+        "to": "EventCorrelation (synapse/event/correlation.py)",
+        "type": "feeds-into"
+      },
+      {
+        "from": "NLP Event Output",
+        "to": "EventReviewIntegrator (synapse/event/integration.py)",
+        "type": "feeds-into"
+      },
+      {
+        "from": "NLP Text Input",
+        "to": "StreamingIngestion (synapse/event/streaming.py)",
+        "type": "receives-from"
+      },
+      {
+        "from": "NLP Text Input",
+        "to": "DataSource (synapse/event/datasource.py)",
+        "type": "receives-from"
+      },
+      {
+        "from": "Existing LexiconAnalyzer (social.py)",
+        "to": "NLP Enhanced Sentiment",
+        "type": "extends-or-replaces"
+      }
+    ],
+    "external": [
+      {
+        "package": "jieba",
+        "version": ">=0.42",
+        "usage": "Chinese text segmentation — required for tokenization, NER, and text understanding",
+        "status": "NOT YET ADDED — P4 dependency"
+      },
+      {
+        "package": "pandas",
+        "version": ">=2.0",
+        "usage": "DataFrame operations for batch text processing"
+      },
+      {
+        "package": "numpy",
+        "version": ">=1.24",
+        "usage": "Numerical operations for sentiment scoring and entity normalization"
+      },
+      {
+        "package": "pyyaml",
+        "version": ">=6.0",
+        "usage": "Configuration and lexicon file loading"
+      },
+      {
+        "package": "scipy",
+        "version": ">=1.10",
+        "usage": "Statistical operations for sentiment aggregation"
+      }
+    ]
+  },
+  "conflict_detection": {
+    "risk_level": "medium",
+    "risk_factors": {
+      "existing_implementations": [
+        "synapse/event/social.py — LexiconAnalyzer with 100+ Chinese financial terms",
+        "synapse/event/detectors.py — 8 concrete detectors with established pattern",
+        "synapse/event/sentiment.py — SentimentPropagation R0/cascade model",
+        "synapse/event/streaming.py — PollingSource/StreamingIngestion pipeline"
+      ],
+      "api_changes": false,
+      "architecture_changes": false,
+      "data_model_changes": true,
+      "breaking_changes": [
+        "pyproject.toml will need new NLP dependencies (jieba, optionally transformers)",
+        "taxonomy.py EVENT_TYPES may need expansion for NLP-specific subtypes",
+        "EventSourceType may need NLP-specific sources (news, announcement, policy_doc)"
+      ]
+    },
+    "affected_modules": [
+      "synapse/event/social.py — may be enhanced or partially replaced by NLP sentiment",
+      "synapse/event/detectors.py — new NLP detectors follow existing pattern",
+      "synapse/event/taxonomy.py — may add NLP source types",
+      "synapse/event/__init__.py — exports need updating for new modules",
+      "pyproject.toml — new dependencies"
+    ],
+    "mitigation_strategy": "Incremental enhancement: reuse existing LexiconAnalyzer as fallback, add NLP detectors as new files following BaseDetector pattern, extend taxonomy with new types, no breaking changes to existing Event schema"
+  },
+  "brainstorm_artifacts": {},
+  "exploration_results": {}
+}

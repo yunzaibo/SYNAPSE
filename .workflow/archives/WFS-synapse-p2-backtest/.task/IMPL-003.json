@@ -1,0 +1,159 @@
+{
+  "id": "IMPL-003",
+  "title": "Factor IC Analysis (Rolling RankIC/ICIR)",
+  "description": "Implement ICAnalyzer for cross-sectional IC computation, rolling RankIC with configurable window, ICIR, and IC positive ratio. Integrate with P6 FactorEngine's existing IC infrastructure.",
+  "status": "pending",
+  "type": "feature",
+  "scope": "synapse/backtest",
+  "action": "Implement",
+  "depends_on": ["IMPL-001"],
+  "focus_paths": ["synapse/backtest/ic_analyzer.py", "tests/unit/test_ic_analyzer.py"],
+
+  "convergence": {
+    "criteria": [
+      "ICAnalyzer computes cross-sectional RankIC: verify by py -m pytest tests/unit/test_ic_analyzer.py -p no:asyncio (exit code 0)",
+      "ICIR computed as mean/std: verify by assertion in tests",
+      "Rolling IC with configurable window: verify by window parameter test",
+      "IC positive ratio computed: verify by assertion in tests"
+    ],
+    "verification": "py -m pytest tests/unit/test_ic_analyzer.py -p no:asyncio",
+    "definition_of_done": "ICAnalyzer correctly computes RankIC, ICIR, rolling IC, and IC positive ratio from factor values and forward returns"
+  },
+
+  "files": [
+    {"path": "synapse/backtest/ic_analyzer.py", "action": "create", "change": "ICAnalyzer class with compute_ic() and compute_ic_by_quintile() methods"},
+    {"path": "tests/unit/test_ic_analyzer.py", "action": "create", "change": "Unit tests for ICAnalyzer: RankIC correctness, ICIR, rolling window, edge cases"}
+  ],
+
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Implement ICAnalyzer class",
+      "description": "Create synapse/backtest/ic_analyzer.py with ICAnalyzer class. Constructor accepts window (default 20) and min_periods (default 10). compute_ic() takes factor_values DataFrame (MultiIndex date, ticker) and forward_returns Series (MultiIndex date, ticker), returns frozen ICAnalysisResult. For each date, compute cross-sectional RankIC using scipy.stats.spearmanr. Compute rolling IC with configurable window. Compute ICIR as mean(IC)/std(IC).",
+      "modification_points": [
+        "Create ICAnalyzer class in ic_analyzer.py",
+        "Implement compute_ic() method: iterate dates, compute Spearman RankIC for each date using scipy.stats.spearmanr, compute rolling IC with pd.Series.rolling(), compute ICIR as mean/std, compute ic_positive_ratio as count(IC>0)/total",
+        "Return frozen ICAnalysisResult with all statistics"
+      ],
+      "logic_flow": [
+        "Extract unique dates from factor_values MultiIndex",
+        "For each date: extract factor values and forward returns, drop NaN, compute RankIC using spearmanr",
+        "Build IC series from per-date RankIC values",
+        "Compute rolling IC using pd.Series.rolling(window=min_periods).mean()",
+        "Compute statistics: ic_mean, ic_std, icir, rank_ic_mean, rank_ic_std, rank_icir, ic_positive_ratio",
+        "Return frozen ICAnalysisResult"
+      ],
+      "depends_on": [0],
+      "output": "ICAnalyzer class"
+    },
+    {
+      "step": 2,
+      "title": "Write unit tests for ICAnalyzer",
+      "description": "Create tests/unit/test_ic_analyzer.py with 6+ test cases: RankIC correctness against known correlation, ICIR computation, rolling window size, edge cases (empty data, insufficient stocks), frozen dataclass immutability.",
+      "modification_points": [
+        "Test RankIC matches scipy.stats.spearmanr for known data",
+        "Test ICIR = mean(IC) / std(IC)",
+        "Test rolling IC window parameter controls output length",
+        "Test edge case: empty DataFrame returns empty ICAnalysisResult",
+        "Test edge case: < min_periods dates returns default ICAnalysisResult",
+        "Test frozen dataclass immutability"
+      ],
+      "logic_flow": [
+        "Create synthetic factor and return DataFrames with known correlation",
+        "Compute IC and verify against expected Spearman correlation",
+        "Verify ICIR computation matches manual calculation",
+        "Test rolling window produces correct-length output"
+      ],
+      "depends_on": [1],
+      "output": "tests/unit/test_ic_analyzer.py"
+    }
+  ],
+
+  "pre_analysis": [
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature spec for F-032 IC analysis and subject-matter-expert analysis",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-032-factor-ic-analysis.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_p6_ic_infrastructure",
+      "action": "Analyze existing P6 IC computation functions in audit.py",
+      "commands": [
+        "Read(synapse/factor/audit.py)",
+        "Read(synapse/factor/decay.py)"
+      ],
+      "output_to": "p6_ic",
+      "on_error": "skip_optional"
+    }
+  ],
+
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-032-factor-ic-analysis.md",
+      "feature_id": "F-032",
+      "priority": "highest",
+      "usage": "ICAnalysisResult data model and IC computation specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md",
+      "priority": "high",
+      "usage": "Cross-sectional IC methodology, ICIR thresholds, IC decay analysis (Section 3)"
+    }
+  ],
+
+  "inherited": {
+    "from": "IMPL-001",
+    "context": ["ICAnalysisResult frozen dataclass from result.py"]
+  },
+
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-003",
+    "strategy": "resume",
+    "resume_from": "WFS-synapse-p2-backtest-IMPL-001"
+  },
+
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+
+  "reference": {
+    "p6_ic": "synapse/factor/audit.py - compute_ic, compute_rank_ic, compute_rolling_ic, compute_icir functions",
+    "p6_decay": "synapse/factor/decay.py - compute_ic_decay, compute_decay_half_life"
+  },
+
+  "rationale": {
+    "why_cross_sectional": "Standard factor research uses cross-sectional IC (multiple stocks at single date), not time-series IC",
+    "why_spearman": "RankIC is robust to outliers and measures monotonic relationship, preferred for factor evaluation"
+  },
+
+  "risks": [
+    {"risk": "scipy dependency not in project", "mitigation": "Check if scipy is already imported; if not, use pandas corr(method='spearman') as alternative"},
+    {"risk": "Insufficient stocks at some dates", "mitigation": "Skip dates with < min_stocks (10) valid pairs, log warning"}
+  ],
+
+  "test": {
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_ic_analyzer.py -p no:asyncio",
+      "run_coverage": "py -m pytest tests/unit/test_ic_analyzer.py -p no:asyncio --cov=synapse/backtest/ic_analyzer --cov-report=term-missing"
+    }
+  }
+}

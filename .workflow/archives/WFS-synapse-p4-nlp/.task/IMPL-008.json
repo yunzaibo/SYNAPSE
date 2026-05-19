@@ -1,0 +1,271 @@
+{
+  "id": "IMPL-008",
+  "title": "NLP-P3 Event Integration — NLP与P3事件引擎集成",
+  "description": "Connect all NLP outputs to the P3 event engine via BaseDetector implementations. Create 6 NLP detectors (AnnouncementDetector, ResearchReportDetector, NewsSentimentDetector, PolicyDetector, NERDetector, EventExtractionDetector) that implement BaseDetector ABC, register with DetectorRegistry, and map NLP confidence scores to Event.confidence_score. This is the final Wave 4 integration task that depends on all previous NLP tasks.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/event/",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-003",
+    "IMPL-004",
+    "IMPL-005",
+    "IMPL-006",
+    "IMPL-007"
+  ],
+  "focus_paths": [
+    "synapse/event/nlp_detectors.py",
+    "tests/unit/test_nlp_detectors.py",
+    "tests/integration/test_nlp_event_pipeline.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "6 NLP detectors implemented: [AnnouncementDetector, ResearchReportDetector, NewsSentimentDetector, PolicyDetector, NERDetector, EventExtractionDetector]",
+      "All 6 detectors registered in DetectorRegistry",
+      "NLP events flow through PropagationGraph correctly",
+      "Confidence scores propagate to ImpactAnalyzer",
+      "Graceful degradation: NLP failure returns None, no crash",
+      "20+ unit tests + 5+ integration tests pass: verify by py -m pytest tests/unit/test_nlp_detectors.py tests/integration/test_nlp_event_pipeline.py -p no:asyncio -q (exit code 0)",
+      "All existing P3 tests continue to pass"
+    ],
+    "verification": "py -m pytest tests/unit/test_nlp_detectors.py tests/integration/test_nlp_event_pipeline.py -p no:asyncio -q && py -m pytest tests/ -p no:asyncio -q",
+    "definition_of_done": "All NLP detectors registered, events flow through P3 pipeline, graceful degradation, no regression in existing tests"
+  },
+  "files": [
+    {
+      "path": "synapse/event/nlp_detectors.py",
+      "action": "create",
+      "change": "6 NLP BaseDetector implementations mapping NLP outputs to P3 Event schema"
+    },
+    {
+      "path": "synapse/event/taxonomy.py",
+      "action": "modify",
+      "change": "Add NLP-specific source types to EventSourceType if needed (NLP_NEWS, NLP_ANNOUNCEMENT, NLP_POLICY_DOC)"
+    },
+    {
+      "path": "synapse/event/__init__.py",
+      "action": "modify",
+      "change": "Add lazy imports for NLP detector exports"
+    },
+    {
+      "path": "tests/unit/test_nlp_detectors.py",
+      "action": "create",
+      "change": "20+ unit tests for all 6 NLP detectors: detect(), event_type(), confidence_score(), graceful degradation"
+    },
+    {
+      "path": "tests/integration/test_nlp_event_pipeline.py",
+      "action": "create",
+      "change": "5+ integration tests: NLP text → detector → Event → PropagationGraph → ImpactAnalyzer pipeline"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Implement 6 NLP BaseDetector classes",
+      "description": "Create synapse/event/nlp_detectors.py with 6 detectors implementing BaseDetector ABC: AnnouncementDetector (F-037→EARNINGS_FORECAST), ResearchReportDetector (F-038→SOCIAL_SENTIMENT), NewsSentimentDetector (F-039→SOCIAL_SENTIMENT), PolicyDetector_NLP (F-040→POLICY_CHANGE), NERDetector (F-041→metadata enrichment), EventExtractionDetector (F-042→varies). Each detector: detect(data) calls corresponding NLP module, maps output to Event schema.",
+      "modification_points": [
+        "Create 1 new file: synapse/event/nlp_detectors.py",
+        "6 detector classes implementing BaseDetector ABC",
+        "Each with detect(), event_type(), confidence_score()"
+      ],
+      "logic_flow": [
+        "Implement AnnouncementDetector: detect() calls AnnouncementParser, maps to EARNINGS_FORECAST Event",
+        "Implement ResearchReportDetector: detect() calls ReportSummarizer, maps to SOCIAL_SENTIMENT Event",
+        "Implement NewsSentimentDetector: detect() calls NewsSentimentClassifier, maps to SOCIAL_SENTIMENT Event",
+        "Implement PolicyDetector_NLP: detect() calls PolicyUnderstander, maps to POLICY_CHANGE Event",
+        "Implement NERDetector: detect() calls NEREngine, enriches Event metadata with entities",
+        "Implement EventExtractionDetector: detect() calls EventExtractor, maps to P3 EventType"
+      ],
+      "depends_on": [],
+      "output": "nlp_detectors"
+    },
+    {
+      "step": 2,
+      "title": "Update taxonomy and __init__.py exports",
+      "description": "Update synapse/event/taxonomy.py with NLP source types if needed. Update synapse/event/__init__.py with lazy imports for all 6 NLP detectors.",
+      "modification_points": [
+        "Modify 1 file: synapse/event/taxonomy.py — add NLP source types",
+        "Modify 1 file: synapse/event/__init__.py — add lazy imports for NLP detectors"
+      ],
+      "logic_flow": [
+        "Add NLP source types to SOURCE_PRIORITY if needed",
+        "Add __getattr__ entries for 6 NLP detectors in __init__.py",
+        "Update __all__ with new exports"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "taxonomy_and_exports"
+    },
+    {
+      "step": 3,
+      "title": "Write NLP detector unit tests",
+      "description": "Create tests/unit/test_nlp_detectors.py with 20+ tests: each detector's detect(), event_type(), confidence_score(), graceful degradation (empty NLP result→None), Event schema compliance, confidence score propagation.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_nlp_detectors.py",
+        "20+ test methods covering all 6 detectors"
+      ],
+      "logic_flow": [
+        "Test each detector: detect() returns Event or None",
+        "Test event_type() returns correct string",
+        "Test confidence_score() in [0.0, 1.0]",
+        "Test graceful degradation: empty input→None",
+        "Test Event schema: all required fields populated"
+      ],
+      "depends_on": [
+        2
+      ],
+      "output": "nlp_detector_tests"
+    },
+    {
+      "step": 4,
+      "title": "Write NLP event pipeline integration tests",
+      "description": "Create tests/integration/test_nlp_event_pipeline.py with 5+ integration tests: NLP text → NLP module → detector → Event → DetectorRegistry.detect_all() → PropagationGraph → ImpactAnalyzer. Test end-to-end pipeline with real Chinese text samples.",
+      "modification_points": [
+        "Create 1 new file: tests/integration/test_nlp_event_pipeline.py",
+        "5+ integration test methods"
+      ],
+      "logic_flow": [
+        "Test: earnings text → AnnouncementDetector → Event → PropagationGraph.add_event()",
+        "Test: news text → NewsSentimentDetector → SOCIAL_SENTIMENT Event",
+        "Test: policy text → PolicyDetector_NLP → POLICY_CHANGE Event",
+        "Test: DetectorRegistry.detect_all() with NLP detectors registered",
+        "Test: ImpactAnalyzer computes impact for NLP events"
+      ],
+      "depends_on": [
+        3
+      ],
+      "output": "integration_tests"
+    },
+    {
+      "step": 5,
+      "title": "Verify no regression in existing P3 tests",
+      "description": "Run full test suite to verify all existing P3 tests continue to pass after NLP integration. Fix any regressions.",
+      "modification_points": [
+        "Run full test suite: py -m pytest tests/ -p no:asyncio -q",
+        "Fix any import or dependency issues"
+      ],
+      "logic_flow": [
+        "Run full test suite",
+        "Identify any failures",
+        "Fix import cycles or dependency issues",
+        "Re-run until all tests pass"
+      ],
+      "depends_on": [
+        4
+      ],
+      "output": "regression_check"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-043 integration feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-043-nlp-p3-event-integration.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_detector_pattern",
+      "action": "Study existing concrete detectors for pattern consistency",
+      "commands": [
+        "Read(synapse/event/detectors.py)",
+        "Read(synapse/event/base.py)",
+        "Read(synapse/event/registry.py)"
+      ],
+      "output_to": "detector_patterns"
+    },
+    {
+      "step": "verify_existing_tests",
+      "action": "Run existing P3 tests to establish baseline before integration",
+      "commands": [
+        "bash(cd D:/Study2/SYNAPSE && py -m pytest tests/ -p no:asyncio -q --tb=short 2>&1 | tail -20)"
+      ],
+      "output_to": "baseline_tests"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-043-nlp-p3-event-integration.md",
+      "feature_id": "F-043",
+      "priority": "highest",
+      "usage": "Integration requirements: 6 detectors, BaseDetector ABC, DetectorRegistry, graceful degradation"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-003",
+    "context": [
+      "AnnouncementParser",
+      "ReportSummarizer",
+      "NewsSentimentClassifier",
+      "PolicyUnderstander",
+      "NEREngine",
+      "EventExtractor"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-008",
+    "strategy": "merge_fork",
+    "resume_from": null,
+    "merge_from": [
+      "WFS-synapse-p4-nlp-IMPL-003",
+      "WFS-synapse-p4-nlp-IMPL-004",
+      "WFS-synapse-p4-nlp-IMPL-005",
+      "WFS-synapse-p4-nlp-IMPL-006",
+      "WFS-synapse-p4-nlp-IMPL-007"
+    ]
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave4-integration",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "feature_spec": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-043-nlp-p3-event-integration.md",
+    "base_detector": "synapse/event/base.py",
+    "registry": "synapse/event/registry.py",
+    "existing_detectors": "synapse/event/detectors.py"
+  },
+  "rationale": {
+    "priority": "Wave 4 Integration — Final task, depends on all NLP tasks",
+    "approach": "BaseDetector implementations wrapping NLP modules, register with DetectorRegistry"
+  },
+  "risks": [
+    "Import cycles between synapse/nlp/ and synapse/event/ — mitigate with lazy imports",
+    "NLP model loading may block event engine — mitigate with graceful degradation (None return)"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_nlp_detectors.py tests/integration/test_nlp_event_pipeline.py -p no:asyncio -q",
+      "run_all": "py -m pytest tests/ -p no:asyncio -q"
+    }
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T14:52:55.050535+00:00"
+    }
+  ]
+}

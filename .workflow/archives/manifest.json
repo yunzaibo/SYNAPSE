@@ -8,7 +8,13 @@
       "tasks_completed": 5,
       "tests_passed": 114
     },
-    "tags": ["data-source", "adapter", "eastmoney", "akshare", "streaming"]
+    "tags": [
+      "data-source",
+      "adapter",
+      "eastmoney",
+      "akshare",
+      "streaming"
+    ]
   },
   {
     "session_id": "WFS-synapse-p6-factor-engine",
@@ -19,7 +25,13 @@
       "tasks_completed": 7,
       "tests_passed": 230
     },
-    "tags": ["factor-engine", "IC-RankIC", "portfolio-optimization", "event-factor", "traditional-factors"]
+    "tags": [
+      "factor-engine",
+      "IC-RankIC",
+      "portfolio-optimization",
+      "event-factor",
+      "traditional-factors"
+    ]
   },
   {
     "session_id": "WFS-synapse-p1-market-semantics",
@@ -30,7 +42,13 @@
       "tasks_completed": 6,
       "tests_passed": 1078
     },
-    "tags": ["market-semantics", "trading-calendar", "ex-right-adjustment", "northbound-flow", "index-constituent"]
+    "tags": [
+      "market-semantics",
+      "trading-calendar",
+      "ex-right-adjustment",
+      "northbound-flow",
+      "index-constituent"
+    ]
   },
   {
     "session_id": "WFS-synapse-p1-2-watchlist",
@@ -42,7 +60,13 @@
       "tests_passed": 183,
       "coverage": 0.97
     },
-    "tags": ["watchlist", "scoring", "event-driven", "portfolio-aware", "market-semantics"],
+    "tags": [
+      "watchlist",
+      "scoring",
+      "event-driven",
+      "portfolio-aware",
+      "market-semantics"
+    ],
     "lessons": {
       "successes": [
         "Parallel execution of IMPL-3/4/5 saved time",
@@ -51,6 +75,72 @@
       ],
       "challenges": [],
       "watch_patterns": []
+    }
+  },
+  {
+    "session_id": "WFS-synapse-p2-backtest",
+    "description": "P2 Long-Short Quintile Backtest Engine — 5分位回测、8项指标、因子IC分析、组合收益归因、与P6 FactorEngine集成",
+    "archived_at": "2026-05-20T01:30:00+08:00",
+    "archive_path": ".workflow/archives/WFS-synapse-p2-backtest",
+    "metrics": {
+      "tasks_completed": 8,
+      "tests_passed": 223,
+      "coverage": 0.98,
+      "review_dimensions": 3
+    },
+    "tags": [
+      "backtest-engine",
+      "quintile-sorting",
+      "factor-IC",
+      "return-attribution",
+      "parquet-persistence"
+    ],
+    "lessons": {
+      "successes": [
+        "Parallel execution of IMPL-2/3/4/5 saved significant time",
+        "Phased approach with clear dependencies worked well",
+        "98% test coverage achieved with comprehensive integration tests",
+        "All conflicts resolved before implementation"
+      ],
+      "challenges": [
+        "Architecture review identified shared mutable state issue in MetricsCalculator",
+        "Security review found path traversal vulnerability in persistence layer"
+      ],
+      "watch_patterns": [
+        "MetricsCalculator._benchmark_returns state mutation needs refactoring",
+        "Persistence layer needs path sanitization for factor_id/run_id"
+      ]
+    }
+  },
+  {
+    "session_id": "WFS-synapse-p4-nlp",
+    "description": "P4 Chinese Financial NLP Layer",
+    "archived_at": "2026-05-20T04:30:00+08:00",
+    "archive_path": ".workflow/archives/WFS-synapse-p4-nlp",
+    "metrics": {
+      "tasks_completed": 8,
+      "tests_passed": 263
+    },
+    "tags": [
+      "nlp",
+      "financial-ner",
+      "sentiment-lexicon",
+      "event-extraction",
+      "p3-integration"
+    ],
+    "lessons": {
+      "successes": [
+        "4-wave parallel execution",
+        "263+ dedicated tests",
+        "Zero regressions"
+      ],
+      "challenges": [
+        "Agent task ID lookup via filesystem fallback"
+      ],
+      "watch_patterns": [
+        "Lazy imports for circular dep prevention",
+        "Graceful degradation pattern"
+      ]
     }
   }
 ]

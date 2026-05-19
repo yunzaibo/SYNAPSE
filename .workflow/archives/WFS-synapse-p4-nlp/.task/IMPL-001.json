@@ -1,0 +1,283 @@
+{
+  "id": "IMPL-001",
+  "title": "Financial NER Engine — 金融实体识别引擎",
+  "description": "Implement a Chinese financial Named Entity Recognition engine that recognizes 5 entity types (company, person, product, institution, metric) with surface form extraction, character offsets, confidence scoring, and company-to-ticker linking. The NER engine is a Wave 1 foundation dependency for F-037, F-042, F-038, and F-040. It MUST recognize A-share company names (full name, abbreviation, stock name), person names (analysts, executives, regulators), financial metrics (ROE, PE, PB, EPS), and link company entities to stock tickers via fuzzy matching.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/nlp/",
+  "action": "Implement",
+  "depends_on": [],
+  "focus_paths": [
+    "synapse/nlp/",
+    "tests/unit/test_ner_engine.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "5 entity types recognized: [company, person, product, institution, metric]",
+      "NERResult frozen dataclass created with 7 fields: [surface_form, entity_type, start_offset, end_offset, confidence, linked_ticker, normalized_name]",
+      "Company ticker linking with fuzzy matching implemented",
+      "18+ unit tests pass: verify by py -m pytest tests/unit/test_ner_engine.py -p no:asyncio -q (exit code 0)",
+      "All frozen dataclasses use frozen=True, slots=True pattern"
+    ],
+    "verification": "py -m pytest tests/unit/test_ner_engine.py -p no:asyncio -q && ls synapse/nlp/ner*.py | wc -l",
+    "definition_of_done": "NER engine recognizes 5 entity types in Chinese financial text with >90% accuracy on company names, links companies to tickers, and exposes a clean frozen dataclass API"
+  },
+  "files": [
+    {
+      "path": "synapse/nlp/__init__.py",
+      "action": "create",
+      "change": "NLP module init with lazy imports for all NLP components"
+    },
+    {
+      "path": "synapse/nlp/schemas.py",
+      "action": "create",
+      "change": "TextDocument and NERResult frozen dataclasses with slots=True, to_dict/from_dict round-trip"
+    },
+    {
+      "path": "synapse/nlp/ner_engine.py",
+      "action": "create",
+      "change": "NEREngine class with recognize() method, 5 entity type recognizers, ticker linking via fuzzy match"
+    },
+    {
+      "path": "synapse/nlp/dict/company_dict.py",
+      "action": "create",
+      "change": "A-share company name dictionary (stock names, abbreviations, full names) with ticker mapping"
+    },
+    {
+      "path": "synapse/nlp/dict/metric_dict.py",
+      "action": "create",
+      "change": "Financial metric abbreviation dictionary (ROE/市盈率/每股收益 etc.)"
+    },
+    {
+      "path": "synapse/nlp/dict/person_patterns.py",
+      "action": "create",
+      "change": "Person name detection patterns (analyst names, executive names via suffix matching)"
+    },
+    {
+      "path": "synapse/nlp/text_preprocessor.py",
+      "action": "create",
+      "change": "TextPreprocessor with abbreviation expansion, number normalization (亿/万→float), approximation marker preservation"
+    },
+    {
+      "path": "tests/unit/test_ner_engine.py",
+      "action": "create",
+      "change": "18+ tests covering: company recognition, person recognition, metric recognition, ticker linking, edge cases (empty text, nested entities), preprocessor"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create NLP module structure and shared schemas",
+      "description": "Create synapse/nlp/ package with __init__.py (lazy imports), schemas.py defining TextDocument and NERResult frozen dataclasses. TextDocument: text, doc_id, source_type, metadata. NERResult: doc_id, entities tuple[NEREntity, ...], processing_time_ms. NEREntity: surface_form, entity_type, start_offset, end_offset, confidence, linked_ticker, normalized_name. All frozen=True, slots=True.",
+      "modification_points": [
+        "Create 2 new files: synapse/nlp/__init__.py, synapse/nlp/schemas.py",
+        "Define 3 frozen dataclasses: TextDocument, NERResult, NEREntity",
+        "Implement to_dict() and from_dict() round-trip for all schemas"
+      ],
+      "logic_flow": [
+        "Define TextDocument with id, text, source_type, metadata fields",
+        "Define NEREntity with 7 fields per spec",
+        "Define NERResult with doc_id, entities tuple, processing_time_ms",
+        "Add to_dict/from_dict to each schema",
+        "Add lazy imports in __init__.py"
+      ],
+      "depends_on": [],
+      "output": "nlp_schemas"
+    },
+    {
+      "step": 2,
+      "title": "Implement TextPreprocessor",
+      "description": "Create synapse/nlp/text_preprocessor.py with abbreviation expansion (营收→营业收入, 净利→净利润, 扣非→扣除非经常性损益, 50+ abbreviations), number normalization (1.5亿→150000000.0, 3000万→30000000.0), approximation marker preservation (约/超/近 stored as metadata).",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/text_preprocessor.py",
+        "Implement 50+ abbreviation mappings",
+        "Implement 亿/万 number normalization",
+        "Implement approximation marker extraction"
+      ],
+      "logic_flow": [
+        "Define ABBREVIATIONS dict with 50+ financial term expansions",
+        "Implement expand_abbreviations(text) -> str",
+        "Implement normalize_numbers(text) -> tuple[str, dict] with metadata",
+        "Implement extract_approximation_markers(text) -> list[str]",
+        "Combine into TextPreprocessor.preprocess(text) -> PreprocessedText"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "text_preprocessor"
+    },
+    {
+      "step": 3,
+      "title": "Implement dictionary-based entity recognizers",
+      "description": "Create 3 dictionary modules: company_dict.py (A-share listed company names with ticker mapping, 100+ entries), metric_dict.py (financial metric abbreviations, 30+ entries), person_patterns.py (person name detection via suffix matching for 分析师/总经理/董事长 etc.).",
+      "modification_points": [
+        "Create 3 new files in synapse/nlp/dict/",
+        "company_dict.py: COMPANY_NAMES dict mapping name→ticker, 100+ A-share companies",
+        "metric_dict.py: METRIC_ALIASES dict mapping abbreviation→standard_name, 30+ metrics",
+        "person_patterns.py: PERSON_SUFFIXES list, PERSON_ROLE_PATTERNS regex list"
+      ],
+      "logic_flow": [
+        "Populate company_dict.py with top A-share company names (贵州茅台/600519.SH, 宁德时代/300750.SZ, etc.)",
+        "Populate metric_dict.py with common financial abbreviations",
+        "Define person detection patterns based on Chinese name conventions + role suffixes"
+      ],
+      "depends_on": [],
+      "output": "entity_dictionaries"
+    },
+    {
+      "step": 4,
+      "title": "Implement NEREngine core with ticker linking",
+      "description": "Create synapse/nlp/ner_engine.py implementing NEREngine with recognize(text: TextDocument) -> NERResult. Engine chains: (1) company name dict lookup, (2) metric dict lookup, (3) person name pattern matching, (4) institution pattern matching (证监会/央行 etc.), (5) ticker linking via fuzzy match (difflib.SequenceMatcher).",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/ner_engine.py",
+        "Implement NEREngine class with recognize() method",
+        "Implement 5 entity type recognizers",
+        "Implement fuzzy ticker linking (difflib or ratio-based)"
+      ],
+      "logic_flow": [
+        "Load dictionaries at __init__ (lazy)",
+        "Chain recognizers: company→metric→person→institution",
+        "Deduplicate overlapping spans (keep highest confidence)",
+        "Link company entities to tickers via fuzzy matching",
+        "Return NERResult with all entities and timing"
+      ],
+      "depends_on": [
+        2,
+        3
+      ],
+      "output": "ner_engine"
+    },
+    {
+      "step": 5,
+      "title": "Write comprehensive NER tests",
+      "description": "Create tests/unit/test_ner_engine.py with 18+ tests covering: company recognition (full name, abbreviation, stock name), person recognition, metric recognition, institution recognition, ticker linking accuracy, preprocessor abbreviation expansion, number normalization, edge cases (empty text, nested entities, no-match text), frozen dataclass immutability, to_dict/from_dict round-trip.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_ner_engine.py",
+        "Write 18+ test methods covering all entity types and edge cases",
+        "Verify frozen=True, slots=True on all dataclasses"
+      ],
+      "logic_flow": [
+        "Test company recognition: 贵州茅台→('贵州茅台', 'company', '600519.SH')",
+        "Test person recognition: 张三(分析师)→('张三', 'person')",
+        "Test metric recognition: ROE→('ROE', 'metric', '净资产收益率')",
+        "Test ticker linking: fuzzy match accuracy",
+        "Test preprocessor: abbreviation expansion, number normalization",
+        "Test edge cases: empty text returns empty NERResult",
+        "Test frozen dataclass: assignment raises FrozenInstanceError"
+      ],
+      "depends_on": [
+        4
+      ],
+      "output": "ner_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package for artifact paths and smart context",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-041 NER engine feature spec and guidance specification",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-041-financial-ner-engine.md)",
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/guidance-specification.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_event_patterns",
+      "action": "Study existing BaseDetector and Event schema patterns for integration design",
+      "commands": [
+        "Read(synapse/event/base.py)",
+        "Read(synapse/core/schemas/event.py)",
+        "Read(synapse/event/social.py)"
+      ],
+      "output_to": "integration_patterns"
+    },
+    {
+      "step": "search_existing_nlp_patterns",
+      "action": "Search for existing NLP-related code patterns in the codebase",
+      "commands": [
+        "bash(rg 'LexiconAnalyzer|NERResult|TextDocument' --type py -n --max-count 10)",
+        "bash(rg 'frozen=True|slots=True' --type py -n --max-count 5)"
+      ],
+      "output_to": "nlp_patterns"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-041-financial-ner-engine.md",
+      "feature_id": "F-041",
+      "priority": "highest",
+      "usage": "NER engine requirements: 5 entity types, ticker linking, frozen dataclass API"
+    },
+    {
+      "type": "topic_framework",
+      "source": "brainstorm_framework",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/guidance-specification.md",
+      "priority": "high",
+      "usage": "Architectural decisions: modular pipeline, BaseDetector integration, graceful degradation"
+    }
+  ],
+  "inherited": {},
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-001",
+    "strategy": "new",
+    "resume_from": null,
+    "merge_from": []
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave1-foundation",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "base_detector": "synapse/event/base.py",
+    "event_schema": "synapse/core/schemas/event.py",
+    "existing_nlp": "synapse/event/social.py",
+    "test_pattern": "tests/unit/test_event_detection.py"
+  },
+  "rationale": {
+    "priority": "Wave 1 Foundation — NER is prerequisite for F-037, F-042, F-038, F-040",
+    "approach": "Dictionary-based NER with fuzzy ticker linking, no ML model required for MVP"
+  },
+  "risks": [
+    "A-share company name dictionary may be incomplete — mitigate with extensible YAML loading",
+    "Fuzzy ticker linking accuracy may vary — mitigate with confidence threshold"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_ner_engine.py -p no:asyncio -q",
+      "run_coverage": "py -m pytest tests/unit/test_ner_engine.py -p no:asyncio --cov=synapse/nlp --cov-report=term-missing"
+    }
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T21:52:48.080354"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T21:58:13.203943"
+    }
+  ]
+}

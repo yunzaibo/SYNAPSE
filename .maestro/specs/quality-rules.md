@@ -16,3 +16,5 @@ keywords: [test, coverage, quality, market-data]
 - [test:scoring-pipeline] ScoringEngine 必须测试 register/unregister 动态管理、权重归一化、多维度聚合 (2026-05-19)
 - [test:backward-compat] 新增 dataclass 字段必须测试旧数据格式兼容性（Lazy Upcast） (2026-05-19)
 - [test:coverage-target] 核心模块测试覆盖率目标 ≥ 80%，关键路径 ≥ 90% (2026-05-19)
+- [test:backtest-coverage] backtest 模块测试覆盖率目标 ≥ 90%，所有公开方法必须有对应测试 (2026-05-20)
+- [test:serialization-roundtrip] Parquet 持久化层必须测试 schema 版本兼容性和 to_dict/from_dict 往返一致性 (2026-05-20)

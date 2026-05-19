@@ -1,0 +1,199 @@
+{
+  "id": "IMPL-004",
+  "title": "News Sentiment Classifier — 新闻情感分类器",
+  "description": "Implement a Chinese financial news sentiment classifier with bullish/bearish/neutral classification and aspect-level granularity. The classifier MUST achieve >85% accuracy on financial news, use the 500+ term domain lexicon from F-044, handle negation and degree modifiers, and output SentimentResult frozen dataclass. Depends on F-044 Sentiment Lexicon for domain-specific scoring.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/nlp/",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-002"
+  ],
+  "focus_paths": [
+    "synapse/nlp/sentiment_classifier.py",
+    "tests/unit/test_sentiment_classifier.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "3 sentiment labels: [bullish, bearish, neutral]",
+      "SentimentResult frozen dataclass with 5 fields: [label, confidence, score, aspect_sentiments, processing_time_ms]",
+      "AspectSentiment frozen dataclass with 3 fields: [aspect, label, confidence]",
+      "5+ aspects supported: [earnings, management, market, regulatory, risk]",
+      "16+ unit tests pass: verify by py -m pytest tests/unit/test_sentiment_classifier.py -p no:asyncio -q (exit code 0)",
+      "All frozen dataclasses use frozen=True, slots=True pattern"
+    ],
+    "verification": "py -m pytest tests/unit/test_sentiment_classifier.py -p no:asyncio -q",
+    "definition_of_done": "Sentiment classifier achieves >85% accuracy on financial news with aspect-level granularity"
+  },
+  "files": [
+    {
+      "path": "synapse/nlp/sentiment_classifier.py",
+      "action": "create",
+      "change": "NewsSentimentClassifier with classify() method, lexicon-based scoring, aspect detection, confidence computation"
+    },
+    {
+      "path": "synapse/nlp/aspect_detector.py",
+      "action": "create",
+      "change": "AspectDetector: identify financial aspects (earnings/management/market/regulatory/risk) in text segments"
+    },
+    {
+      "path": "tests/unit/test_sentiment_classifier.py",
+      "action": "create",
+      "change": "16+ tests covering: bullish/bearish/neutral classification, aspect sentiment, negation handling, edge cases, frozen dataclass"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Implement AspectDetector",
+      "description": "Create synapse/nlp/aspect_detector.py with AspectDetector class. Identifies financial aspects in text segments using keyword matching: earnings (业绩/利润/营收), management (管理层/CEO/董事长), market (市场/股价/估值), regulatory (政策/监管/合规), risk (风险/诉讼/处罚). Returns list of (aspect, text_segment) pairs.",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/aspect_detector.py",
+        "5 aspect categories with keyword dictionaries",
+        "detect_aspects(text) -> list[tuple[str, str]]"
+      ],
+      "logic_flow": [
+        "Define ASPECT_KEYWORDS dict mapping aspect→keyword list",
+        "Split text into sentences",
+        "Match keywords per sentence",
+        "Return (aspect, sentence) pairs"
+      ],
+      "depends_on": [],
+      "output": "aspect_detector"
+    },
+    {
+      "step": 2,
+      "title": "Implement NewsSentimentClassifier",
+      "description": "Create synapse/nlp/sentiment_classifier.py with NewsSentimentClassifier. Pipeline: (1) TextPreprocessor, (2) EnhancedLexiconAnalyzer.score(), (3) AspectDetector for aspect-level sentiment, (4) Threshold-based label assignment (score > 0.1 → bullish, < -0.1 → bearish, else neutral), (5) Confidence = abs(score).",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/sentiment_classifier.py",
+        "NewsSentimentClassifier.classify() pipeline",
+        "SentimentResult and AspectSentiment frozen dataclasses"
+      ],
+      "logic_flow": [
+        "Preprocess text",
+        "Compute overall lexicon score via EnhancedLexiconAnalyzer",
+        "Detect aspects and compute per-aspect scores",
+        "Assign label based on thresholds",
+        "Compute confidence from score magnitude"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "sentiment_classifier"
+    },
+    {
+      "step": 3,
+      "title": "Write sentiment classifier tests",
+      "description": "Create tests/unit/test_sentiment_classifier.py with 16+ tests: bullish text, bearish text, neutral text, mixed sentiment, aspect detection, negation handling (不看好→bearish), degree modifiers (非常看好→higher confidence), edge cases, frozen dataclass.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_sentiment_classifier.py",
+        "16+ test methods"
+      ],
+      "logic_flow": [
+        "Test bullish: '业绩大幅增长超预期'→bullish",
+        "Test bearish: '亏损扩大,业绩下滑'→bearish",
+        "Test neutral: '公司召开股东大会'→neutral",
+        "Test mixed: '业绩增长但估值偏高'→depends on score",
+        "Test aspect: earnings vs management aspects"
+      ],
+      "depends_on": [
+        2
+      ],
+      "output": "sentiment_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-039 sentiment classifier feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-039-news-sentiment-classifier.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_sentiment",
+      "action": "Study existing LexiconAnalyzer and SentimentPropagation for integration",
+      "commands": [
+        "Read(synapse/event/social.py)",
+        "Read(synapse/event/sentiment.py)"
+      ],
+      "output_to": "existing_sentiment_analysis"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-039-news-sentiment-classifier.md",
+      "feature_id": "F-039",
+      "priority": "highest",
+      "usage": "Sentiment classifier requirements: 3 labels, aspect-level, negation/degree handling"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-002",
+    "context": [
+      "EnhancedLexiconAnalyzer from step 3",
+      "NegationDetector, DegreeModifier"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-004",
+    "strategy": "fork",
+    "resume_from": "WFS-synapse-p4-nlp-IMPL-002",
+    "merge_from": []
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave2-core-nlp",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "feature_spec": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-039-news-sentiment-classifier.md"
+  },
+  "rationale": {
+    "priority": "Wave 2 Core NLP — Depends on Lexicon (Wave 1)",
+    "approach": "Lexicon-based scoring with aspect detection, threshold classification"
+  },
+  "risks": [
+    "85% accuracy target may require transformer model augmentation — mitigate with lexicon+rule hybrid",
+    "Aspect detection keyword coverage — mitigate with extensible keyword dictionaries"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_sentiment_classifier.py -p no:asyncio -q"
+    }
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T14:22:08.546016+00:00"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T14:22:08.546016+00:00"
+    }
+  ]
+}

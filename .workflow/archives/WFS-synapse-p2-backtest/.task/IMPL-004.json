@@ -1,0 +1,148 @@
+{
+  "id": "IMPL-004",
+  "title": "Long-Short Spread Calculation",
+  "description": "Implement long-short portfolio spread calculation: compute spread returns (Q5 - Q1), cumulative spread, and optional benchmark comparison (CSI 300). Return frozen LongShortResult dataclass.",
+  "status": "pending",
+  "type": "feature",
+  "scope": "synapse/backtest",
+  "action": "Implement",
+  "depends_on": ["IMPL-001"],
+  "focus_paths": ["synapse/backtest/spread.py", "tests/unit/test_long_short_spread.py"],
+
+  "convergence": {
+    "criteria": [
+      "LongShort spread computed as Q5 - Q1: verify by py -m pytest tests/unit/test_long_short_spread.py -p no:asyncio (exit code 0)",
+      "Cumulative spread computed correctly: verify by assertion in tests",
+      "Benchmark comparison works: verify by benchmark parameter test",
+      "Annualized spread return computed: verify by assertion in tests"
+    ],
+    "verification": "py -m pytest tests/unit/test_long_short_spread.py -p no:asyncio",
+    "definition_of_done": "LongShortSpread correctly computes spread returns, cumulative spread, and benchmark-relative metrics"
+  },
+
+  "files": [
+    {"path": "synapse/backtest/spread.py", "action": "create", "change": "LongShortSpread class with compute() method for spread returns and cumulative calculation"},
+    {"path": "tests/unit/test_long_short_spread.py", "action": "create", "change": "Unit tests for LongShortSpread: spread computation, cumulative, benchmark comparison, edge cases"}
+  ],
+
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Implement LongShortSpread class",
+      "description": "Create synapse/backtest/spread.py with LongShortSpread class. Constructor accepts optional benchmark_returns Series. compute() takes quintile_returns DataFrame (columns Q1-Q5) and returns a frozen dataclass with spread_returns (Q5 - Q1), cumulative_spread, benchmark_returns, excess_returns, annual_spread_return, annual_benchmark_return, annual_excess_return. Handle missing benchmark gracefully (excess_returns = None when no benchmark).",
+      "modification_points": [
+        "Create LongShortSpread class in spread.py",
+        "Implement compute() method: spread = Q5_return - Q1_return, cumulative = (1+spread).cumprod()-1",
+        "Compute annualized spread return: (1+total_spread)^(252/n)-1",
+        "Compute excess returns: spread - benchmark when benchmark provided",
+        "Compute annualized benchmark and excess returns when benchmark available"
+      ],
+      "logic_flow": [
+        "Extract Q5 and Q1 columns from quintile_returns DataFrame",
+        "Compute spread_returns = Q5 - Q1 for each period",
+        "Compute cumulative_spread using geometric compounding",
+        "If benchmark provided: compute excess_returns = spread - benchmark",
+        "Compute annualized metrics for all return series",
+        "Return frozen dataclass with all results"
+      ],
+      "depends_on": [0],
+      "output": "LongShortSpread class"
+    },
+    {
+      "step": 2,
+      "title": "Write unit tests for LongShortSpread",
+      "description": "Create tests/unit/test_long_short_spread.py with 6+ test cases: spread computation correctness, cumulative return, benchmark comparison, missing benchmark handling, annualized returns, frozen dataclass.",
+      "modification_points": [
+        "Test spread = Q5 - Q1 for known quintile returns",
+        "Test cumulative spread matches manual calculation",
+        "Test benchmark comparison with known benchmark series",
+        "Test missing benchmark produces None for excess_returns",
+        "Test annualized return computation",
+        "Test frozen dataclass immutability"
+      ],
+      "logic_flow": [
+        "Create synthetic quintile returns DataFrame with known Q5 and Q1 values",
+        "Verify spread = Q5 - Q1",
+        "Verify cumulative spread = product(1+spread) - 1",
+        "Test with and without benchmark"
+      ],
+      "depends_on": [1],
+      "output": "tests/unit/test_long_short_spread.py"
+    }
+  ],
+
+  "pre_analysis": [
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature spec for F-035 long-short spread",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-035-long-short-spread.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-035-long-short-spread.md",
+      "feature_id": "F-035",
+      "priority": "highest",
+      "usage": "LongShortResult data model and spread calculation specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/subject-matter-expert/analysis.md",
+      "priority": "high",
+      "usage": "Long-short spread interpretation, cumulative return formula, benchmark methodology (Section 1.2, 5)"
+    }
+  ],
+
+  "inherited": {
+    "from": "IMPL-001",
+    "context": ["QuintilePortfolio returns format from result.py"]
+  },
+
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-004",
+    "strategy": "resume",
+    "resume_from": "WFS-synapse-p2-backtest-IMPL-001"
+  },
+
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+
+  "reference": {
+    "formula": "R_LS(t) = R_Q5(t) - R_Q1(t), CUM_LS(T) = Product(1+R_LS(t)) - 1"
+  },
+
+  "rationale": {
+    "why_q5_minus_q1": "Standard long-short convention: go long top quintile (factor predicts high returns), short bottom quintile",
+    "why_optional_benchmark": "L/S spread is already market-neutral; benchmark comparison is supplementary"
+  },
+
+  "risks": [
+    {"risk": "Mismatched index alignment between quintile returns and benchmark", "mitigation": "Use .align() or .reindex() to ensure matching dates before subtraction"}
+  ],
+
+  "test": {
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_long_short_spread.py -p no:asyncio"
+    }
+  }
+}

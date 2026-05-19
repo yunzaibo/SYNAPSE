@@ -1,0 +1,202 @@
+{
+  "id": "IMPL-003",
+  "title": "Financial Announcement Parser — 财报公告解析器",
+  "description": "Implement a structured extraction pipeline for Chinese financial announcements (earnings reports, prospectuses, board resolutions). The parser MUST use TextPreprocessor for abbreviation expansion, extract 5+ financial metrics (revenue, net_profit, eps, roe, gross_margin), handle number format normalization (亿/万→float), preserve approximation markers, and output AnnouncementResult frozen dataclass. Depends on F-041 NER Engine for entity recognition and F-044 Lexicon for text preprocessing.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/nlp/",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-001",
+    "IMPL-002"
+  ],
+  "focus_paths": [
+    "synapse/nlp/announcement_parser.py",
+    "tests/unit/test_announcement_parser.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "5+ financial metrics extracted: [revenue, net_profit, eps, roe, gross_margin]",
+      "AnnouncementResult frozen dataclass with 8 fields: [metrics, period_info, growth_highlights, risk_factors, entities, approximation_markers, confidence, processing_time_ms]",
+      "TextPreprocessor abbreviation expansion integrated",
+      "14+ unit tests pass: verify by py -m pytest tests/unit/test_announcement_parser.py -p no:asyncio -q (exit code 0)",
+      "All frozen dataclasses use frozen=True, slots=True pattern"
+    ],
+    "verification": "py -m pytest tests/unit/test_announcement_parser.py -p no:asyncio -q",
+    "definition_of_done": "Announcement parser extracts 5+ metrics from Chinese earnings text with abbreviation expansion and approximation markers"
+  },
+  "files": [
+    {
+      "path": "synapse/nlp/announcement_parser.py",
+      "action": "create",
+      "change": "AnnouncementParser class with parse() method, regex-based metric extraction, period detection"
+    },
+    {
+      "path": "synapse/nlp/patterns/financial_patterns.py",
+      "action": "create",
+      "change": "20+ regex patterns for financial metric extraction (revenue, profit, EPS, ROE, etc.)"
+    },
+    {
+      "path": "tests/unit/test_announcement_parser.py",
+      "action": "create",
+      "change": "14+ tests covering: metric extraction, period detection, approximation markers, edge cases, frozen dataclass"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create financial extraction patterns",
+      "description": "Create synapse/nlp/patterns/financial_patterns.py with 20+ regex patterns for extracting financial metrics from Chinese text. Patterns handle: revenue (营业收入/营收/总收入), net profit (净利润/归母净利润), EPS (每股收益), ROE (净资产收益率/ROE), gross margin (毛利率), period detection (Q1/Q2/Q3/Q4/年报), approximation markers (约/超/近).",
+      "modification_points": [
+        "Create 1 new file with 20+ regex patterns",
+        "Pattern groups: revenue, profit, eps, roe, margin, period, approximation"
+      ],
+      "logic_flow": [
+        "Define METRIC_PATTERNS dict mapping metric_name→regex",
+        "Each pattern captures: value, unit (亿/万), approximation marker",
+        "Define PERIOD_PATTERNS for Q1-Q4 and annual report detection",
+        "Define APPROXIMATION_MARKERS list (约/超/近/左右/超过)"
+      ],
+      "depends_on": [],
+      "output": "financial_patterns"
+    },
+    {
+      "step": 2,
+      "title": "Implement AnnouncementParser",
+      "description": "Create synapse/nlp/announcement_parser.py with AnnouncementParser class. Methods: parse(text: TextDocument) -> AnnouncementResult. Pipeline: (1) TextPreprocessor.expand_abbreviations, (2) regex metric extraction, (3) period detection, (4) NER entity extraction for company/auditor, (5) approximation marker preservation, (6) confidence scoring.",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/announcement_parser.py",
+        "AnnouncementParser.parse() pipeline with 6 stages",
+        "AnnouncementResult frozen dataclass with 8 fields"
+      ],
+      "logic_flow": [
+        "Preprocess text with TextPreprocessor",
+        "Apply financial pattern matching",
+        "Extract period info (Q1/Q2/Q3/Q4/annual)",
+        "Extract entities via NEREngine",
+        "Collect approximation markers as metadata",
+        "Compute confidence score based on metrics found"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "announcement_parser"
+    },
+    {
+      "step": 3,
+      "title": "Write announcement parser tests",
+      "description": "Create tests/unit/test_announcement_parser.py with 14+ tests: parse standard earnings text, extract 5+ metrics correctly, handle approximation markers, period detection, edge cases (empty text, malformed text), frozen dataclass immutability, confidence scoring.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_announcement_parser.py",
+        "14+ test methods"
+      ],
+      "logic_flow": [
+        "Test standard earnings text extraction",
+        "Test approximation markers preserved",
+        "Test period detection (Q1-Q4)",
+        "Test edge cases (empty/malformed)",
+        "Test frozen dataclass"
+      ],
+      "depends_on": [
+        2
+      ],
+      "output": "announcement_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-037 announcement parser feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-037-financial-announcement-parser.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_patterns",
+      "action": "Study existing regex and data extraction patterns in the codebase",
+      "commands": [
+        "Read(synapse/event/detectors.py)",
+        "Read(synapse/event/taxonomy.py)"
+      ],
+      "output_to": "existing_patterns"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-037-financial-announcement-parser.md",
+      "feature_id": "F-037",
+      "priority": "highest",
+      "usage": "Announcement parser requirements: metric extraction, period detection, approximation markers"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-001",
+    "context": [
+      "TextPreprocessor from step 2",
+      "NEREngine for entity extraction"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-003",
+    "strategy": "merge_fork",
+    "resume_from": null,
+    "merge_from": [
+      "WFS-synapse-p4-nlp-IMPL-001",
+      "WFS-synapse-p4-nlp-IMPL-002"
+    ]
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave2-core-nlp",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "feature_spec": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-037-financial-announcement-parser.md"
+  },
+  "rationale": {
+    "priority": "Wave 2 Core NLP — Depends on NER Engine + Lexicon",
+    "approach": "Regex-based metric extraction with abbreviation expansion, no ML model"
+  },
+  "risks": [
+    "Regex patterns may miss unconventional metric formats — mitigate with extensible pattern registry",
+    "PDF table extraction is out of scope (text-only for MVP)"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_announcement_parser.py -p no:asyncio -q"
+    }
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T22:13:48.465491+08:00"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T22:21:12.198213+08:00"
+    }
+  ]
+}

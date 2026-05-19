@@ -1,0 +1,268 @@
+{
+  "id": "IMPL-002",
+  "title": "Financial Sentiment Lexicon — 金融情感词典",
+  "description": "Build a domain-specific sentiment dictionary with 500+ Chinese financial terms across 7 categories (growth, decline, risk, opportunity, market, regulatory, neutral). The lexicon MUST support negation detection (不看好, 未达预期), degree modifiers (非常, 极其, 略微), and be loadable from external YAML file for user customization. This is a Wave 1 foundation dependency for F-039 News Sentiment Classifier. It extends the existing LexiconAnalyzer in synapse/event/social.py.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/nlp/",
+  "action": "Implement",
+  "depends_on": [],
+  "focus_paths": [
+    "synapse/nlp/",
+    "synapse/nlp/lexicon/",
+    "tests/unit/test_sentiment_lexicon.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "500+ sentiment terms across 7 categories: [growth=80+, decline=70+, risk=60+, opportunity=50+, market=60+, regulatory=50+, neutral=100+]",
+      "Negation detection correctly flips sentiment for 90%+ cases",
+      "Degree modifier handling with 3 levels: [strong=1.5x, moderate=1.0x, weak=0.5x]",
+      "YAML lexicon file loadable in <100ms",
+      "16+ unit tests pass: verify by py -m pytest tests/unit/test_sentiment_lexicon.py -p no:asyncio -q (exit code 0)",
+      "All frozen dataclasses use frozen=True, slots=True pattern"
+    ],
+    "verification": "py -m pytest tests/unit/test_sentiment_lexicon.py -p no:asyncio -q && ls synapse/nlp/lexicon/*.yaml | wc -l",
+    "definition_of_done": "500+ term sentiment lexicon with negation/degree handling, YAML-based configuration, and clean frozen dataclass API"
+  },
+  "files": [
+    {
+      "path": "synapse/nlp/lexicon/__init__.py",
+      "action": "create",
+      "change": "Lexicon sub-package init"
+    },
+    {
+      "path": "synapse/nlp/lexicon/sentiment_dict.yaml",
+      "action": "create",
+      "change": "500+ sentiment terms in YAML format with category, score, negation_sensitive flags"
+    },
+    {
+      "path": "synapse/nlp/lexicon/loader.py",
+      "action": "create",
+      "change": "LexiconLoader class: load from YAML, validate schema, cache in memory, <100ms load time"
+    },
+    {
+      "path": "synapse/nlp/lexicon/scorer.py",
+      "action": "create",
+      "change": "EnhancedLexiconAnalyzer extending social.py LexiconAnalyzer with negation/degree/yaml support"
+    },
+    {
+      "path": "synapse/nlp/lexicon/negation.py",
+      "action": "create",
+      "change": "NegationDetector: context window-based negation detection (不/未/没/非/无 + 3-token window)"
+    },
+    {
+      "path": "synapse/nlp/lexicon/degree.py",
+      "action": "create",
+      "change": "DegreeModifier: 3-level degree detection (非常/极其→strong, 较为/比较→moderate, 略微/稍→weak)"
+    },
+    {
+      "path": "tests/unit/test_sentiment_lexicon.py",
+      "action": "create",
+      "change": "16+ tests covering: term count, category distribution, negation flipping, degree modification, YAML loading, custom terms, scorer integration, edge cases"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create 500+ term sentiment YAML lexicon",
+      "description": "Create synapse/nlp/lexicon/sentiment_dict.yaml with 500+ terms across 7 categories. Each entry: term, sentiment (bullish/bearish/neutral), score [-1.0, 1.0], category, negation_sensitive (bool), context_window (int). Categories: growth (80+), decline (70+), risk (60+), opportunity (50+), market (60+), regulatory (50+), neutral (100+).",
+      "modification_points": [
+        "Create 1 new YAML file with 500+ entries",
+        "7 categories with specified minimum counts",
+        "Each entry has 5 fields: term, sentiment, score, category, negation_sensitive"
+      ],
+      "logic_flow": [
+        "Define YAML schema with required fields per entry",
+        "Populate growth terms (高增长, 超预期, 扭亏为盈, 景气度提升, etc.)",
+        "Populate decline terms (业绩下滑, 亏损扩大, 景气度下降, etc.)",
+        "Populate risk terms (高风险, 商誉减值, 质押风险, etc.)",
+        "Populate opportunity terms (低估, 安全边际, 成长空间, etc.)",
+        "Populate market terms (涨停, 跌停, 北向资金流入, etc.)",
+        "Populate regulatory terms (政策利好, 监管收紧, etc.)",
+        "Populate neutral terms (公告, 披露, 召开, 审议, etc.)"
+      ],
+      "depends_on": [],
+      "output": "yaml_lexicon"
+    },
+    {
+      "step": 2,
+      "title": "Implement lexicon loader and negation/degree modules",
+      "description": "Create 3 files: loader.py (LexiconLoader with YAML loading, schema validation, memory cache), negation.py (NegationDetector with context window), degree.py (DegreeModifier with 3 levels).",
+      "modification_points": [
+        "Create 3 new files in synapse/nlp/lexicon/",
+        "Loader: load_yaml(), validate_schema(), _cache dict",
+        "Negation: detect_negation(text, position) with 不/未/没/非/无 patterns",
+        "Degree: detect_degree(text, position) returning multiplier 0.5/1.0/1.5"
+      ],
+      "logic_flow": [
+        "Implement LexiconLoader.load(path) -> dict[str, TermEntry]",
+        "Implement schema validation (all required fields present)",
+        "Implement NegationDetector with 5 negation markers + configurable window",
+        "Implement DegreeModifier with strong/moderate/weak levels"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "loader_and_detectors"
+    },
+    {
+      "step": 3,
+      "title": "Implement EnhancedLexiconAnalyzer",
+      "description": "Create synapse/nlp/lexicon/scorer.py with EnhancedLexiconAnalyzer extending social.py LexiconAnalyzer. Adds negation-aware scoring, degree-modified scoring, YAML-based lexicon loading, and custom term support.",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/lexicon/scorer.py",
+        "EnhancedLexiconAnalyzer class inheriting from LexiconAnalyzer",
+        "Override score() with negation + degree awareness",
+        "Add load_from_yaml() classmethod"
+      ],
+      "logic_flow": [
+        "Inherit from LexiconAnalyzer in social.py",
+        "Load YAML lexicon via LexiconLoader",
+        "Override score() to apply negation detection before term matching",
+        "Apply degree modifiers to matched term scores",
+        "Return aggregated score in [-1.0, 1.0]"
+      ],
+      "depends_on": [
+        2
+      ],
+      "output": "enhanced_analyzer"
+    },
+    {
+      "step": 4,
+      "title": "Update synapse/nlp/__init__.py with lexicon exports",
+      "description": "Update synapse/nlp/__init__.py to export EnhancedLexiconAnalyzer, LexiconLoader, and lexicon utilities via lazy imports.",
+      "modification_points": [
+        "Modify 1 file: synapse/nlp/__init__.py",
+        "Add lazy imports for lexicon components",
+        "Add to __all__ list"
+      ],
+      "logic_flow": [
+        "Add __getattr__ entries for EnhancedLexiconAnalyzer, LexiconLoader",
+        "Update __all__ with new exports"
+      ],
+      "depends_on": [
+        3
+      ],
+      "output": "nlp_init_updated"
+    },
+    {
+      "step": 5,
+      "title": "Write comprehensive lexicon tests",
+      "description": "Create tests/unit/test_sentiment_lexicon.py with 16+ tests covering: 500+ term count verification, category distribution, negation detection (90%+ accuracy), degree modification levels, YAML loading (<100ms), custom term addition, EnhancedLexiconAnalyzer.score() integration, edge cases (empty text, mixed sentiment), frozen dataclass immutability.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_sentiment_lexicon.py",
+        "Write 16+ test methods",
+        "Verify term counts per category"
+      ],
+      "logic_flow": [
+        "Test term count: assert len(lexicon) >= 500",
+        "Test category distribution: each category has minimum count",
+        "Test negation: '不看好' should flip bullish→bearish",
+        "Test degree: '非常看好' should score higher than '看好'",
+        "Test YAML load time: assert < 100ms",
+        "Test custom term addition via YAML"
+      ],
+      "depends_on": [
+        4
+      ],
+      "output": "lexicon_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package for artifact paths and smart context",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-044 sentiment lexicon feature spec and guidance specification",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-044-financial-sentiment-lexicon.md)",
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/guidance-specification.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_lexicon",
+      "action": "Study existing LexiconAnalyzer in social.py for extension pattern",
+      "commands": [
+        "Read(synapse/event/social.py)",
+        "Read(synapse/event/sentiment.py)"
+      ],
+      "output_to": "existing_lexicon_analysis"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-044-financial-sentiment-lexicon.md",
+      "feature_id": "F-044",
+      "priority": "highest",
+      "usage": "Lexicon requirements: 500+ terms, 7 categories, negation/degree handling, YAML format"
+    },
+    {
+      "type": "topic_framework",
+      "source": "brainstorm_framework",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/guidance-specification.md",
+      "priority": "high",
+      "usage": "Architectural decisions: lexicon-based analysis, graceful degradation, storage format"
+    }
+  ],
+  "inherited": {},
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-002",
+    "strategy": "new",
+    "resume_from": null,
+    "merge_from": []
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave1-foundation",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "existing_lexicon": "synapse/event/social.py",
+    "sentiment_propagation": "synapse/event/sentiment.py"
+  },
+  "rationale": {
+    "priority": "Wave 1 Foundation — Lexicon is prerequisite for F-039, F-038",
+    "approach": "YAML-based 500+ term lexicon extending existing LexiconAnalyzer with negation/degree"
+  },
+  "risks": [
+    "500+ term count may be labor-intensive — mitigate with structured YAML generation from existing POSITIVE/NEGATIVE lexicons",
+    "Negation context window tuning — mitigate with configurable window size"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_sentiment_lexicon.py -p no:asyncio -q",
+      "run_coverage": "py -m pytest tests/unit/test_sentiment_lexicon.py -p no:asyncio --cov=synapse/nlp/lexicon --cov-report=term-missing"
+    }
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T21:52:49.571021+08:00"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T22:07:54.993745+08:00"
+    }
+  ]
+}

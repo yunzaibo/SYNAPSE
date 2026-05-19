@@ -1,0 +1,193 @@
+{
+  "id": "IMPL-006",
+  "title": "Research Report Summarizer — 研报摘要提取器",
+  "description": "Implement key viewpoint and investment thesis extraction from Chinese analyst research reports. The summarizer MUST identify report structure (title, author, conclusion, key points), extract analyst rating (buy/hold/sell/overweight/underweight), target price, generate concise thesis summary (1-3 sentences), and identify risk factors. Depends on F-041 NER Engine for entity recognition and F-039 Sentiment Classifier for sentiment labeling.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/nlp/",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-001",
+    "IMPL-004"
+  ],
+  "focus_paths": [
+    "synapse/nlp/report_summarizer.py",
+    "tests/unit/test_report_summarizer.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "ResearchReportResult frozen dataclass with 8 fields: [report_title, analyst_name, institution, rating, target_price, thesis_summary, key_points, risk_factors]",
+      "5 rating types: [buy, hold, sell, overweight, underweight]",
+      "Thesis summary within 50 words",
+      "12+ unit tests pass: verify by py -m pytest tests/unit/test_report_summarizer.py -p no:asyncio -q (exit code 0)",
+      "All frozen dataclasses use frozen=True, slots=True pattern"
+    ],
+    "verification": "py -m pytest tests/unit/test_report_summarizer.py -p no:asyncio -q",
+    "definition_of_done": "Report summarizer extracts rating, target price, thesis, and risks from Chinese analyst reports"
+  },
+  "files": [
+    {
+      "path": "synapse/nlp/report_summarizer.py",
+      "action": "create",
+      "change": "ReportSummarizer class with summarize() method, structure parsing, rating extraction, thesis generation"
+    },
+    {
+      "path": "synapse/nlp/report_patterns.py",
+      "action": "create",
+      "change": "Report structure patterns: title, author, institution, rating, conclusion section detection"
+    },
+    {
+      "path": "tests/unit/test_report_summarizer.py",
+      "action": "create",
+      "change": "12+ tests covering: rating extraction, target price, thesis summary, key points, risk factors, edge cases"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create report structure patterns",
+      "description": "Create synapse/nlp/report_patterns.py with regex patterns for: report title detection (XX证券/XX研究报告), author/institution extraction, rating keywords (买入/增持/中性/减持/卖出), target price extraction, conclusion/key_points section markers.",
+      "modification_points": [
+        "Create 1 new file with 15+ report structure patterns",
+        "Rating keyword mapping (5 types)"
+      ],
+      "logic_flow": [
+        "Define TITLE_PATTERNS for report header detection",
+        "Define RATING_KEYWORDS mapping Chinese→English rating",
+        "Define SECTION_MARKERS for conclusion/key_points/risks sections",
+        "Define TARGET_PRICE_PATTERN for price extraction"
+      ],
+      "depends_on": [],
+      "output": "report_patterns"
+    },
+    {
+      "step": 2,
+      "title": "Implement ReportSummarizer",
+      "description": "Create synapse/nlp/report_summarizer.py with ReportSummarizer.summarize(text: TextDocument) -> ResearchReportResult. Pipeline: (1) TextPreprocessor, (2) NEREngine for analyst/institution, (3) Structure parsing (title, sections), (4) Rating extraction, (5) Target price extraction, (6) Thesis summary generation (first 1-3 sentences of conclusion), (7) Key points extraction (bullet points), (8) Risk factor identification.",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/report_summarizer.py",
+        "ReportSummarizer.summarize() pipeline",
+        "ResearchReportResult frozen dataclass"
+      ],
+      "logic_flow": [
+        "Parse report structure sections",
+        "Extract analyst name and institution via NER",
+        "Extract rating from keywords",
+        "Extract target price from pattern",
+        "Generate thesis summary from conclusion section",
+        "Extract key points from bullet/numbered lists",
+        "Identify risk factors from risk section"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "report_summarizer"
+    },
+    {
+      "step": 3,
+      "title": "Write report summarizer tests",
+      "description": "Create tests/unit/test_report_summarizer.py with 12+ tests: extract rating from buy/hold/sell text, target price extraction, thesis summary generation, key points extraction, risk factor identification, edge cases (no rating, no target price), frozen dataclass.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_report_summarizer.py",
+        "12+ test methods"
+      ],
+      "logic_flow": [
+        "Test rating: '买入评级'→buy",
+        "Test target price: '目标价50元'→50.0",
+        "Test thesis: extract from conclusion section",
+        "Test edge: no rating present→None",
+        "Test edge: no target price→None"
+      ],
+      "depends_on": [
+        2
+      ],
+      "output": "report_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-038 report summarizer feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-038-research-report-summarizer.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-038-research-report-summarizer.md",
+      "feature_id": "F-038",
+      "priority": "highest",
+      "usage": "Report summarizer requirements: rating extraction, thesis generation, risk factors"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-001",
+    "context": [
+      "NEREngine for analyst/institution extraction"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-006",
+    "strategy": "merge_fork",
+    "resume_from": null,
+    "merge_from": [
+      "WFS-synapse-p4-nlp-IMPL-001",
+      "WFS-synapse-p4-nlp-IMPL-004"
+    ]
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave3-advanced",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "feature_spec": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-038-research-report-summarizer.md"
+  },
+  "rationale": {
+    "priority": "Wave 3 Advanced — Depends on NER + Sentiment",
+    "approach": "Pattern-based structure parsing with NER entity extraction"
+  },
+  "risks": [
+    "Report format varies across brokerages — mitigate with flexible section detection",
+    "Thesis summary quality may be low without ML — mitigate with extractive summarization"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_report_summarizer.py -p no:asyncio -q"
+    }
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T22:27:08.153798"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T22:34:15.471636"
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "id": "IMPL-007",
+  "title": "Policy Document Understander — 政策文件理解器",
+  "description": "Implement structured extraction from Chinese regulatory documents (PBOC, CSRC, State Council). The understander MUST identify issuing body, extract effective date, map policy changes to affected sectors, and output PolicyResult frozen dataclass. Depends on F-041 NER Engine for entity recognition and F-039 Sentiment Classifier for sentiment impact scoring.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/nlp/",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-001",
+    "IMPL-004"
+  ],
+  "focus_paths": [
+    "synapse/nlp/policy_understander.py",
+    "tests/unit/test_policy_understander.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "PolicyResult frozen dataclass with 6 fields: [issuing_body, document_type, effective_date, key_changes, affected_sectors, sentiment_impact]",
+      "3 issuing bodies: [PBOC, CSRC, State Council]",
+      "4 document types: [monetary_policy, regulatory_rule, guidance, enforcement]",
+      "Sector mapping for 8+ sectors: [banking, insurance, securities, real_estate, technology, healthcare, energy, consumer]",
+      "12+ unit tests pass: verify by py -m pytest tests/unit/test_policy_understander.py -p no:asyncio -q (exit code 0)",
+      "All frozen dataclasses use frozen=True, slots=True pattern"
+    ],
+    "verification": "py -m pytest tests/unit/test_policy_understander.py -p no:asyncio -q",
+    "definition_of_done": "Policy understander extracts issuing body, effective date, key changes, and sector impact from regulatory documents"
+  },
+  "files": [
+    {
+      "path": "synapse/nlp/policy_understander.py",
+      "action": "create",
+      "change": "PolicyUnderstander class with understand() method, issuing body detection, sector mapping"
+    },
+    {
+      "path": "synapse/nlp/policy_patterns.py",
+      "action": "create",
+      "change": "Policy document patterns: issuing body headers, effective date extraction, sector keyword mapping"
+    },
+    {
+      "path": "synapse/nlp/sector_mapper.py",
+      "action": "create",
+      "change": "SectorMapper: map policy keywords to affected sectors (8+ sectors)"
+    },
+    {
+      "path": "tests/unit/test_policy_understander.py",
+      "action": "create",
+      "change": "12+ tests covering: issuing body, effective date, sector mapping, key changes, edge cases"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create policy patterns and sector mapper",
+      "description": "Create synapse/nlp/policy_patterns.py with issuing body headers (中国人民银行/中国证监会/国务院), effective date patterns (自X日起施行/生效日期), key change extraction patterns. Create synapse/nlp/sector_mapper.py with 8+ sector keyword mappings.",
+      "modification_points": [
+        "Create 2 new files: policy_patterns.py, sector_mapper.py",
+        "Issuing body detection patterns",
+        "Effective date extraction regex",
+        "8+ sector keyword mappings"
+      ],
+      "logic_flow": [
+        "Define ISSUING_BODY_HEADERS dict mapping keywords→body name",
+        "Define EFFECTIVE_DATE_PATTERNS for date extraction",
+        "Define SECTOR_KEYWORDS dict mapping sector→keyword list",
+        "Implement SectorMapper.map_to_sectors(text) -> list[str]"
+      ],
+      "depends_on": [],
+      "output": "policy_patterns_and_mapper"
+    },
+    {
+      "step": 2,
+      "title": "Implement PolicyUnderstander",
+      "description": "Create synapse/nlp/policy_understander.py with PolicyUnderstander.understand(text: TextDocument) -> PolicyResult. Pipeline: (1) TextPreprocessor, (2) Issuing body detection, (3) Document type classification, (4) Effective date extraction, (5) Key change identification, (6) Sector mapping, (7) Sentiment impact per sector.",
+      "modification_points": [
+        "Create 1 new file: synapse/nlp/policy_understander.py",
+        "PolicyUnderstander.understand() pipeline",
+        "PolicyResult frozen dataclass"
+      ],
+      "logic_flow": [
+        "Detect issuing body from header/signature",
+        "Classify document type",
+        "Extract effective date",
+        "Identify key regulatory changes",
+        "Map to affected sectors",
+        "Score sentiment impact per sector"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "policy_understander"
+    },
+    {
+      "step": 3,
+      "title": "Write policy understander tests",
+      "description": "Create tests/unit/test_policy_understander.py with 12+ tests: PBOC document, CSRC document, State Council document, effective date extraction, sector mapping accuracy, key changes, sentiment impact, edge cases, frozen dataclass.",
+      "modification_points": [
+        "Create 1 new file: tests/unit/test_policy_understander.py",
+        "12+ test methods"
+      ],
+      "logic_flow": [
+        "Test PBOC: '中国人民银行决定下调存款准备金率'→issuing_body=PBOC",
+        "Test CSRC: '中国证监会发布IPO新规'→issuing_body=CSRC",
+        "Test date: '自2026年6月1日起施行'→effective_date=2026-06-01",
+        "Test sectors: banking keyword→['banking']"
+      ],
+      "depends_on": [
+        2
+      ],
+      "output": "policy_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-040 policy understander feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-040-policy-document-understander.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-040-policy-document-understander.md",
+      "feature_id": "F-040",
+      "priority": "highest",
+      "usage": "Policy understander requirements: issuing body, effective date, sector mapping"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-001",
+    "context": [
+      "NEREngine for entity recognition"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p4-nlp/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p4-nlp-IMPL-007",
+    "strategy": "merge_fork",
+    "resume_from": null,
+    "merge_from": [
+      "WFS-synapse-p4-nlp-IMPL-001",
+      "WFS-synapse-p4-nlp-IMPL-004"
+    ]
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave3-advanced",
+    "module": "nlp",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "reference": {
+    "feature_spec": ".workflow/active/WFS-synapse-p4-nlp/.brainstorming/feature-specs/F-040-policy-document-understander.md"
+  },
+  "rationale": {
+    "priority": "Wave 3 Advanced — Depends on NER + Sentiment",
+    "approach": "Pattern-based policy parsing with sector keyword mapping"
+  },
+  "risks": [
+    "Policy document format varies — mitigate with flexible header detection",
+    "Sector mapping accuracy — mitigate with extensible keyword dictionaries"
+  ],
+  "test": {
+    "reusable_tools": [],
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_policy_understander.py -p no:asyncio -q"
+    }
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T22:30:10.580188"
+    }
+  ]
+}
