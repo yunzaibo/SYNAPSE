@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 from synapse.event.graph import PropagationGraph, PropagationEdge, TraversalNode
 from synapse.event.impact import ImpactAnalyzer, ImpactReport
 from synapse.event.integration import EventReviewIntegrator
+from synapse.event.datasource import DataSource, MarketData
 
 if TYPE_CHECKING:
     from synapse.event.base import BaseDetector
@@ -77,6 +78,10 @@ __all__ = [
     "PollingSource",
     "StreamBuffer",
     "StreamingIngestion",
+    # Data source adapter protocol (P5)
+    "DataSource",
+    "MarketData",
+    "adapter_fetch_fn",
 ]
 
 
@@ -116,4 +121,10 @@ def __getattr__(name: str):
     if name in ("PollingSource", "StreamBuffer", "StreamingIngestion"):
         from synapse.event import streaming
         return getattr(streaming, name)
+    if name in ("DataSource", "MarketData"):
+        from synapse.event import datasource
+        return getattr(datasource, name)
+    if name in ("adapter_fetch_fn",):
+        from synapse.event.adapters import adapter_fetch_fn
+        return adapter_fetch_fn
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
