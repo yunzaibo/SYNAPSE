@@ -116,6 +116,14 @@
   "development_index": {
     "feature": [
       {
+        "title": "P5-1 真实数据源接入 — DataSource ABC + 东方财富/akshare adapters",
+        "sub_feature": "data-source",
+        "date": "2026-05-19",
+        "description": "DataSource ABC unified interface, EastMoneyAdapter (quotes + capital flow), AkshareAdapter (LHB + capital flow), adapter_fetch_fn pipeline integration",
+        "status": "completed",
+        "session_id": "WFS-synapse-p5-datasource"
+      },
+      {
         "title": "P3 Event-Driven Extensions — F-007/F-008/F-009",
         "sub_feature": "event",
         "date": "2026-05-19",
@@ -139,9 +147,9 @@
     "docs": []
   },
   "statistics": {
-    "total_features": 1,
-    "total_sessions": 2,
-    "last_updated": "2026-05-19T16:00:00+08:00"
+    "total_features": 2,
+    "total_sessions": 3,
+    "last_updated": "2026-05-19T18:00:00+08:00"
   },
   "_metadata": {
     "initialized_by": "cli-explore-agent",
