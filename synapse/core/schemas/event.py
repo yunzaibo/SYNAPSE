@@ -29,6 +29,11 @@ class EventType(str, Enum):
     THEME = "theme"
     CAPITAL_FLOW = "capital_flow"
     CORPORATE_ACTION = "corporate_action"
+    # --- v3.0 P3 enhancement types ---
+    POLICY_CHANGE = "policy_change"
+    MACRO_SHIFT = "macro_shift"
+    # --- v3.0 P4 realtime types ---
+    SOCIAL_SENTIMENT = "social_sentiment"
 
 
 class ImpactLevel(str, Enum):

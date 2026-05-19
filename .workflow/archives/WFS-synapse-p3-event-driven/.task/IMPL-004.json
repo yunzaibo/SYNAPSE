@@ -1,0 +1,167 @@
+{
+  "id": "IMPL-004",
+  "title": "F-009 Cross-Event Correlation -- schema + affinity matrix + correlation engine",
+  "description": "Implement EventCorrelation dataclass with to_dict()/from_dict(), EVENT_TYPE_AFFINITY 8x8 matrix, correlation score computation, amplification vs dampening, combined impact, and PropagationGraph edge integration. Creates synapse/event/correlation.py.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/event/correlation.py",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-001",
+    "IMPL-002"
+  ],
+  "focus_paths": [
+    "synapse/event/correlation.py",
+    "synapse/event/graph.py",
+    "synapse/event/sentiment.py",
+    "synapse/event/divergence.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "1 new file created: verify by ls synapse/event/correlation.py | wc -l >= 1",
+      "EventCorrelation dataclass with 8 fields",
+      "EVENT_TYPE_AFFINITY 8x8 symmetric matrix with diagonal = 1.0",
+      "compute_correlation_score(type_a, type_b, days_between, window) returns float in [0, 1]",
+      "classify_amplification(impact_a, impact_b) returns bool",
+      "compute_combined_impact(sev_a, sev_b, score, amplification) returns float",
+      "find_correlations(events, window_days=7) returns list[EventCorrelation]",
+      "add_correlation_edges(graph, correlations) adds edges with edge_type=correlation (single direction, DAG-safe)"
+    ],
+    "verification": "py -m pytest tests/unit/test_cross_event_correlation.py -p no:asyncio -q && ls synapse/event/correlation.py",
+    "definition_of_done": "Cross-event correlation engine with affinity matrix, scoring, amplification detection, and PropagationGraph integration"
+  },
+  "files": [
+    {
+      "path": "synapse/event/correlation.py",
+      "action": "create",
+      "change": "New module: EventCorrelation dataclass, EVENT_TYPE_AFFINITY matrix, compute_correlation_score(), classify_amplification(), compute_combined_impact(), find_correlations(), add_correlation_edges()"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create EventCorrelation schema and affinity matrix",
+      "description": "Define EventCorrelation dataclass with 8 fields. Define EVENT_TYPE_AFFINITY as 8x8 dict-of-dict matrix covering all 8 event types. Symmetric with diagonal = 1.0.",
+      "modification_points": [
+        "Create 1 new file: synapse/event/correlation.py (~250 lines)",
+        "Define EventCorrelation dataclass with 8 fields",
+        "Define EVENT_TYPE_AFFINITY: 8x8 matrix with 36 unique entries",
+        "Implement to_dict()/from_dict() round-trip"
+      ],
+      "logic_flow": [
+        "Import dataclass, datetime, Optional, uuid, itertools.combinations",
+        "Define EventCorrelation dataclass",
+        "Define EVENT_TYPE_AFFINITY as dict[str, dict[str, float]]",
+        "Implement to_dict() with datetime serialization",
+        "Implement from_dict() with Lazy Upcast defaults"
+      ],
+      "depends_on": [],
+      "output": "correlation_schema"
+    },
+    {
+      "step": 2,
+      "title": "Implement correlation scoring and engine",
+      "description": "Create compute_correlation_score(), classify_amplification(), compute_combined_impact(), find_correlations(), add_correlation_edges() with single-direction edges (min_id -> max_id) to preserve DAG.",
+      "modification_points": [
+        "Add 5 functions to correlation.py",
+        "compute_correlation_score: ~10 lines, affinity * proximity",
+        "classify_amplification: ~5 lines, ImpactLevel comparison",
+        "compute_combined_impact: ~10 lines, amplification/dampening formula",
+        "find_correlations: ~40 lines, pairwise comparison within window",
+        "add_correlation_edges: ~20 lines, single direction for DAG safety"
+      ],
+      "logic_flow": [
+        "compute_correlation_score: affinity * (1 - days/window)",
+        "classify_amplification: same ImpactLevel = True",
+        "compute_combined_impact: amp->max*(1+score*0.5), damp->max*(1-score*0.3)",
+        "find_correlations: combinations within window, compute score, build EventCorrelation",
+        "add_correlation_edges: source=min(ids), target=max(ids), weight=score, edge_type=correlation"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "correlation_algorithms"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-009 feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-009-cross-event-correlation.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-009-cross-event-correlation.md",
+      "feature_id": "F-009",
+      "priority": "highest",
+      "usage": "Correlation engine specification: affinity matrix, scoring, amplification/dampening"
+    },
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-007-sentiment-propagation.md",
+      "feature_id": "F-007",
+      "priority": "high",
+      "usage": "Sentiment cascade events as correlation candidates"
+    },
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-008-capital-flow-divergence.md",
+      "feature_id": "F-008",
+      "priority": "high",
+      "usage": "Divergence events as correlation candidates"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-001",
+    "context": [
+      "SentimentPropagation schema fields",
+      "compute_viral_coefficient signature"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p3-event-driven-IMPL-004",
+    "strategy": "merge_fork",
+    "resume_from": null,
+    "merge_from": [
+      "WFS-synapse-p3-event-driven-IMPL-001",
+      "WFS-synapse-p3-event-driven-IMPL-002"
+    ]
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave-6-correlation",
+    "module": null,
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T11:13:01.778032"
+    }
+  ]
+}

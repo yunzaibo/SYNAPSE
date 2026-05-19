@@ -366,3 +366,71 @@ class TestStuckProtection:
         # Not stuck if not in PROPAGATING state
         lc._state = PropagationState.SETTLED
         assert lc.is_stuck() is False
+
+
+# ------------------------------------------------------------------
+# TestDecayEnhancement (4 tests)
+# ------------------------------------------------------------------
+
+
+class TestDecayEnhancement:
+    def test_per_type_decay_rate(self):
+        """apply_decay_to_edges with event_type uses CATEGORY_HALF_LIVES."""
+        g = PropagationGraph()
+        g.add_edge("A", "B", weight=1.0, decay_rate=0.1)
+        results = g.apply_decay_to_edges(1.0, event_type="earnings")
+        # earnings half_life=6.5, decay_rate=ln(2)/6.5≈0.1066
+        import math
+        expected = 1.0 * math.exp(-math.log(2) / 6.5 * 1.0)
+        assert abs(results["A->B"] - expected) < 1e-6
+
+    def test_unknown_type_fallback(self):
+        """apply_decay_to_edges with unknown event_type uses DEFAULT_HALF_LIFE."""
+        g = PropagationGraph()
+        g.add_edge("A", "B", weight=1.0, decay_rate=0.1)
+        results = g.apply_decay_to_edges(1.0, event_type="nonexistent")
+        import math
+        expected = 1.0 * math.exp(-math.log(2) / 5.0 * 1.0)
+        assert abs(results["A->B"] - expected) < 1e-6
+
+    def test_prune_weak_edges_removes(self):
+        """prune_weak_edges removes edges below threshold."""
+        g = PropagationGraph()
+        g.add_edge("A", "B", weight=0.005)
+        g.add_edge("A", "C", weight=0.5)
+        removed = g.prune_weak_edges(threshold=0.01)
+        assert len(removed) == 1
+        assert "A->B" in removed
+        # C still exists
+        assert g.get_edge("A", "C") is not None
+        assert g.get_edge("A", "B") is None
+
+    def test_prune_returns_removed_keys(self):
+        """prune_weak_edges returns list of removed edge keys."""
+        g = PropagationGraph()
+        g.add_edge("X", "Y", weight=0.001)
+        g.add_edge("X", "Z", weight=0.002)
+        removed = g.prune_weak_edges(threshold=0.01)
+        assert set(removed) == {"X->Y", "X->Z"}
+
+
+# ------------------------------------------------------------------
+# TestAutoDecay (1 test)
+# ------------------------------------------------------------------
+
+
+class TestAutoDecay:
+    def test_auto_decay_on_transition(self):
+        """auto_decay_on_transition triggers on SETTLED/EXPIRED, no-op otherwise."""
+        from synapse.event.lifecycle import auto_decay_on_transition, PropagationState
+
+        g = PropagationGraph()
+        g.add_edge("E1", "T1", weight=1.0, decay_rate=0.1)
+        # SETTLED triggers decay
+        count = auto_decay_on_transition(g, "E1", PropagationState.SETTLED, 1.0)
+        assert count == 1
+        # PROPAGATING does not trigger
+        g2 = PropagationGraph()
+        g2.add_edge("E2", "T2", weight=1.0, decay_rate=0.1)
+        count2 = auto_decay_on_transition(g2, "E2", PropagationState.PROPAGATING, 1.0)
+        assert count2 == 0

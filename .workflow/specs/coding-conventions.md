@@ -42,6 +42,8 @@ keywords:
 - [pattern:enum] 枚举合并使用向后兼容别名：`NewEnum = OldEnum` 保留旧导入，移除重复定义
 - [pattern:exception] 异常收窄：只捕获 API 实际抛出的异常（如 `date.fromisoformat()` 仅抛 ValueError）
 - [pattern:integration] 集成测试覆盖跨模块流水线（如 detection → dedup）
+- [pattern:duck-typing] 跨模块避免循环依赖时用 duck-typing + hasattr 守卫（如 `graph: object` 参数 + `hasattr(graph, "get_outgoing_edges")`），而非类型注解直接引用（2026-05-19）
+- [pattern:fallback] 配置查找使用 dict.get(key, default) 模式，未知 key 优雅降级到默认值（如 CATEGORY_HALF_LIVES.get(event_type, DEFAULT_HALF_LIFE)）（2026-05-19）
 
 ## Entries
 
@@ -60,3 +62,4 @@ keywords:
 用户选择：snake_case 变量 + PascalCase 类型 + UPPER_SNAKE 常量 + 无前缀
 
 </spec-entry>
+- [pattern:graph] DAG 保持：相关性边使用单向添加（min_id -> max_id），避免双向边产生环路 (2026-05-19)

@@ -1,0 +1,130 @@
+{
+  "id": "IMPL-002",
+  "title": "F-008 Capital Flow Divergence -- schema + divergence scoring algorithm",
+  "description": "Implement CapitalFlowDivergence dataclass with to_dict()/from_dict(), divergence score computation (institutional vs retail), classification (bullish/bearish/neutral), and EventContract settlement integration. Creates synapse/event/divergence.py.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/event/divergence.py",
+  "action": "Implement",
+  "depends_on": [],
+  "focus_paths": [
+    "synapse/event/divergence.py",
+    "synapse/core/schemas/event_contract.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "1 new file created: verify by ls synapse/event/divergence.py | wc -l >= 1",
+      "CapitalFlowDivergence dataclass with 10 fields",
+      "to_dict()/from_dict() round-trip produces identical output",
+      "compute_divergence_score(inst, retail) returns float in [-1.0, 1.0]",
+      "classify_divergence(score) returns bullish_divergence/bearish_divergence/neutral",
+      "build_divergence_from_flows() orchestrates score + classification"
+    ],
+    "verification": "py -m pytest tests/unit/test_capital_flow_divergence.py -p no:asyncio -q && ls synapse/event/divergence.py",
+    "definition_of_done": "Capital flow divergence schema and scoring algorithm implemented"
+  },
+  "files": [
+    {
+      "path": "synapse/event/divergence.py",
+      "action": "create",
+      "change": "New module: CapitalFlowDivergence dataclass, compute_divergence_score(), classify_divergence(), build_divergence_from_flows(), settle_divergence_contract()"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create CapitalFlowDivergence schema",
+      "description": "Define dataclass with 10 fields following existing schema pattern.",
+      "modification_points": [
+        "Create 1 new file: synapse/event/divergence.py (~150 lines)",
+        "Define CapitalFlowDivergence dataclass with 10 fields",
+        "Implement to_dict()/from_dict() round-trip"
+      ],
+      "logic_flow": [
+        "Import dataclass, datetime, Optional, uuid",
+        "Define CapitalFlowDivergence dataclass",
+        "Implement to_dict() and from_dict()"
+      ],
+      "depends_on": [],
+      "output": "divergence_schema"
+    },
+    {
+      "step": 2,
+      "title": "Implement divergence scoring and settlement integration",
+      "description": "Create compute_divergence_score(), classify_divergence(), build_divergence_from_flows(), settle_divergence_contract().",
+      "modification_points": [
+        "Add 4 functions to divergence.py",
+        "compute_divergence_score: normalization formula",
+        "classify_divergence: threshold logic",
+        "build_divergence_from_flows: orchestrator",
+        "settle_divergence_contract: EventContract.settle() integration"
+      ],
+      "logic_flow": [
+        "compute_divergence_score: (inst-retail)/(|inst|+|retail|+eps)",
+        "classify_divergence: >0.3 bullish, <-0.3 bearish, else neutral",
+        "build_divergence_from_flows: generate id, compute score, classify",
+        "settle_divergence_contract: call contract.settle() with metadata"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "divergence_algorithms"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-008 feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-008-capital-flow-divergence.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-008-capital-flow-divergence.md",
+      "feature_id": "F-008",
+      "priority": "highest",
+      "usage": "Capital flow divergence schema, scoring formula, classification thresholds"
+    }
+  ],
+  "inherited": {},
+  "context_package_path": ".workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p3-event-driven-IMPL-002",
+    "strategy": "new",
+    "resume_from": null,
+    "merge_from": []
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave-5-divergence",
+    "module": null,
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T11:08:20.599582"
+    }
+  ]
+}

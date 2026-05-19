@@ -1,0 +1,128 @@
+{
+  "id": "IMPL-001",
+  "title": "F-007 Sentiment Propagation -- schema + viral coefficient algorithm",
+  "description": "Implement SentimentPropagation dataclass schema with to_dict()/from_dict() round-trip, viral coefficient (R0) calculation via BFS, and cascade detection. Creates synapse/event/sentiment.py.",
+  "status": "completed",
+  "type": "feature",
+  "scope": "synapse/event/sentiment.py",
+  "action": "Implement",
+  "depends_on": [],
+  "focus_paths": [
+    "synapse/event/sentiment.py",
+    "synapse/event/graph.py",
+    "synapse/event/lifecycle.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "1 new file created: verify by ls synapse/event/sentiment.py | wc -l >= 1",
+      "SentimentPropagation dataclass with 8 fields",
+      "to_dict()/from_dict() round-trip produces identical output",
+      "compute_viral_coefficient(graph, root_event_id) returns float R0",
+      "detect_cascade(propagation) returns bool: R0 > 1.0 AND cascade_depth >= 2"
+    ],
+    "verification": "py -m pytest tests/unit/test_sentiment_propagation.py -p no:asyncio -q && ls synapse/event/sentiment.py",
+    "definition_of_done": "Sentiment propagation schema and viral coefficient algorithm implemented"
+  },
+  "files": [
+    {
+      "path": "synapse/event/sentiment.py",
+      "action": "create",
+      "change": "New module: SentimentPropagation dataclass, compute_viral_coefficient(), detect_cascade(), build_sentiment_propagation()"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create SentimentPropagation schema",
+      "description": "Define dataclass with 8 fields following existing schema pattern.",
+      "modification_points": [
+        "Create 1 new file: synapse/event/sentiment.py (~120 lines)",
+        "Define SentimentPropagation dataclass with 8 fields",
+        "Implement to_dict()/from_dict() round-trip"
+      ],
+      "logic_flow": [
+        "Import dataclass, datetime, Optional",
+        "Define SentimentPropagation dataclass",
+        "Implement to_dict() and from_dict()"
+      ],
+      "depends_on": [],
+      "output": "sentiment_schema"
+    },
+    {
+      "step": 2,
+      "title": "Implement viral coefficient algorithm",
+      "description": "Create compute_viral_coefficient(), detect_cascade(), build_sentiment_propagation().",
+      "modification_points": [
+        "Add 3 functions to sentiment.py",
+        "compute_viral_coefficient: BFS + R0 formula",
+        "detect_cascade: boolean check",
+        "build_sentiment_propagation: orchestrator"
+      ],
+      "logic_flow": [
+        "compute_viral_coefficient: BFS traversal, count nodes, compute R0",
+        "detect_cascade: check R0 > 1.0 AND depth >= 2",
+        "build_sentiment_propagation: orchestrate BFS + R0 + cascade"
+      ],
+      "depends_on": [
+        1
+      ],
+      "output": "sentiment_algorithms"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-007 feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-007-sentiment-propagation.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-007-sentiment-propagation.md",
+      "feature_id": "F-007",
+      "priority": "highest",
+      "usage": "Sentiment propagation schema and algorithm specification"
+    }
+  ],
+  "inherited": {},
+  "context_package_path": ".workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p3-event-driven-IMPL-001",
+    "strategy": "new",
+    "resume_from": null,
+    "merge_from": []
+  },
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": "wave-5-sentiment",
+    "module": null,
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T11:08:20.599582"
+    }
+  ]
+}

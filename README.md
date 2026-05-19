@@ -4,9 +4,9 @@ AI-native Quant Research OS for cross-sectional equity factor research.
 
 ## Status
 
-**P0: Minimum Research Loop — COMPLETED** (2026-05-17)
+**P3: Event-Driven Extensions — COMPLETED** (2026-05-19)
 
-124 tests passing. Complete pipeline: data → factor → audit → experiment → backtest → report.
+607 tests passing. Event detection (8 types), propagation graph, settlement lifecycle, sentiment propagation (R0), capital flow divergence, cross-event correlation.
 
 ## Installation
 
@@ -46,6 +46,7 @@ py -m pytest tests/ -v -p no:asyncio
 synapse/
   core/          — Error registry, config loader, workspace init
   data/          — Dataset metadata, CSV/Parquet loader, validator
+  event/         — Event detection (8 types), propagation graph, settlement, sentiment/divergence/correlation
   factor/        — Factor spec, compute engine, audit (IC/RankIC)
   experiment/    — Experiment records, tracker, state machine
   backtest/      — Config, engine (long-short quintile), 8 metrics

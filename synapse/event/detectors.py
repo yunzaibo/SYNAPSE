@@ -342,6 +342,114 @@ class CorporateActionDetector(BaseDetector):
 
 
 # ---------------------------------------------------------------------------
+# PolicyChangeDetector
+# ---------------------------------------------------------------------------
+
+
+class PolicyChangeDetector(BaseDetector):
+    """Detects regulatory policy changes (CSRC/PBOC announcements).
+
+    Triggers when data contains:
+    - policy_change = True
+    - regulation_body in ["csrc", "pboc"]
+    - announcement_type in ["rate_change", "rule_change", "rrr_change"]
+    """
+
+    _REGULATION_BODIES = {"csrc", "pboc"}
+    _ANNOUNCEMENT_TYPES = {"rate_change", "rule_change", "rrr_change"}
+
+    @classmethod
+    def event_type(cls) -> str:
+        return "policy_change"
+
+    def detect(self, data: dict) -> Optional[Event]:
+        has_flag = data.get("policy_change") is True
+        has_body = data.get("regulation_body", "") in self._REGULATION_BODIES
+        has_type = data.get("announcement_type", "") in self._ANNOUNCEMENT_TYPES
+
+        if not (has_flag or has_body or has_type):
+            return None
+
+        confidence = self.confidence_score(data)
+        body = data.get("regulation_body", "official")
+        atype = data.get("announcement_type", "policy_update")
+        return Event(
+            id=_event_id(),
+            event_type=EventType.POLICY_CHANGE,
+            title=f"Policy change: {body} {atype}",
+            description=f"Regulatory policy change detected from {body}: {atype}",
+            event_date=_extract_date(data),
+            related_tickers=data.get("tickers", []),
+            confidence=confidence,
+            source=EventSourceType.NEWS,
+        )
+
+    def confidence_score(self, data: dict) -> float:
+        score = 0.0
+        if data.get("policy_change") is True:
+            score += 0.4
+        if data.get("regulation_body", "") in self._REGULATION_BODIES:
+            score += 0.3
+        if data.get("announcement_type", "") in self._ANNOUNCEMENT_TYPES:
+            score += 0.3
+        return min(score, 1.0)
+
+
+# ---------------------------------------------------------------------------
+# MacroShiftDetector
+# ---------------------------------------------------------------------------
+
+
+class MacroShiftDetector(BaseDetector):
+    """Detects macroeconomic regime shifts (GDP/CPI/PMI surprises).
+
+    Triggers when data contains:
+    - macro_shift = True
+    - indicator in ["gdp", "cpi", "ppi", "pmi", "rate"]
+    - surprise_magnitude > 0.5
+    """
+
+    _INDICATORS = {"gdp", "cpi", "ppi", "pmi", "rate"}
+
+    @classmethod
+    def event_type(cls) -> str:
+        return "macro_shift"
+
+    def detect(self, data: dict) -> Optional[Event]:
+        has_flag = data.get("macro_shift") is True
+        has_indicator = data.get("indicator", "") in self._INDICATORS
+        magnitude = data.get("surprise_magnitude", 0)
+        has_surprise = isinstance(magnitude, (int, float)) and magnitude > 0.5
+
+        if not (has_flag or has_indicator or has_surprise):
+            return None
+
+        confidence = self.confidence_score(data)
+        indicator = data.get("indicator", "macro")
+        return Event(
+            id=_event_id(),
+            event_type=EventType.MACRO_SHIFT,
+            title=f"Macro shift: {indicator}",
+            description=f"Macroeconomic regime shift detected: {indicator} surprise={magnitude}",
+            event_date=_extract_date(data),
+            related_tickers=data.get("tickers", []),
+            confidence=confidence,
+            source=EventSourceType.DATA_FEED,
+        )
+
+    def confidence_score(self, data: dict) -> float:
+        score = 0.0
+        if data.get("macro_shift") is True:
+            score += 0.5
+        if data.get("indicator", "") in self._INDICATORS:
+            score += 0.3
+        magnitude = data.get("surprise_magnitude", 0)
+        if isinstance(magnitude, (int, float)) and magnitude > 0.5:
+            score += 0.2
+        return min(score, 1.0)
+
+
+# ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------
 

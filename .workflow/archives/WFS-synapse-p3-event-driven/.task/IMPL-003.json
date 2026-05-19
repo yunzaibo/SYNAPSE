@@ -1,0 +1,157 @@
+{
+  "id": "IMPL-003",
+  "title": "F-007/F-008 Sentiment + Divergence tests",
+  "description": "Write 14 tests (8 sentiment + 6 divergence) covering schema round-trip, R0 calculation, cascade detection, divergence score computation, classification thresholds, and edge cases.",
+  "status": "completed",
+  "type": "test-gen",
+  "scope": "tests/unit/test_sentiment_propagation.py, tests/unit/test_capital_flow_divergence.py",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-001",
+    "IMPL-002"
+  ],
+  "focus_paths": [
+    "tests/unit/test_sentiment_propagation.py",
+    "tests/unit/test_capital_flow_divergence.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "2 new test files created",
+      "8 sentiment tests passing",
+      "6 divergence tests passing",
+      "All tests use class-based grouping",
+      "Float assertions use pytest.approx",
+      "Schema round-trip tests verify d == Schema.from_dict(d.to_dict())"
+    ],
+    "verification": "py -m pytest tests/unit/test_sentiment_propagation.py tests/unit/test_capital_flow_divergence.py -p no:asyncio -q",
+    "definition_of_done": "14 tests (8+6) passing for sentiment propagation and capital flow divergence"
+  },
+  "files": [
+    {
+      "path": "tests/unit/test_sentiment_propagation.py",
+      "action": "create",
+      "change": "8 tests: schema round-trip, R0=0 single node, R0>1 cascade, cascade detection true/false, intensity decay, full build_sentiment_propagation"
+    },
+    {
+      "path": "tests/unit/test_capital_flow_divergence.py",
+      "action": "create",
+      "change": "6 tests: schema round-trip, bullish/bearish/neutral classification, zero flows, full build_divergence_from_flows"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Write sentiment propagation tests (8 tests)",
+      "description": "Create test_sentiment_propagation.py with TestSentimentPropagation class.",
+      "modification_points": [
+        "Create tests/unit/test_sentiment_propagation.py (~150 lines)",
+        "8 test methods",
+        "Helper: _make_mock_graph()",
+        "Helper: _make_root_event()"
+      ],
+      "logic_flow": [
+        "Import pytest, SentimentPropagation, PropagationGraph",
+        "Create test helpers",
+        "Test schema round-trip",
+        "Test R0 and cascade detection",
+        "Test build_sentiment_propagation integration"
+      ],
+      "depends_on": [],
+      "output": "sentiment_tests"
+    },
+    {
+      "step": 2,
+      "title": "Write capital flow divergence tests (6 tests)",
+      "description": "Create test_capital_flow_divergence.py with TestCapitalFlowDivergence class.",
+      "modification_points": [
+        "Create tests/unit/test_capital_flow_divergence.py (~120 lines)",
+        "6 test methods",
+        "Helper: _make_divergence()"
+      ],
+      "logic_flow": [
+        "Import pytest, CapitalFlowDivergence, compute_divergence_score, classify_divergence",
+        "Test schema round-trip",
+        "Test classification thresholds",
+        "Test build_divergence_from_flows integration"
+      ],
+      "depends_on": [],
+      "output": "divergence_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-007 and F-008 feature specs",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-007-sentiment-propagation.md)",
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-008-capital-flow-divergence.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-007-sentiment-propagation.md",
+      "feature_id": "F-007",
+      "priority": "highest",
+      "usage": "Testing strategy for sentiment propagation"
+    },
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-008-capital-flow-divergence.md",
+      "feature_id": "F-008",
+      "priority": "highest",
+      "usage": "Testing strategy for capital flow divergence"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-001",
+    "context": [
+      "SentimentPropagation API",
+      "compute_viral_coefficient signature"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p3-event-driven-IMPL-003",
+    "strategy": "merge_fork",
+    "resume_from": null,
+    "merge_from": [
+      "WFS-synapse-p3-event-driven-IMPL-001",
+      "WFS-synapse-p3-event-driven-IMPL-002"
+    ]
+  },
+  "meta": {
+    "type": "test-gen",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": null,
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    },
+    "test_framework": "pytest",
+    "coverage_target": "80%"
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T11:12:06.638450"
+    }
+  ]
+}

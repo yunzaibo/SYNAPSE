@@ -1,0 +1,734 @@
+{
+  "metadata": {
+    "session_id": "WFS-synapse-p3-event-driven",
+    "timestamp": "2026-05-19T16:30:00+08:00",
+    "task_description": "Implement F-007 Sentiment Propagation, F-008 Capital Flow Divergence, F-009 Cross-Event Correlation",
+    "keywords": [
+      "sentiment-propagation",
+      "capital-flow-divergence",
+      "cross-event-correlation",
+      "viral-coefficient",
+      "divergence-score",
+      "event-correlation"
+    ],
+    "complexity": "medium"
+  },
+  "project_context": {
+    "architecture_patterns": [
+      "BaseDetector ABC with detect()/event_type()/confidence_score() interface",
+      "DetectorRegistry mapping event_type -> detector class",
+      "PropagationGraph DAG with cycle detection (Tarjan) and topological sort (Kahn)",
+      "PropagationLifecycle 4-state machine: DETECTED -> PROPAGATING -> SETTLED / EXPIRED",
+      "ImpactAnalyzer with 4 metrics: direct, cascaded, aggregate, risk-adjusted",
+      "EventReviewIntegrator for bidirectional event-review linkage",
+      "Lazy Upcast schema evolution (v2.0 -> v3.0)"
+    ],
+    "coding_conventions": {
+      "naming": {
+        "classes": "PascalCase",
+        "methods": "snake_case",
+        "constants": "UPPER_SNAKE"
+      },
+      "error_handling": "ValueError for invalid transitions, TypeError for registry type checks",
+      "async_patterns": "No async used in event module (synchronous only)",
+      "serialization": "to_dict()/from_dict() round-trip pattern on all schemas",
+      "testing": "pytest with class-based test grouping, helper functions for factory patterns"
+    },
+    "tech_stack": {
+      "language": "python",
+      "frameworks": [],
+      "libraries": [
+        "pytest",
+        "math",
+        "hashlib",
+        "uuid",
+        "dataclasses"
+      ],
+      "testing": [
+        "pytest"
+      ]
+    }
+  },
+  "assets": {
+    "documentation": [
+      {
+        "path": "IMPL_PLAN.md",
+        "scope": "session-plan",
+        "contains": [
+          "8 implementation tasks",
+          "5 execution waves",
+          "71 tests"
+        ],
+        "relevance_score": 0.95
+      },
+      {
+        "path": ".brainstorming/guidance-specification.md",
+        "scope": "brainstorm-output",
+        "contains": [
+          "P3 positioning",
+          "architecture decisions"
+        ],
+        "relevance_score": 0.85
+      }
+    ],
+    "source_code": [
+      {
+        "path": "synapse/event/detectors.py",
+        "role": "core-detectors",
+        "exports": [
+          "EarningsDetector",
+          "PolicyDetector",
+          "SentimentDetector",
+          "ThemeDetector",
+          "CapitalFlowDetector",
+          "CorporateActionDetector"
+        ],
+        "relevance_score": 0.99,
+        "rationale": "6 existing detectors define the pattern for new detector types. Each implements detect(data)->Optional[Event], event_type()->str, confidence_score(data)->float. All use _event_id() helper for UUID generation and _extract_date(data) for date extraction."
+      },
+      {
+        "path": "synapse/event/graph.py",
+        "role": "propagation-dag",
+        "exports": [
+          "PropagationGraph",
+          "PropagationEdge",
+          "TraversalNode",
+          "MAX_PROPAGATION_DEPTH"
+        ],
+        "relevance_score": 0.99,
+        "rationale": "PropagationGraph has apply_decay_to_edges(days) already implemented with idempotent double-decay prevention. Uses _original_weight attribute on edges. Missing: integration with PropagationLifecycle state transitions for automatic decay triggering."
+      },
+      {
+        "path": "synapse/event/base.py",
+        "role": "detector-abc",
+        "exports": [
+          "BaseDetector"
+        ],
+        "relevance_score": 0.95,
+        "rationale": "ABC with 3 abstract methods: detect(), event_type() (classmethod), confidence_score(). New detectors must implement all three."
+      },
+      {
+        "path": "synapse/event/registry.py",
+        "role": "detector-registry",
+        "exports": [
+          "DetectorRegistry"
+        ],
+        "relevance_score": 0.95,
+        "rationale": "Maps event_type string -> detector class. Methods: register(), unregister(), get_detector(), list_detectors(), detect_all(). New detector types need registration."
+      },
+      {
+        "path": "synapse/core/schemas/event_contract.py",
+        "role": "contract-schema",
+        "exports": [
+          "EventContract"
+        ],
+        "relevance_score": 0.99,
+        "rationale": "EventContract has settled_at field but NO settlement_status enum, NO settlement_metadata, NO settlement_result. Only has affected_theses/positions, impact_scores, aggregate_impact, propagation_depth. Needs settlement lifecycle enhancement."
+      },
+      {
+        "path": "synapse/core/schemas/event.py",
+        "role": "event-schema",
+        "exports": [
+          "Event",
+          "EventType",
+          "ImpactLevel",
+          "EventSourceType",
+          "PropagationState"
+        ],
+        "relevance_score": 0.99,
+        "rationale": "Event v3.0 has 10 EventType values. New detector types need new EventType enum entries. PropagationState has 4 states: DETECTED, PROPAGATING, SETTLED, EXPIRED."
+      },
+      {
+        "path": "synapse/event/impact.py",
+        "role": "impact-analyzer",
+        "exports": [
+          "ImpactAnalyzer",
+          "ImpactReport"
+        ],
+        "relevance_score": 0.9,
+        "rationale": "ImpactAnalyzer computes impact = severity * confidence * decay_factor * path_weight. Uses compute_decay() from lifecycle module. Already integrates decay into impact scoring."
+      },
+      {
+        "path": "synapse/event/lifecycle.py",
+        "role": "lifecycle-state-machine",
+        "exports": [
+          "PropagationLifecycle",
+          "LifecycleState",
+          "compute_decay",
+          "apply_category_decay",
+          "CATEGORY_HALF_LIVES"
+        ],
+        "relevance_score": 0.95,
+        "rationale": "4-state machine with VALID_TRANSITIONS. CATEGORY_HALF_LIVES maps 6 event types to half-life values. compute_decay() and apply_category_decay() provide exponential decay. Missing: automatic decay trigger on state transitions."
+      },
+      {
+        "path": "synapse/event/taxonomy.py",
+        "role": "event-taxonomy",
+        "exports": [
+          "EVENT_TYPES",
+          "SOURCE_PRIORITY",
+          "EVENT_CATEGORY_MAP",
+          "PRIORITY_LEVELS"
+        ],
+        "relevance_score": 0.9,
+        "rationale": "EVENT_TYPES defines 6 types. New detector types need new entries. SOURCE_PRIORITY defines 8 sources. EVENT_CATEGORY_MAP groups types into 4 categories."
+      },
+      {
+        "path": "synapse/event/dedup.py",
+        "role": "deduplication-engine",
+        "exports": [
+          "DeduplicationEngine"
+        ],
+        "relevance_score": 0.8,
+        "rationale": "SHA-256 based dedup. Merge strategy: highest confidence wins. New detector types must work with existing dedup logic."
+      },
+      {
+        "path": "synapse/event/integration.py",
+        "role": "event-review-integration",
+        "exports": [
+          "EventReviewIntegrator"
+        ],
+        "relevance_score": 0.85,
+        "rationale": "Bidirectional event-review linkage. 30-day configurable window for revision detection. Referential integrity validation."
+      },
+      {
+        "path": "synapse/core/schemas/thesis.py",
+        "role": "thesis-schema",
+        "exports": [
+          "Thesis"
+        ],
+        "relevance_score": 0.8,
+        "rationale": "Thesis has event_influences (list[str]) and event_influence_weight (float) for event references. Integration point for EventContract settlement."
+      },
+      {
+        "path": "synapse/core/schemas/decision.py",
+        "role": "decision-schema",
+        "exports": [
+          "Decision"
+        ],
+        "relevance_score": 0.8,
+        "rationale": "Decision has event_trigger_id and event_influence_score. AttentionOrigin.EVENT_ATTENTION indicates event-driven decisions."
+      },
+      {
+        "path": "synapse/core/schemas/review.py",
+        "role": "review-schema",
+        "exports": [
+          "Review"
+        ],
+        "relevance_score": 0.8,
+        "rationale": "Review has event_id and event_trigger_type ('direct'|'propagated'|'manual'). Post-event review linkage."
+      },
+      {
+        "path": "synapse/core/schemas/propagation_edge.py",
+        "role": "propagation-edge-schema",
+        "exports": [
+          "PropagationEdge"
+        ],
+        "relevance_score": 0.85,
+        "rationale": "Schema-layer PropagationEdge (distinct from graph.py internal PropagationEdge). Has weight, decay_rate, edge_type, src/tgt_entity_type."
+      },
+      {
+        "path": "synapse/event/graph.py",
+        "role": "propagation-graph-extension",
+        "exports": [
+          "PropagationGraph"
+        ],
+        "relevance_score": 0.99,
+        "rationale": "F-007: edge_type=sentiment for sentiment propagation. F-009: correlation edges (bidirectional). F-008: divergence events create edges. apply_decay_to_edges already supports per-type decay."
+      },
+      {
+        "path": "synapse/core/schemas/event_contract.py",
+        "role": "settlement-integration",
+        "exports": [
+          "EventContract",
+          "SettlementStatus"
+        ],
+        "relevance_score": 0.99,
+        "rationale": "F-008: divergence events use settle(). F-007: cascade metrics in settlement_metadata. F-009: correlation results stored as EventCorrelation objects."
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/unit/test_event_detection.py",
+        "role": "detection-tests",
+        "relevance_score": 0.95,
+        "rationale": "Tests for BaseDetector ABC, DetectorRegistry, Taxonomy, 6 concrete detectors, and DeduplicationEngine. Uses stub detector classes (_EarningsDetector, _PolicyDetector, _SentimentDetector). Pattern: class-based test grouping with helper functions."
+      },
+      {
+        "path": "tests/unit/test_propagation_graph.py",
+        "role": "graph-tests",
+        "relevance_score": 0.95,
+        "rationale": "Tests for DAG structure, cycle detection, topological sort, BFS traversal, depth limit, determinism, lifecycle transitions, decay model, category decay, stuck protection. 18 tests total."
+      },
+      {
+        "path": "tests/unit/test_impact_analyzer.py",
+        "role": "impact-tests",
+        "relevance_score": 0.9,
+        "rationale": "Tests for direct/cascaded/aggregate/risk-adjusted impact, decay accuracy, edge cases (expired event, zero-weight), ImpactReport serialization, performance (1000-node < 150ms)."
+      },
+      {
+        "path": "tests/unit/test_event_integration.py",
+        "role": "integration-tests",
+        "relevance_score": 0.85,
+        "rationale": "Tests for schema extensions, bidirectional linking, revision detection, referential integrity, multiple events same thesis, decision event tracking."
+      },
+      {
+        "path": "tests/integration/test_event_pipeline.py",
+        "role": "pipeline-tests",
+        "relevance_score": 0.9,
+        "rationale": "End-to-end pipeline: data -> detect -> dedup -> graph -> impact. Uses tmp_path for file isolation. Tests full workflow."
+      }
+    ]
+  },
+  "dependencies": {
+    "internal": [
+      {
+        "from": "synapse/event/detectors.py",
+        "to": "synapse/event/base.py",
+        "type": "inheritance"
+      },
+      {
+        "from": "synapse/event/detectors.py",
+        "to": "synapse/core/schemas/event.py",
+        "type": "schema-dependency"
+      },
+      {
+        "from": "synapse/event/registry.py",
+        "to": "synapse/event/base.py",
+        "type": "type-check"
+      },
+      {
+        "from": "synapse/event/graph.py",
+        "to": "synapse/core/schemas/event.py",
+        "type": "state-tracking"
+      },
+      {
+        "from": "synapse/event/impact.py",
+        "to": "synapse/event/graph.py",
+        "type": "graph-traversal"
+      },
+      {
+        "from": "synapse/event/impact.py",
+        "to": "synapse/event/lifecycle.py",
+        "type": "decay-computation"
+      },
+      {
+        "from": "synapse/event/lifecycle.py",
+        "to": "synapse/core/schemas/event.py",
+        "type": "state-enum"
+      },
+      {
+        "from": "synapse/event/integration.py",
+        "to": "synapse/core/schemas/event.py",
+        "type": "schema-dependency"
+      },
+      {
+        "from": "synapse/event/integration.py",
+        "to": "synapse/core/schemas/review.py",
+        "type": "schema-dependency"
+      },
+      {
+        "from": "synapse/event/integration.py",
+        "to": "synapse/core/schemas/thesis.py",
+        "type": "schema-dependency"
+      },
+      {
+        "from": "synapse/core/schemas/event_contract.py",
+        "to": "synapse/core/schemas/base.py",
+        "type": "inheritance"
+      }
+    ],
+    "external": [
+      {
+        "package": "pytest",
+        "usage": "Test framework"
+      },
+      {
+        "package": "hashlib",
+        "usage": "SHA-256 dedup keys"
+      }
+    ]
+  },
+  "prioritized_context": {
+    "critical": [
+      {
+        "file": "synapse/event/detectors.py",
+        "rationale": "Pattern for new detectors: each class extends BaseDetector with event_type() classmethod returning string, detect(data)->Optional[Event], confidence_score(data)->float. Uses _event_id() and _extract_date() helpers.",
+        "key_patterns": [
+          "class FooDetector(BaseDetector): event_type() -> str; detect(data) -> Optional[Event]; confidence_score(data) -> float",
+          "_event_id() returns str(uuid.uuid4())",
+          "_extract_date(data) checks event_date/date/report_date keys"
+        ]
+      },
+      {
+        "file": "synapse/event/graph.py",
+        "rationale": "apply_decay_to_edges(days) exists with idempotent guard (_original_weight). Missing: automatic decay trigger on PropagationState transitions. Missing: per-edge decay rate vs global decay.",
+        "key_patterns": [
+          "edge._original_weight stored on first call for idempotency",
+          "decayed = original * math.exp(-edge.decay_rate * days)",
+          "returns dict[str, float] mapping edge_key -> decayed_weight"
+        ]
+      },
+      {
+        "file": "synapse/core/schemas/event_contract.py",
+        "rationale": "EventContract has settled_at but NO settlement_status, NO settlement_result, NO settlement_metadata. Only stores affected entities and impact scores. Needs settlement lifecycle fields.",
+        "key_patterns": [
+          "settled_at: Optional[datetime] = None",
+          "affected_theses: list[str], affected_positions: list[str]",
+          "impact_scores: dict[str, float], aggregate_impact: float"
+        ]
+      },
+      {
+        "file": "synapse/core/schemas/event.py",
+        "rationale": "EventType enum has 10 values. New detector types need new enum entries. PropagationState has 4 states.",
+        "key_patterns": [
+          "class EventType(str, Enum): 10 A-share event types",
+          "class PropagationState(str, Enum): DETECTED, PROPAGATING, SETTLED, EXPIRED",
+          "Event v3.0 fields: severity, confidence, decay_rate, source, propagation_state, propagation_graph_id, contract_id"
+        ]
+      }
+    ],
+    "high": [
+      {
+        "file": "synapse/event/lifecycle.py",
+        "rationale": "CATEGORY_HALF_LIVES maps 6 event types to half-lives. Missing: new event types need half-life entries. compute_decay() and apply_category_decay() are pure functions.",
+        "key_patterns": [
+          "CATEGORY_HALF_LIVES: earnings=6.5, policy=1.5, sentiment=2.0, theme=4.0, capital_flow=2.0, corporate_action=5.0",
+          "STUCK_TIMEOUT_DAYS = 7",
+          "VALID_TRANSITIONS: frozenset of (from_state, to_state) tuples"
+        ]
+      },
+      {
+        "file": "synapse/event/taxonomy.py",
+        "rationale": "EVENT_TYPES has 6 entries, EVENT_CATEGORY_MAP has 4 categories. New detector types need entries in both.",
+        "key_patterns": [
+          "EVENT_TYPES: dict[str, str] mapping type -> description",
+          "EVENT_CATEGORY_MAP: dict[str, list[str]] grouping types by category",
+          "SOURCE_PRIORITY: dict[str, int] for dedup resolution"
+        ]
+      },
+      {
+        "file": "synapse/event/__init__.py",
+        "rationale": "Lazy import module with __getattr__. New exports need to be added to __all__ and __getattr__.",
+        "key_patterns": [
+          "__all__ list with all public exports",
+          "__getattr__ for lazy imports to avoid circular dependencies"
+        ]
+      },
+      {
+        "file": "synapse/core/schemas/thesis.py",
+        "rationale": "Thesis.event_influences and event_influence_weight are the integration points for EventContract settlement.",
+        "key_patterns": [
+          "event_influences: list[str] = field(default_factory=list)",
+          "event_influence_weight: float = 0.0"
+        ]
+      },
+      {
+        "file": "synapse/core/schemas/decision.py",
+        "rationale": "Decision.event_trigger_id and event_influence_score link decisions to events.",
+        "key_patterns": [
+          "event_trigger_id: Optional[str] = None",
+          "event_influence_score: float = 0.0",
+          "AttentionOrigin.EVENT_ATTENTION"
+        ]
+      },
+      {
+        "file": "synapse/core/schemas/review.py",
+        "rationale": "Review.event_id and event_trigger_type link reviews to events.",
+        "key_patterns": [
+          "event_id: Optional[str] = None",
+          "event_trigger_type: Optional[str] = None  # 'direct' | 'propagated' | 'manual'"
+        ]
+      }
+    ],
+    "medium": [
+      {
+        "file": "synapse/event/impact.py",
+        "rationale": "ImpactAnalyzer already uses decay_factor in scoring. New decay features need integration here.",
+        "key_patterns": [
+          "impact = severity * confidence * decay_factor * path_weight",
+          "compute_decay(1.0, self._event.decay_rate, self._days)"
+        ]
+      },
+      {
+        "file": "synapse/event/integration.py",
+        "rationale": "EventReviewIntegrator handles bidirectional linking. New settlement features may need integration.",
+        "key_patterns": [
+          "link_event_to_review() sets both directions",
+          "detect_post_event_revision() checks 30-day window",
+          "validate_referential_integrity() checks all links"
+        ]
+      },
+      {
+        "file": "synapse/core/schemas/propagation_edge.py",
+        "rationale": "Schema-layer PropagationEdge has weight and decay_rate. Graph-internal edge is distinct.",
+        "key_patterns": [
+          "weight: float = 0.5 (validated 0.0-1.0)",
+          "decay_rate: float = 0.1",
+          "src_entity_type/tgt_entity_type for entity classification"
+        ]
+      },
+      {
+        "file": "synapse/event/dedup.py",
+        "rationale": "DeduplicationEngine.merge_events() preserves v3.0 fields. New event types work with existing logic.",
+        "key_patterns": [
+          "sha256(event_type + entity_id + date + source)",
+          "merge_events: highest confidence wins",
+          "resolve_conflicts: groups by event_type + title + event_date"
+        ]
+      }
+    ],
+    "low": [
+      {
+        "file": "synapse/core/schemas/base.py",
+        "rationale": "BaseSchema provides id, schema_version, status, created_at, updated_at, source_type, created_by, market_context.",
+        "key_patterns": [
+          "to_dict()/base_from_dict() pattern",
+          "ObjectStatus, SourceType, CreatorType enums"
+        ]
+      }
+    ],
+    "user_intent": {
+      "goal": "Implement 3 new feature specs: F-007 Sentiment Viral Propagation (R0, cascade detection), F-008 Capital Flow Divergence (institutional/retail scoring), F-009 Cross-Event Correlation (event clusters, type affinity matrix)",
+      "scope": "New schemas (SentimentPropagation, CapitalFlowDivergence, EventCorrelation), new algorithms, integration with existing PropagationGraph and EventContract, comprehensive tests",
+      "key_constraints": [
+        "Build on existing event module (8 EventTypes, 8 detectors, PropagationGraph, EventContract settlement)",
+        "All changes additive — no breaking changes to existing APIs",
+        "Lazy Upcast for new schema fields",
+        "F-009 depends on F-007 and F-008",
+        "Tests: py -m pytest -p no:asyncio (Windows)"
+      ]
+    }
+  },
+  "conflict_detection": {
+    "risk_level": "low",
+    "risk_factors": {
+      "existing_implementations": [
+        "synapse/event/detectors.py (6 detectors)",
+        "synapse/event/graph.py (PropagationGraph with decay)",
+        "synapse/core/schemas/event_contract.py (EventContract schema)",
+        "synapse/event/lifecycle.py (4-state machine + decay model)"
+      ],
+      "api_changes": true,
+      "architecture_changes": false,
+      "data_model_changes": true,
+      "breaking_changes": [
+        "EventType enum needs new entries (additive, non-breaking)",
+        "EventContract needs new fields (additive, non-breaking via Lazy Upcast)",
+        "CATEGORY_HALF_LIVES needs new entries (additive)",
+        "EVENT_TYPES needs new entries (additive)"
+      ]
+    },
+    "affected_modules": [
+      "synapse/event/detectors.py",
+      "synapse/event/graph.py",
+      "synapse/event/lifecycle.py",
+      "synapse/event/taxonomy.py",
+      "synapse/event/__init__.py",
+      "synapse/core/schemas/event.py",
+      "synapse/core/schemas/event_contract.py"
+    ],
+    "mitigation_strategy": "All F-007/008/009 changes are purely additive: new schemas, new methods, new edge types. No existing APIs modified. Lazy Upcast ensures backward compatibility."
+  },
+  "gap_analysis": {
+    "new_detector_types": {
+      "description": "New detector types need: (1) EventType enum entry, (2) detector class extending BaseDetector, (3) taxonomy entries, (4) CATEGORY_HALF_LIVES entry, (5) tests",
+      "existing_pattern": "6 detectors in detectors.py follow identical pattern",
+      "files_to_modify": [
+        "synapse/core/schemas/event.py (EventType enum)",
+        "synapse/event/detectors.py (new detector class)",
+        "synapse/event/taxonomy.py (EVENT_TYPES, EVENT_CATEGORY_MAP)",
+        "synapse/event/lifecycle.py (CATEGORY_HALF_LIVES)",
+        "synapse/event/__init__.py (exports)",
+        "tests/unit/test_event_detection.py (tests)"
+      ]
+    },
+    "propagation_graph_decay": {
+      "description": "Graph decay exists (apply_decay_to_edges) but missing: (1) automatic trigger on lifecycle transitions, (2) per-event-type decay rate from CATEGORY_HALF_LIVES, (3) decay threshold for edge pruning",
+      "existing_pattern": "apply_decay_to_edges(days) with idempotent guard",
+      "files_to_modify": [
+        "synapse/event/graph.py (decay integration)",
+        "synapse/event/lifecycle.py (auto-decay on transition)",
+        "tests/unit/test_propagation_graph.py (tests)"
+      ]
+    },
+    "event_contract_settlement": {
+      "description": "EventContract has settled_at but missing: (1) settlement_status enum (pending/settled/expired/disputed), (2) settlement_result (what happened), (3) settlement_metadata (additional context), (4) lifecycle integration",
+      "existing_pattern": "EventContract with basic fields, LifecycleState enum for state tracking",
+      "files_to_modify": [
+        "synapse/core/schemas/event_contract.py (new fields)",
+        "synapse/event/lifecycle.py (settlement transitions)",
+        "tests/unit/test_event_schemas.py (tests)"
+      ]
+    },
+    "sentiment_propagation": {
+      "description": "F-007: Viral coefficient (R0) via BFS, cascade detection (R0>1.0 AND depth>=2), SentimentPropagation schema, integration with PropagationGraph edge_type=sentiment",
+      "existing_pattern": "PropagationGraph BFS traversal, CATEGORY_HALF_LIVES decay",
+      "files_to_modify": [
+        "synapse/event/sentiment.py (new: SentimentPropagation, viral_coefficient, cascade detection)",
+        "synapse/event/graph.py (edge_type=sentiment support)",
+        "tests/unit/test_sentiment_propagation.py (new tests)"
+      ]
+    },
+    "capital_flow_divergence": {
+      "description": "F-008: Divergence score = (inst-retail)/(|inst|+|retail|+eps), classification (bullish>0.3, bearish<-0.3, neutral), CapitalFlowDivergence schema, EventContract settlement integration",
+      "existing_pattern": "CapitalFlowDetector (existing), EventContract.settle()",
+      "files_to_modify": [
+        "synapse/event/divergence.py (new: CapitalFlowDivergence, divergence scoring)",
+        "synapse/event/detectors.py (CapitalFlowDetector integration)",
+        "tests/unit/test_capital_flow_divergence.py (new tests)"
+      ]
+    },
+    "cross_event_correlation": {
+      "description": "F-009: Correlation via EVENT_TYPE_AFFINITY matrix + temporal proximity, combined impact (amplification/dampening), EventCorrelation schema, correlation edges on PropagationGraph",
+      "existing_pattern": "PropagationGraph, EventContract, all existing event types",
+      "files_to_modify": [
+        "synapse/event/correlation.py (new: EventCorrelation, correlation engine)",
+        "synapse/event/graph.py (correlation edge support)",
+        "tests/unit/test_cross_event_correlation.py (new tests)"
+      ]
+    }
+  },
+  "exploration_results": {
+    "critical_files": [
+      {
+        "path": "synapse/event/detectors.py",
+        "relevance": 0.99,
+        "role": "modify_target",
+        "rationale": "6 existing detectors define pattern for new ones. All implement BaseDetector ABC.",
+        "key_symbols": [
+          "EarningsDetector",
+          "PolicyDetector",
+          "SentimentDetector",
+          "ThemeDetector",
+          "CapitalFlowDetector",
+          "CorporateActionDetector",
+          "_event_id",
+          "_extract_date"
+        ]
+      },
+      {
+        "path": "synapse/event/graph.py",
+        "relevance": 0.99,
+        "role": "modify_target",
+        "rationale": "PropagationGraph with decay support. Needs auto-decay trigger and threshold pruning.",
+        "key_symbols": [
+          "PropagationGraph",
+          "PropagationEdge",
+          "apply_decay_to_edges",
+          "bfs_downstream",
+          "bfs_upstream",
+          "MAX_PROPAGATION_DEPTH"
+        ]
+      },
+      {
+        "path": "synapse/core/schemas/event_contract.py",
+        "relevance": 0.99,
+        "role": "modify_target",
+        "rationale": "EventContract schema needs settlement lifecycle fields.",
+        "key_symbols": [
+          "EventContract",
+          "settled_at",
+          "affected_theses",
+          "affected_positions",
+          "impact_scores"
+        ]
+      },
+      {
+        "path": "synapse/core/schemas/event.py",
+        "relevance": 0.99,
+        "role": "modify_target",
+        "rationale": "EventType enum needs new entries for new detector types.",
+        "key_symbols": [
+          "EventType",
+          "PropagationState",
+          "Event",
+          "ImpactLevel",
+          "EventSourceType"
+        ]
+      },
+      {
+        "path": "synapse/event/lifecycle.py",
+        "relevance": 0.95,
+        "role": "modify_target",
+        "rationale": "CATEGORY_HALF_LIVES needs new entries. VALID_TRANSITIONS may need settlement transitions.",
+        "key_symbols": [
+          "PropagationLifecycle",
+          "CATEGORY_HALF_LIVES",
+          "VALID_TRANSITIONS",
+          "compute_decay",
+          "apply_category_decay"
+        ]
+      },
+      {
+        "path": "synapse/event/taxonomy.py",
+        "relevance": 0.9,
+        "role": "modify_target",
+        "rationale": "EVENT_TYPES and EVENT_CATEGORY_MAP need new entries for new detector types.",
+        "key_symbols": [
+          "EVENT_TYPES",
+          "SOURCE_PRIORITY",
+          "EVENT_CATEGORY_MAP",
+          "PRIORITY_LEVELS"
+        ]
+      }
+    ],
+    "patterns": [
+      {
+        "pattern": "Detector implementation pattern",
+        "description": "Each detector: class FooDetector(BaseDetector) with event_type() classmethod returning string, detect(data)->Optional[Event] checking trigger conditions, confidence_score(data)->float computing confidence from 0.0-1.0",
+        "source_file": "synapse/event/detectors.py"
+      },
+      {
+        "pattern": "Schema serialization pattern",
+        "description": "All schemas: dataclass with to_dict() method calling super().to_dict() then updating with schema-specific fields. from_dict() classmethod using base_from_dict() for BaseSchema fields then constructing with data.get() defaults.",
+        "source_file": "synapse/core/schemas/event.py"
+      },
+      {
+        "pattern": "Decay computation pattern",
+        "description": "compute_decay(impact_0, decay_rate, days) = impact_0 * e^(-decay_rate * days). apply_category_decay(event_type, impact_0, days) uses CATEGORY_HALF_LIVES to derive decay_rate = ln(2)/half_life.",
+        "source_file": "synapse/event/lifecycle.py"
+      },
+      {
+        "pattern": "Test helper pattern",
+        "description": "Tests use _make_event() factory functions, _build_*_graph() graph builders, class-based test grouping (TestFoo), and pytest.approx for float comparisons.",
+        "source_file": "tests/unit/test_event_detection.py"
+      },
+      {
+        "pattern": "Integration test pattern",
+        "description": "Integration tests use tmp_path fixture, YAML file creation, full pipeline execution (detect -> dedup -> graph -> impact), and assertion on end-to-end results.",
+        "source_file": "tests/integration/test_event_pipeline.py"
+      }
+    ],
+    "integration_points": [
+      {
+        "location": "synapse/core/schemas/event.py:19-31",
+        "description": "EventType enum - new detector types need new entries here"
+      },
+      {
+        "location": "synapse/event/lifecycle.py:105-112",
+        "description": "CATEGORY_HALF_LIVES - new event types need half-life entries"
+      },
+      {
+        "location": "synapse/event/taxonomy.py:14-21",
+        "description": "EVENT_TYPES - new event types need description entries"
+      },
+      {
+        "location": "synapse/event/taxonomy.py:45-50",
+        "description": "EVENT_CATEGORY_MAP - new event types need category assignments"
+      },
+      {
+        "location": "synapse/event/__init__.py:34-68",
+        "description": "__all__ and __getattr__ - new exports need registration"
+      },
+      {
+        "location": "synapse/core/schemas/event_contract.py:17-68",
+        "description": "EventContract - needs settlement lifecycle fields"
+      },
+      {
+        "location": "synapse/event/graph.py:299-325",
+        "description": "apply_decay_to_edges - existing decay logic, needs auto-trigger integration"
+      }
+    ]
+  }
+}

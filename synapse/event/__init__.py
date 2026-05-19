@@ -22,6 +22,8 @@ if TYPE_CHECKING:
         ThemeDetector,
         CapitalFlowDetector,
         CorporateActionDetector,
+        PolicyChangeDetector,
+        MacroShiftDetector,
     )
     from synapse.event.dedup import DeduplicationEngine
     from synapse.event.taxonomy import (
@@ -46,6 +48,8 @@ __all__ = [
     "ThemeDetector",
     "CapitalFlowDetector",
     "CorporateActionDetector",
+    "PolicyChangeDetector",
+    "MacroShiftDetector",
     # Deduplication (IMPL-003)
     "DeduplicationEngine",
     # Taxonomy
@@ -65,6 +69,14 @@ __all__ = [
     "ImpactReport",
     # Integration (IMPL-007)
     "EventReviewIntegrator",
+    # Social media sentiment (P4)
+    "SocialMediaSignal",
+    "LexiconAnalyzer",
+    "collect_from_source",
+    # Streaming ingestion (P4)
+    "PollingSource",
+    "StreamBuffer",
+    "StreamingIngestion",
 ]
 
 
@@ -79,6 +91,7 @@ def __getattr__(name: str):
     if name in (
         "EarningsDetector", "PolicyDetector", "SentimentDetector",
         "ThemeDetector", "CapitalFlowDetector", "CorporateActionDetector",
+        "PolicyChangeDetector", "MacroShiftDetector",
     ):
         from synapse.event import detectors
         return getattr(detectors, name)
@@ -97,4 +110,10 @@ def __getattr__(name: str):
     if name in ("EventReviewIntegrator",):
         from synapse.event.integration import EventReviewIntegrator
         return EventReviewIntegrator
+    if name in ("SocialMediaSignal", "LexiconAnalyzer", "collect_from_source"):
+        from synapse.event import social
+        return getattr(social, name)
+    if name in ("PollingSource", "StreamBuffer", "StreamingIngestion"):
+        from synapse.event import streaming
+        return getattr(streaming, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
