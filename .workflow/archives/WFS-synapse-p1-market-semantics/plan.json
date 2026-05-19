@@ -1,0 +1,68 @@
+{
+  "session_id": "WFS-synapse-p1-market-semantics",
+  "created_at": "2026-05-19",
+  "complexity": "Medium",
+  "total_tasks": 6,
+  "execution_waves": 2,
+  "recommended_execution": {
+    "mode": "sequential",
+    "rationale": "Single module complexity, sequential ensures clean regression after each task"
+  },
+  "task_ids": [
+    "IMPL-001",
+    "IMPL-002",
+    "IMPL-003",
+    "IMPL-004",
+    "IMPL-005",
+    "IMPL-006"
+  ],
+  "wave_plan": {
+    "wave_1": {
+      "tasks": ["IMPL-001", "IMPL-002", "IMPL-003", "IMPL-004"],
+      "description": "Core feature implementation — 4 independent modules",
+      "parallel": false
+    },
+    "wave_2": {
+      "tasks": ["IMPL-005", "IMPL-006"],
+      "description": "Integration exports and regression verification",
+      "depends_on": "wave_1"
+    }
+  },
+  "shared_context": {
+    "test_command": "py -m pytest -p no:asyncio",
+    "conventions": {
+      "annotations": "from __future__ import annotations",
+      "dataclass": "@dataclass(frozen=True, slots=True)",
+      "serialization": "to_dict() / from_dict() pattern",
+      "decimal": "ROUND_HALF_UP for financial calculations",
+      "storage": "Parquet-based local storage",
+      "provenance": "source field on all data records"
+    },
+    "existing_files": {
+      "calendar.py": "162 lines — is_trading_day, next_trading_day, trading_days_between",
+      "semantics.py": "110 lines — SymbolType, PRICE_LIMITS, price_limit, validate_t1_settlement, is_suspended",
+      "data_loader.py": "102 lines — load_daily, load_daily_from_api stub",
+      "datasource.py": "130 lines — DataSource ABC, MarketData schema"
+    },
+    "new_files": {
+      "adjustment.py": "Ex-right price adjustment module",
+      "northbound.py": "Northbound flow data module",
+      "constituent.py": "Index constituent tracking module"
+    },
+    "features": {
+      "F-017": "TradingCalendar Enhancement",
+      "F-018": "Ex-Right Adjustment (复权)",
+      "F-019": "Northbound Flow (北向资金)",
+      "F-020": "Index Constituent (指数成分)"
+    }
+  },
+  "dependencies": {
+    "IMPL-001": [],
+    "IMPL-002": [],
+    "IMPL-003": [],
+    "IMPL-004": [],
+    "IMPL-005": ["IMPL-001", "IMPL-002", "IMPL-003", "IMPL-004"],
+    "IMPL-006": ["IMPL-005"]
+  },
+  "estimated_total_hours": "8-10"
+}

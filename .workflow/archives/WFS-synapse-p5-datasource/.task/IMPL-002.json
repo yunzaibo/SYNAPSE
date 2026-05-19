@@ -1,0 +1,44 @@
+{
+  "id": "IMPL-002",
+  "title": "东方财富 adapter（行情 + 资金流向）",
+  "description": "实现 EastMoneyAdapter，接入东方财富 API 的股票行情和资金流向接口。无需认证，需控制请求频率。",
+  "wave": 2,
+  "status": "completed",
+  "status_history": [
+    {"from": "pending", "to": "in_progress", "changed_at": "2026-05-19T00:00:00"},
+    {"from": "in_progress", "to": "completed", "changed_at": "2026-05-19T00:01:00"}
+  ],
+  "depends_on": ["IMPL-001"],
+  "meta": {
+    "type": "feature",
+    "complexity": "medium",
+    "execution_group": "parallel"
+  },
+  "convergence": {
+    "verification": [
+      "fetch() 返回标准化 MarketData 列表",
+      "资金流向接口正确解析 klines 数据",
+      "频率控制生效（min_interval_sec）",
+      "错误处理：网络异常、API 错误码非 0",
+      "tests/unit/test_eastmoney_adapter.py 存在且全部通过"
+    ],
+    "definition_of_done": [
+      "synapse/event/adapters/eastmoney.py 创建",
+      "支持行情 + 资金流向两个接口",
+      "tests/unit/test_eastmoney_adapter.py 创建，覆盖正常/异常场景",
+      "py -m pytest -p no:asyncio tests/unit/test_eastmoney_adapter.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/event/adapters/ 目录 + __init__.py",
+      "实现 EastMoneyAdapter(DataSource)",
+      "fetch_quotes(tickers): GET push2.eastmoney.com/api/qt/ulist.np/get",
+      "fetch_capital_flow(ticker): GET push2.eastmoney.com/api/qt/stock/fflow/kline/get",
+      "内置频率控制（min_interval_sec=1）",
+      "错误处理：rc != 0 时 raise 或返回空",
+      "同步编写 tests/unit/test_eastmoney_adapter.py：mock requests，验证解析逻辑、频率控制、错误处理"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_eastmoney_adapter.py -v"
+  }
+}

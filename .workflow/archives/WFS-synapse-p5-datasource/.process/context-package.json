@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "session_id": "WFS-synapse-p5-datasource",
+    "task_description": "P5-1 真实数据源接入",
+    "timestamp": "2026-05-19T12:30:00Z"
+  },
+  "project_context": {
+    "architecture": "Layered (core → schemas → projection → market → workflow → cli)",
+    "tech_stack": ["Python 3.11", "pandas", "numpy", "requests", "akshare"],
+    "key_patterns": ["dataclass", "duck-typing", "deque buffer", "lazy imports"]
+  },
+  "critical_files": [
+    {"path": "synapse/event/streaming.py", "relevance": 0.95, "rationale": "P4 流式管线核心：PollingSource + StreamBuffer + StreamingIngestion，需扩展适配器"},
+    {"path": "synapse/event/social.py", "relevance": 0.90, "rationale": "P4 SocialMediaSignal schema + LexiconAnalyzer，新数据源需产出兼容数据"},
+    {"path": "synapse/event/__init__.py", "relevance": 0.70, "rationale": "包导出入口，新模块需注册"}
+  ],
+  "integration_points": [
+    {"file": "synapse/event/streaming.py", "line": 143, "type": "extension", "description": "set_fetch_fn() 已支持自定义 fetch，可直接注入 adapter"},
+    {"file": "synapse/event/streaming.py", "line": 147, "type": "override", "description": "_default_fetch() 可被具体 adapter 替代"},
+    {"file": "synapse/event/social.py", "line": 179, "type": "factory", "description": "collect_from_source() 工厂函数，新数据源可复用此模式"}
+  ],
+  "external_references": [
+    {"name": "东方财富 API", "url": "https://f0ecde19.pinme.dev/", "endpoints": 6, "auth": "none"},
+    {"name": "UZI-Skill", "path": "D:\\AI\\UZI-Skill", "pattern": "akshare-based fetchers", "fetcher_count": 22}
+  ],
+  "conflict_detection": {
+    "risk_level": "low",
+    "rationale": "纯新增模块，不修改现有 API，P4 基础设施已预留扩展点"
+  },
+  "constraints": [
+    "接口设计必须可插拔（不绑定具体数据源）",
+    "MVP 范围：先实现 1-2 个 adapter",
+    "东方财富 API 有频率限制，需控制请求间隔",
+    "akshare 为可选依赖，不强制安装"
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "session_id": "WFS-synapse-p1-2-watchlist",
+  "project": "SYNAPSE P1-2 Daily Watchlist Generator",
+  "status": "active",
+  "type": "workflow",
+  "created_at": "2026-05-19T21:00:00+08:00",
+  "task_description": {
+    "goal": "实现 P1-2 Daily Watchlist Generator — 基于 P1 Market Semantics 和 P5 DataSource 的每日关注列表生成器",
+    "scope": "信号评分整合、事件驱动过滤、持仓状态感知、个性化推荐",
+    "context": "依赖 P1-1 Market Semantics（交易日历、复权、北向资金、指数成分）和 P5 DataSource 适配器"
+  },
+  "selected_roles": ["system-architect", "data-architect", "product-manager"],
+  "terminology": [
+    {"term": "WatchlistEntry", "definition": "每日关注列表条目", "aliases": ["关注列表条目"], "category": "core"},
+    {"term": "Signal Scoring", "definition": "基于多维度数据计算优先级分数", "aliases": ["信号评分"], "category": "core"},
+    {"term": "Event-driven", "definition": "基于 Event lifecycle decay model 的时间衰减评分机制", "aliases": ["事件驱动"], "category": "core"},
+    {"term": "Portfolio-aware", "definition": "基于 Position thesis_status 和 attention_state 的持仓感知机制", "aliases": ["持仓感知"], "category": "core"},
+    {"term": "Market Semantics", "definition": "市场语义层，包括 TradingCalendar、NorthboundFlow、IndexConstituent", "aliases": ["市场语义"], "category": "core"},
+    {"term": "Daily Generation", "definition": "每日全量再生（非增量更新），遵循 ADR-009", "aliases": ["每日生成"], "category": "core"},
+    {"term": "Priority Score", "definition": "优先级分数，0.0-1.0 之间，越高越重要", "aliases": ["优先级分数"], "category": "core"},
+    {"term": "Ranking", "definition": "基于 priority_score 的排序机制", "aliases": ["排序"], "category": "core"},
+    {"term": "Filtering", "definition": "基于市场语义和用户配置的过滤机制", "aliases": ["过滤"], "category": "core"},
+    {"term": "Personalization", "definition": "基于用户配置的评分权重和过滤规则的个性化机制", "aliases": ["个性化"], "category": "core"}
+  ],
+  "non_goals": [
+    {"item": "实时推送", "rationale": "本次只做每日批量生成，不实现实时推送通知"},
+    {"item": "复杂 UI", "rationale": "只提供数据接口（JSON/YAML），不实现 Web 或移动端 UI"},
+    {"item": "机器学习推荐", "rationale": "基于规则的评分机制，不引入机器学习模型"},
+    {"item": "多市场支持", "rationale": "只支持 A 股市场，不支持港股、美股等"},
+    {"item": "历史回测", "rationale": "只关注当日生成，不实现场景回测功能"},
+    {"item": "自定义评分公式", "rationale": "评分公式固定，不支持用户自定义公式"}
+  ],
+  "feature_list": [
+    {"id": "F-021", "name": "watchlist-schema-extension", "description": "WatchlistEntry schema 新增 priority_score 和 reason 字段", "priority": "High"},
+    {"id": "F-022", "name": "signal-scoring-engine", "description": "基于 Signal、Event、Position 等多维度数据计算优先级分数", "priority": "High"},
+    {"id": "F-023", "name": "event-driven-filtering", "description": "基于 Event lifecycle decay model 的时间衰减评分机制", "priority": "High"},
+    {"id": "F-024", "name": "portfolio-aware-scoring", "description": "基于 Position thesis_status 和 attention_state 的持仓感知机制", "priority": "High"},
+    {"id": "F-025", "name": "market-semantics-validation", "description": "集成 P1-1 Market Semantics（TradingCalendar、NorthboundFlow、IndexConstituent）", "priority": "Medium"},
+    {"id": "F-026", "name": "ranking-and-filtering", "description": "基于 priority_score 的排序和过滤机制", "priority": "Medium"},
+    {"id": "F-027", "name": "personalization-config", "description": "支持用户配置评分权重和过滤规则", "priority": "Low"},
+    {"id": "F-028", "name": "watchlist-tests", "description": "扩展 test_projection.py，添加 scoring/ranking/filtering 测试", "priority": "High"}
+  ],
+  "phase_completed": "planning",
+  "brainstorming": {
+    "product-manager": {
+      "status": "complete",
+      "completed_at": "2026-05-19T17:46:00+08:00",
+      "output_dir": ".brainstorming/product-manager/",
+      "files": [
+        "analysis.md",
+        "analysis-cross-cutting.md",
+        "analysis-F-021-watchlist-schema-extension.md",
+        "analysis-F-022-signal-scoring-engine.md",
+        "analysis-F-023-event-driven-filtering.md",
+        "analysis-F-024-portfolio-aware-scoring.md",
+        "analysis-F-025-market-semantics-validation.md",
+        "analysis-F-026-ranking-and-filtering.md",
+        "analysis-F-027-personalization-config.md",
+        "analysis-F-028-watchlist-tests.md"
+      ],
+      "features_covered": 8,
+      "total_words_approx": 8500
+    },
+    "data-architect": {
+      "status": "complete",
+      "completed_at": "2026-05-19T17:46:00+08:00",
+      "output_dir": ".brainstorming/data-architect/",
+      "files": [
+        "analysis.md",
+        "analysis-cross-cutting.md",
+        "analysis-F-021-watchlist-schema-extension.md",
+        "analysis-F-022-signal-scoring-engine.md",
+        "analysis-F-023-event-driven-filtering.md",
+        "analysis-F-024-portfolio-aware-scoring.md",
+        "analysis-F-025-market-semantics-validation.md",
+        "analysis-F-026-ranking-and-filtering.md",
+        "analysis-F-027-personalization-config.md",
+        "analysis-F-028-watchlist-tests.md"
+      ],
+      "features_covered": 8,
+      "total_words_approx": 5087
+    },
+    "system-architect": {
+      "status": "complete",
+      "completed_at": "2026-05-19T22:15:00+08:00",
+      "output_dir": ".brainstorming/system-architect/",
+      "files": [
+        "analysis.md",
+        "analysis-cross-cutting.md",
+        "analysis-F-021-watchlist-schema-extension.md",
+        "analysis-F-022-signal-scoring-engine.md",
+        "analysis-F-023-event-driven-filtering.md",
+        "analysis-F-024-portfolio-aware-scoring.md",
+        "analysis-F-025-market-semantics-validation.md",
+        "analysis-F-026-ranking-and-filtering.md",
+        "analysis-F-027-personalization-config.md",
+        "analysis-F-028-watchlist-tests.md"
+      ],
+      "features_covered": 8,
+      "total_words_approx": 9200
+    }
+  },
+  "timestamp": "2026-05-19T21:30:00+08:00",
+  "count_parameter": 3,
+  "style_skill_package": null,
+  "synthesis": {
+    "status": "completed",
+    "completed_at": "2026-05-19T22:30:00+08:00",
+    "enhancements_applied": ["EP-001", "EP-002", "EP-003", "EP-004", "EP-005", "EP-006", "EP-007", "EP-008"],
+    "conflicts_resolved": 10,
+    "conflicts_unresolved": 0,
+    "complexity_score": 5,
+    "review_triggered": true,
+    "review_fixes": 5,
+    "review_flags": 2,
+    "feature_spec_results": {
+      "feature_mode": true,
+      "features_generated": ["F-021", "F-022", "F-023", "F-024", "F-025", "F-026", "F-027", "F-028"],
+      "feature_index_path": ".brainstorming/feature-index.json",
+      "feature_specs_dir": ".brainstorming/feature-specs/"
+    },
+    "conflict_resolution": {
+      "resolved_at": "2026-05-19T22:45:00+08:00",
+      "decisions": [
+        {"conflict": "F-022 dimensions", "choice": "4-dimension (signal, event, portfolio, market)"},
+        {"conflict": "F-022 default weights", "choice": "{signal: 0.35, event: 0.30, portfolio: 0.20, market: 0.15}"},
+        {"conflict": "F-022 weight validation", "choice": "auto-normalize with warning"},
+        {"conflict": "F-027 MVP scope", "choice": "defer to iteration 2"},
+        {"conflict": "F-027 YAML structure", "choice": "flat structure"},
+        {"conflict": "F-027 invalid config", "choice": "warning + fallback to defaults"}
+      ]
+    }
+  }
+}

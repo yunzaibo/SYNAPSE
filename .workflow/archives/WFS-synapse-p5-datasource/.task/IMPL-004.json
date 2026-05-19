@@ -1,0 +1,33 @@
+{
+  "id": "IMPL-004",
+  "title": "StreamingIngestion 集成 + 示例",
+  "description": "将 DataSource adapter 与 P4 StreamingIngestion 集成，提供开箱即用的示例配置。",
+  "wave": 3,
+  "depends_on": ["IMPL-002", "IMPL-003"],
+  "meta": {
+    "type": "feature",
+    "complexity": "low",
+    "execution_group": "main"
+  },
+  "convergence": {
+    "verification": [
+      "DataSource adapter 可注入 StreamingIngestion.set_fetch_fn()",
+      "示例代码可运行（poll_once 返回真实数据）",
+      "PollingSource 配置与 DataSource 适配"
+    ],
+    "definition_of_done": [
+      "synapse/event/adapters/__init__.py 导出",
+      "示例脚本或文档说明如何配置",
+      "更新 synapse/event/__init__.py 导出适配器"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/event/adapters/__init__.py",
+      "实现 adapter_fetch_fn(adapter) 工厂函数，将 DataSource 适配为 StreamingIngestion 可用的 fetch_fn",
+      "创建示例配置：EastMoneyAdapter + PollingSource 组合",
+      "更新 synapse/event/__init__.py 导出"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/integration/test_datasource_pipeline.py -v"
+  }
+}

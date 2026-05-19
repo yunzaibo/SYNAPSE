@@ -1,0 +1,38 @@
+{
+  "id": "IMPL-002",
+  "title": "FactorEngine Core",
+  "description": "因子计算引擎核心，支持单因子/批量/全量计算，集成 DataSource 数据获取。",
+  "wave": 2,
+  "depends_on": ["IMPL-001"],
+  "meta": {
+    "type": "feature",
+    "complexity": "high",
+    "execution_group": "parallel"
+  },
+  "status": "completed",
+  "convergence": {
+    "verification": [
+      "compute_factor 正确计算单因子值",
+      "compute_batch 批量计算多个因子",
+      "compute_all 计算所有已注册因子",
+      "DataSource → DataFrame 转换正确",
+      "point-in-time 校验防止 look-ahead bias"
+    ],
+    "definition_of_done": [
+      "synapse/factor/engine.py 创建",
+      "支持 compute_factor / compute_batch / compute_all",
+      "tests/unit/test_factor_engine.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/factor/engine.py — FactorEngine 类",
+      "实现 _to_dataframe(MarketData[]) 转换",
+      "实现 compute_factor(factor_id, tickers, date)",
+      "实现 compute_batch / compute_all",
+      "实现 point-in-time 校验",
+      "同步编写 tests/unit/test_factor_engine.py"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_factor_engine.py -v"
+  }
+}

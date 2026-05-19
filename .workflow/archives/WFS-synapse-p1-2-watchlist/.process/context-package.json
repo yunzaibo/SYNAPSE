@@ -1,0 +1,664 @@
+{
+  "metadata": {
+    "session_id": "WFS-synapse-p1-2-watchlist",
+    "task_description": "P1-2 Daily Watchlist Generator — 基于 P1 Market Semantics（交易日历、复权、北向资金、指数成分）和 P5 DataSource，整合信号评分、事件驱动、持仓状态，生成个性化每日关注列表",
+    "timestamp": "2026-05-19T22:30:00Z",
+    "keywords": ["watchlist", "signal-scoring", "event-driven", "portfolio-aware", "daily-generation", "ranking", "filtering", "market-semantics", "personalization"],
+    "complexity": "medium",
+    "exploration_count": 0,
+    "source": "brainstorm-artifacts",
+    "feature_index_path": ".brainstorming/feature-index.json",
+    "feature_specs_dir": ".brainstorming/feature-specs/",
+    "feature_mode": true,
+    "changelog_path": ".brainstorming/synthesis-changelog.md"
+  },
+  "project_context": {
+    "name": "SYNAPSE",
+    "type": "AI-native Quant Research OS for A-share market",
+    "language": "Python 3.11+",
+    "framework": "dataclass-based, no web framework",
+    "architecture_patterns": [
+      "Canonical vs Projection separation (ADR-009)",
+      "Weak Schema + Lazy Upcast (ADR-005)",
+      "dataclass with to_dict/from_dict round-trip",
+      "Enum for type discrimination",
+      "ABC for extension points",
+      "Parquet/CSV for local storage",
+      "DataSource adapter pattern",
+      "Daily full regeneration (not incremental) — ADR-009"
+    ],
+    "coding_conventions": {
+      "naming": {
+        "functions": "snake_case",
+        "classes": "PascalCase",
+        "enums": "UPPER_SNAKE_CASE",
+        "id_prefixes": "wl/ths/dec/rev/pos/sig/rsk/evt/top"
+      },
+      "error_handling": {
+        "pattern": "SynapseError hierarchy with error codes",
+        "forbidden_patterns": ["bare except", "silently swallowed errors"]
+      },
+      "async_patterns": {
+        "preferred": "sync (no asyncio)"
+      },
+      "serialization": {
+        "pattern": "dataclass + to_dict()/from_dict() round-trip",
+        "storage": "YAML (metadata) + Parquet/CSV (data)"
+      },
+      "testing": {
+        "framework": "pytest",
+        "flags": "-p no:asyncio",
+        "fixtures": "tmp_path (pytest built-in)",
+        "pattern": "round-trip tests for all schemas"
+      },
+      "forbidden_patterns": [
+        "AI auto-modifying canonical artifacts (ADR-011)",
+        "Deleting failed experiments",
+        "Silent transaction cost defaults"
+      ],
+      "quality_gates": [
+        "All new schemas must have to_dict/from_dict round-trip tests",
+        "Schema version bump for breaking changes (Lazy Upcast)",
+        "AI-generated content marked with source_type: ai_generated"
+      ]
+    },
+    "tech_stack": {
+      "language": "python 3.11+",
+      "frameworks": [],
+      "libraries": ["pandas", "numpy", "pyyaml", "scipy"],
+      "testing": ["pytest", "pytest-cov"],
+      "build_system": "pyproject.toml (setuptools)"
+    }
+  },
+  "assets": {
+    "documentation": [
+      {
+        "path": "README.md",
+        "scope": "project-overview",
+        "contains": ["project structure", "architecture", "5-layer platform", "governance rules"],
+        "relevance_score": 0.85
+      },
+      {
+        "path": "Docs/04_contracts/01_Research_Object_Schema.md",
+        "scope": "schema-contract",
+        "contains": ["9 research objects", "schema definitions", "lifecycle states", "WatchlistEntry spec"],
+        "relevance_score": 0.95
+      }
+    ],
+    "source_code": [
+      {
+        "path": "synapse/core/projection/watchlist_generator.py",
+        "role": "primary-modification-target",
+        "exports": ["generate_daily", "save_watchlist", "_build_event_entries", "_build_signal_entries", "_build_portfolio_entries"],
+        "relevance_score": 0.99,
+        "rationale": "Existing basic watchlist generator — needs scoring, ranking, filtering, market-semantics integration, and personalization. Currently 191 lines, simple merge of events+signals+positions."
+      },
+      {
+        "path": "synapse/core/schemas/watchlist.py",
+        "role": "schema-to-extend",
+        "exports": ["WatchlistEntry", "WatchlistSignal", "TriggerType", "SignalType", "SignalStrength"],
+        "relevance_score": 0.98,
+        "rationale": "WatchlistEntry schema — needs priority_score, reason field; TriggerType may need SECTOR_ROTATION addition. SignalType enum defined here overlaps with schemas/signal.py (different enums, intentional)."
+      },
+      {
+        "path": "synapse/core/schemas/signal.py",
+        "role": "input-schema",
+        "exports": ["Signal", "SignalType", "SignalStrength"],
+        "relevance_score": 0.92,
+        "rationale": "Signal schema v2.0 with decay_tracking hook — input to watchlist scoring. SignalType here differs from watchlist.py SignalType (6 types vs 6 types, same values but separate enums)."
+      },
+      {
+        "path": "synapse/core/schemas/event.py",
+        "role": "input-schema",
+        "exports": ["Event", "EventType", "ImpactLevel", "EventSourceType", "PropagationState"],
+        "relevance_score": 0.92,
+        "rationale": "Event schema v3.0 with severity/confidence/decay_rate — key inputs for event-driven watchlist entries. PropagationGraph integration needed."
+      },
+      {
+        "path": "synapse/core/schemas/position.py",
+        "role": "input-schema",
+        "exports": ["Position", "ResearchState", "ThesisStatus", "AttentionState"],
+        "relevance_score": 0.90,
+        "rationale": "Position schema with thesis_status and attention_state — used for portfolio-aware watchlist entries and priority scoring."
+      },
+      {
+        "path": "synapse/core/schemas/base.py",
+        "role": "schema-foundation",
+        "exports": ["BaseSchema", "MarketContext", "ObjectStatus", "SourceType", "CreatorType"],
+        "relevance_score": 0.88,
+        "rationale": "Base class — MarketContext.research_date/market_date used for date-aware filtering."
+      },
+      {
+        "path": "synapse/core/market/__init__.py",
+        "role": "p1-market-semantics-entry",
+        "exports": ["is_trading_day", "next_trading_day", "trading_days_between", "load_northbound_flow", "northbound_to_signals", "index_change_to_signals", "load_constituents", "constituent_tickers", "is_member"],
+        "relevance_score": 0.95,
+        "rationale": "P1 Market Semantics API — calendar validation, northbound signals, index constituent filtering. All ready to integrate."
+      },
+      {
+        "path": "synapse/core/market/calendar.py",
+        "role": "trading-calendar",
+        "exports": ["is_trading_day", "next_trading_day", "trading_days_between", "TradingCalendar"],
+        "relevance_score": 0.92,
+        "rationale": "Trading calendar — validate target_date is a trading day before generating watchlist."
+      },
+      {
+        "path": "synapse/core/market/northbound.py",
+        "role": "northbound-signals",
+        "exports": ["northbound_to_signals", "northbound_momentum", "load_northbound_flow", "fetch_northbound_flow"],
+        "relevance_score": 0.90,
+        "rationale": "Northbound flow signal generation — convert large northbound flows to Signal-compatible dicts for watchlist entry."
+      },
+      {
+        "path": "synapse/core/market/constituent.py",
+        "role": "index-constituent",
+        "exports": ["load_constituents", "constituent_tickers", "is_member", "load_constituent_changes", "IndexCode"],
+        "relevance_score": 0.88,
+        "rationale": "Index constituent filtering — restrict watchlist universe to tracked indices."
+      },
+      {
+        "path": "synapse/core/market/adjustment.py",
+        "role": "price-adjustment",
+        "exports": ["AdjustmentType", "adjust_prices", "get_adjustment_factors"],
+        "relevance_score": 0.75,
+        "rationale": "Price adjustment — may be needed for factor-based scoring if comparing adjusted prices."
+      },
+      {
+        "path": "synapse/event/datasource.py",
+        "role": "data-source-protocol",
+        "exports": ["DataSource", "MarketData"],
+        "relevance_score": 0.88,
+        "rationale": "DataSource ABC — adapter protocol for fetching real-time data (quotes, capital flow) used in scoring."
+      },
+      {
+        "path": "synapse/event/detectors.py",
+        "role": "event-detectors",
+        "exports": ["EarningsDetector", "PolicyDetector", "SentimentDetector", "ThemeDetector", "CapitalFlowDetector", "CorporateActionDetector", "PolicyChangeDetector", "MacroShiftDetector"],
+        "relevance_score": 0.85,
+        "rationale": "8 concrete event detectors — produce Events consumed by watchlist generator."
+      },
+      {
+        "path": "synapse/event/graph.py",
+        "role": "propagation-graph",
+        "exports": ["PropagationGraph", "PropagationEdge", "TraversalNode"],
+        "relevance_score": 0.82,
+        "rationale": "DAG for event propagation — used to compute cascaded event impact scores for watchlist ranking."
+      },
+      {
+        "path": "synapse/event/lifecycle.py",
+        "role": "event-lifecycle",
+        "exports": ["PropagationLifecycle", "compute_decay", "apply_category_decay", "CATEGORY_HALF_LIVES"],
+        "relevance_score": 0.85,
+        "rationale": "Event decay model — critical for scoring: newer events rank higher, stale events decay."
+      },
+      {
+        "path": "synapse/event/impact.py",
+        "role": "impact-analysis",
+        "exports": ["ImpactAnalyzer", "ImpactReport"],
+        "relevance_score": 0.80,
+        "rationale": "Impact analysis — compute cascaded impact scores from propagation graph for watchlist ranking."
+      },
+      {
+        "path": "synapse/factor/engine.py",
+        "role": "factor-engine",
+        "exports": ["FactorEngine", "PartialResult"],
+        "relevance_score": 0.82,
+        "rationale": "Factor engine — compute factor values (momentum, value, quality) for scoring anomalous signals."
+      },
+      {
+        "path": "synapse/factor/spec.py",
+        "role": "factor-spec",
+        "exports": ["FactorSpec"],
+        "relevance_score": 0.75,
+        "rationale": "Factor specification — defines factor identity, lookback, data source. Factor-based anomalies feed watchlist."
+      },
+      {
+        "path": "synapse/core/projection/__init__.py",
+        "role": "projection-pattern",
+        "exports": ["rebuild_from_decisions", "generate_daily", "render_timeline", "IndexManager"],
+        "relevance_score": 0.85,
+        "rationale": "Projection engine — watchlist_generator is one of 4 projections. P1-2 enhances it."
+      },
+      {
+        "path": "synapse/core/projection/position_rebuilder.py",
+        "role": "position-rebuilder",
+        "exports": ["rebuild_from_decisions", "save_positions"],
+        "relevance_score": 0.80,
+        "rationale": "Position rebuilder — rebuild positions from decisions. Positions feed portfolio-aware watchlist entries."
+      },
+      {
+        "path": "synapse/core/workflow/daily_research.py",
+        "role": "workflow-orchestrator",
+        "exports": ["run_daily_research", "DailyResearchResult"],
+        "relevance_score": 0.85,
+        "rationale": "Daily research workflow — orchestrates watchlist generation. P1-2 will enhance this to pass market-semantics context."
+      },
+      {
+        "path": "synapse/core/activity.py",
+        "role": "activity-log",
+        "exports": ["ActivityLog", "ActivityType"],
+        "relevance_score": 0.70,
+        "rationale": "Activity logging — watchlist.generated is already logged here."
+      },
+      {
+        "path": "synapse/core/naming.py",
+        "role": "id-generation",
+        "exports": ["generate_id"],
+        "relevance_score": 0.65,
+        "rationale": "ID generation — generate_id('wl') used for watchlist entry IDs."
+      },
+      {
+        "path": "synapse/core/loader.py",
+        "role": "serialization",
+        "exports": ["load_object", "save_object", "register_object_type"],
+        "relevance_score": 0.75,
+        "rationale": "YAML load/save — save_watchlist uses save_object for WatchlistEntry serialization."
+      },
+      {
+        "path": "synapse/event/adapters/eastmoney.py",
+        "role": "data-adapter",
+        "exports": ["EastMoneyAdapter"],
+        "relevance_score": 0.78,
+        "rationale": "EastMoney adapter — real-time quotes and capital flow data for scoring."
+      },
+      {
+        "path": "synapse/event/adapters/akshare_adapter.py",
+        "role": "data-adapter",
+        "exports": [],
+        "relevance_score": 0.75,
+        "rationale": "Akshare adapter — alternative data source for market data."
+      }
+    ],
+    "config": [
+      {
+        "path": "pyproject.toml",
+        "relevance_score": 0.70,
+        "rationale": "Python version, dependencies, pytest config"
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/unit/test_projection.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.95,
+        "rationale": "Existing watchlist generator tests — TestWatchlistGenerator class with 5 tests. P1-2 must extend this with scoring/ranking/filtering tests."
+      },
+      {
+        "path": "tests/unit/test_schemas.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.90,
+        "rationale": "Round-trip test pattern for all schemas — WatchlistEntry to_dict/from_dict round-trip tests exist."
+      },
+      {
+        "path": "tests/unit/test_calendar.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.78,
+        "rationale": "Trading calendar tests — P1-2 uses is_trading_day for validation."
+      },
+      {
+        "path": "tests/unit/test_market_northbound.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.80,
+        "rationale": "Northbound flow tests — P1-2 uses northbound_to_signals."
+      },
+      {
+        "path": "tests/unit/test_market_constituent.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.78,
+        "rationale": "Constituent tests — P1-2 uses constituent_tickers for universe filtering."
+      },
+      {
+        "path": "tests/unit/test_event_detection.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.75,
+        "rationale": "Event detection tests — detectors produce events consumed by watchlist."
+      },
+      {
+        "path": "tests/unit/test_factor_engine.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.72,
+        "rationale": "Factor engine tests — factor-based scoring integration."
+      },
+      {
+        "path": "tests/unit/test_impact_analyzer.py",
+        "role": "test-pattern-reference",
+        "relevance_score": 0.75,
+        "rationale": "Impact analyzer tests — cascaded impact scores for watchlist ranking."
+      }
+    ]
+  },
+  "dependencies": {
+    "internal": [
+      {
+        "from": "P1-2 watchlist scoring",
+        "to": "synapse/core/projection/watchlist_generator.py",
+        "type": "modification-target"
+      },
+      {
+        "from": "P1-2 watchlist scoring",
+        "to": "synapse/core/schemas/watchlist.py",
+        "type": "schema-extension"
+      },
+      {
+        "from": "P1-2 market-semantics integration",
+        "to": "synapse/core/market/calendar.py",
+        "type": "api-consumer"
+      },
+      {
+        "from": "P1-2 northbound signals",
+        "to": "synapse/core/market/northbound.py",
+        "type": "api-consumer"
+      },
+      {
+        "from": "P1-2 constituent filtering",
+        "to": "synapse/core/market/constituent.py",
+        "type": "api-consumer"
+      },
+      {
+        "from": "P1-2 event-driven scoring",
+        "to": "synapse/event/lifecycle.py",
+        "type": "decay-model"
+      },
+      {
+        "from": "P1-2 event-driven scoring",
+        "to": "synapse/event/graph.py",
+        "type": "propagation-analysis"
+      },
+      {
+        "from": "P1-2 event-driven scoring",
+        "to": "synapse/event/impact.py",
+        "type": "impact-analysis"
+      },
+      {
+        "from": "P1-2 data source integration",
+        "to": "synapse/event/datasource.py",
+        "type": "data-source-protocol"
+      },
+      {
+        "from": "P1-2 factor-based scoring",
+        "to": "synapse/factor/engine.py",
+        "type": "api-consumer"
+      },
+      {
+        "from": "P1-2 portfolio-aware entries",
+        "to": "synapse/core/schemas/position.py",
+        "type": "data-source"
+      },
+      {
+        "from": "P1-2 event-driven entries",
+        "to": "synapse/core/schemas/event.py",
+        "type": "data-source"
+      },
+      {
+        "from": "P1-2 signal-driven entries",
+        "to": "synapse/core/schemas/signal.py",
+        "type": "data-source"
+      },
+      {
+        "from": "P1-2 workflow enhancement",
+        "to": "synapse/core/workflow/daily_research.py",
+        "type": "orchestrator-update"
+      },
+      {
+        "from": "P1-2 serialization",
+        "to": "synapse/core/loader.py",
+        "type": "serialization"
+      },
+      {
+        "from": "P1-2 test extension",
+        "to": "tests/unit/test_projection.py",
+        "type": "test-extension"
+      }
+    ],
+    "external": [
+      {
+        "package": "pandas",
+        "version": ">=2.0",
+        "usage": "DataFrame operations for factor computation and signal aggregation"
+      },
+      {
+        "package": "numpy",
+        "version": ">=1.24",
+        "usage": "Numerical operations for scoring weight computation"
+      },
+      {
+        "package": "pyyaml",
+        "version": ">=6.0",
+        "usage": "YAML serialization for watchlist entries and scoring config"
+      },
+      {
+        "package": "pytest",
+        "version": ">=7.0",
+        "usage": "Testing framework"
+      }
+    ]
+  },
+  "conflict_detection": {
+    "risk_level": "medium",
+    "risk_factors": {
+      "existing_implementations": [
+        "synapse/core/projection/watchlist_generator.py (191 lines, basic implementation)",
+        "synapse/core/schemas/watchlist.py (125 lines, complete schema)",
+        "synapse/core/workflow/daily_research.py (111 lines, orchestrator)",
+        "tests/unit/test_projection.py (5 watchlist tests)"
+      ],
+      "api_changes": true,
+      "architecture_changes": false,
+      "data_model_changes": true,
+      "breaking_changes": [
+        "WatchlistEntry schema may need new fields (priority_score, reason) — non-breaking via Lazy Upcast if added with defaults",
+        "generate_daily() function signature will expand with new optional parameters — backward compatible",
+        "WatchlistEntry has SignalType enum that overlaps with schemas/signal.py SignalType (different enums with same values) — potential confusion but no actual conflict"
+      ]
+    },
+    "affected_modules": ["projection", "schemas", "market", "event", "factor", "workflow", "tests"],
+    "mitigation_strategy": "Add new fields with defaults (Lazy Upcast), keep generate_daily() backward compatible with optional params, avoid modifying existing enum definitions"
+  },
+  "prioritized_context": {
+    "user_intent": {
+      "goal": "实现 P1-2 Daily Watchlist Generator — 基于 P1 Market Semantics 和 P5 DataSource 的个性化每日关注列表",
+      "scope": "信号评分整合、事件驱动过滤、持仓状态感知、市场语义验证、个性化推荐",
+      "key_constraints": [
+        "基于 P1 Market Semantics（TradingCalendar, NorthboundFlow, IndexConstituent）和 P5 DataSource",
+        "现有 watchlist_generator.py 是基础实现（191行），需要大幅增强",
+        "遵循 ADR-009 每日全量再生（非增量更新）",
+        "遵循 ADR-011 AI 生成内容标注 source_type: ai_generated",
+        "所有新字段使用 Lazy Upcast 默认值，不破坏现有 schema",
+        "WatchlistEntry.SignalType 与 schemas/signal.py.SignalType 是独立枚举，注意区分"
+      ]
+    },
+    "priority_tiers": {
+      "critical": [
+        {
+          "path": "synapse/core/projection/watchlist_generator.py",
+          "relevance": 0.99,
+          "rationale": "Primary modification target — existing basic generator (191 lines) needs scoring, ranking, filtering, market-semantics integration. Currently has generate_daily() and save_watchlist() as entry points."
+        },
+        {
+          "path": "synapse/core/schemas/watchlist.py",
+          "relevance": 0.98,
+          "rationale": "Schema to extend — WatchlistEntry needs priority_score, reason, and possibly additional SignalType values. TriggerType may need SECTOR_ROTATION."
+        },
+        {
+          "path": "synapse/core/market/calendar.py",
+          "relevance": 0.95,
+          "rationale": "Trading calendar — is_trading_day() validates target_date before generation. next_trading_day() for date fallback."
+        },
+        {
+          "path": "synapse/core/market/northbound.py",
+          "relevance": 0.93,
+          "rationale": "Northbound flow — northbound_to_signals() converts large flows to Signal-compatible dicts. northbound_momentum() for rolling momentum scoring."
+        },
+        {
+          "path": "synapse/core/market/constituent.py",
+          "relevance": 0.92,
+          "rationale": "Index constituent — constituent_tickers() for universe filtering. is_member() for individual checks. load_constituent_changes() for rebalance signals."
+        },
+        {
+          "path": "synapse/event/lifecycle.py",
+          "relevance": 0.92,
+          "rationale": "Event decay model — CATEGORY_HALF_LIVES dict (earnings=6.5d, policy=1.5d, sentiment=2.0d, etc.) and compute_decay() for scoring stale events lower."
+        },
+        {
+          "path": "synapse/event/graph.py",
+          "relevance": 0.90,
+          "rationale": "PropagationGraph — bfs_downstream() for cascaded event impact, apply_decay_to_edges() for temporal decay, topological_sort() for processing order."
+        },
+        {
+          "path": "synapse/core/schemas/event.py",
+          "relevance": 0.92,
+          "rationale": "Event v3.0 schema — severity, confidence, decay_rate, propagation_state fields are key inputs for event-driven scoring."
+        },
+        {
+          "path": "synapse/core/schemas/signal.py",
+          "relevance": 0.90,
+          "rationale": "Signal v2.0 schema — signal_type, strength, decay_tracking, first_seen_at for signal-based scoring. Note: SignalType here is different from watchlist.py SignalType."
+        },
+        {
+          "path": "synapse/core/schemas/position.py",
+          "relevance": 0.88,
+          "rationale": "Position schema — thesis_status (ACTIVE/WEAKENED/INVALIDATED) and attention_state (STABLE/RISING/FADING) for portfolio-aware priority."
+        },
+        {
+          "path": "tests/unit/test_projection.py",
+          "relevance": 0.95,
+          "rationale": "Existing watchlist tests — TestWatchlistGenerator class. P1-2 must add scoring/ranking/filtering tests following same pattern."
+        }
+      ],
+      "high": [
+        {
+          "path": "synapse/event/impact.py",
+          "relevance": 0.88,
+          "rationale": "ImpactAnalyzer — compute cascaded impact scores from propagation graph for watchlist ranking."
+        },
+        {
+          "path": "synapse/event/datasource.py",
+          "relevance": 0.85,
+          "rationale": "DataSource ABC — adapter protocol for fetching real-time data (quotes, capital flow) used in scoring."
+        },
+        {
+          "path": "synapse/factor/engine.py",
+          "relevance": 0.85,
+          "rationale": "FactorEngine — compute_factor() and compute_batch() for factor-based anomaly detection feeding watchlist signals."
+        },
+        {
+          "path": "synapse/core/projection/__init__.py",
+          "relevance": 0.85,
+          "rationale": "Projection engine entry — generate_daily is exported here. P1-2 may add new exports."
+        },
+        {
+          "path": "synapse/core/workflow/daily_research.py",
+          "relevance": 0.88,
+          "rationale": "Daily research orchestrator — run_daily_research() calls generate_daily(). P1-2 will enhance to pass market-semantics context (calendar, northbound, constituent)."
+        },
+        {
+          "path": "synapse/core/schemas/base.py",
+          "relevance": 0.82,
+          "rationale": "BaseSchema foundation — MarketContext.research_date/market_date used for date-aware filtering and scoring."
+        },
+        {
+          "path": "synapse/event/detectors.py",
+          "relevance": 0.82,
+          "rationale": "8 event detectors — produce Events consumed by watchlist generator. Understanding detector outputs helps design scoring."
+        },
+        {
+          "path": "synapse/core/loader.py",
+          "relevance": 0.78,
+          "rationale": "Serialization — save_object() used by save_watchlist(). May need new register_object_type() for scoring config."
+        },
+        {
+          "path": "synapse/core/activity.py",
+          "relevance": 0.75,
+          "rationale": "Activity logging — watchlist.generated already logged. P1-2 may add scoring breakdown to activity."
+        },
+        {
+          "path": "synapse/event/adapters/eastmoney.py",
+          "relevance": 0.80,
+          "rationale": "EastMoney adapter — real-time quotes and capital flow for scoring."
+        }
+      ],
+      "medium": [
+        {
+          "path": "synapse/core/market/adjustment.py",
+          "relevance": 0.70,
+          "rationale": "Price adjustment — may be needed if factor-based scoring compares adjusted prices."
+        },
+        {
+          "path": "synapse/core/market/data_loader.py",
+          "relevance": 0.68,
+          "rationale": "Data loader — load_daily() for historical data if scoring needs price history."
+        },
+        {
+          "path": "synapse/factor/spec.py",
+          "relevance": 0.72,
+          "rationale": "FactorSpec — defines factor identity, lookback, data source for factor-based scoring."
+        },
+        {
+          "path": "synapse/core/projection/position_rebuilder.py",
+          "relevance": 0.75,
+          "rationale": "Position rebuilder — positions feed portfolio-aware watchlist entries."
+        },
+        {
+          "path": "synapse/core/naming.py",
+          "relevance": 0.65,
+          "rationale": "ID generation — generate_id('wl') for watchlist entry IDs."
+        },
+        {
+          "path": "tests/unit/test_schemas.py",
+          "relevance": 0.80,
+          "rationale": "Schema round-trip tests — WatchlistEntry to_dict/from_dict pattern."
+        },
+        {
+          "path": "tests/unit/test_market_northbound.py",
+          "relevance": 0.75,
+          "rationale": "Northbound tests — northbound_to_signals pattern."
+        },
+        {
+          "path": "tests/unit/test_market_constituent.py",
+          "relevance": 0.72,
+          "rationale": "Constituent tests — constituent_tickers/is_member pattern."
+        }
+      ],
+      "low": [
+        {
+          "path": "synapse/core/schemas/thesis.py",
+          "relevance": 0.60,
+          "rationale": "Thesis schema — linked_thesis_id on Position connects to thesis. Not directly modified."
+        },
+        {
+          "path": "synapse/core/schemas/decision.py",
+          "relevance": 0.58,
+          "rationale": "Decision schema — positions are rebuilt from decisions. Not directly modified."
+        },
+        {
+          "path": "synapse/core/schemas/review.py",
+          "relevance": 0.55,
+          "rationale": "Review schema — review outcomes affect position thesis_status. Not directly modified."
+        },
+        {
+          "path": "synapse/core/temporal.py",
+          "relevance": 0.60,
+          "rationale": "CST timezone — used in BaseSchema defaults."
+        },
+        {
+          "path": "synapse/core/validation.py",
+          "relevance": 0.55,
+          "rationale": "Schema validation — scoring config may use validation patterns."
+        }
+      ]
+    },
+    "dependency_order": [
+      "synapse/core/schemas/watchlist.py (schema extension — priority_score, reason fields)",
+      "synapse/core/market/calendar.py (trading day validation — is_trading_day integration)",
+      "synapse/core/market/northbound.py (northbound signal generation — northbound_to_signals)",
+      "synapse/core/market/constituent.py (universe filtering — constituent_tickers)",
+      "synapse/event/lifecycle.py (decay model — CATEGORY_HALF_LIVES for scoring)",
+      "synapse/event/graph.py (propagation graph — cascaded impact scoring)",
+      "synapse/event/impact.py (impact analysis — compute cascaded scores)",
+      "synapse/core/projection/watchlist_generator.py (main implementation — scoring, ranking, filtering)",
+      "synapse/core/workflow/daily_research.py (orchestrator update — pass market context)",
+      "tests/unit/test_projection.py (test extension — scoring, ranking, filtering tests)"
+    ],
+    "sorting_rationale": "Schema first (add fields), then market semantics (validate and enrich), then event system (score and rank), then main implementation (integrate all), then orchestrator (wire up), then tests (verify)."
+  }
+}

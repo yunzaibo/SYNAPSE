@@ -1,0 +1,56 @@
+[
+  {
+    "session_id": "WFS-synapse-p5-datasource",
+    "description": "P5-1 真实数据源接入 — DataSource ABC + 东方财富/akshare adapters",
+    "archived_at": "2026-05-19T12:00:00Z",
+    "archive_path": ".workflow/archives/WFS-synapse-p5-datasource",
+    "metrics": {
+      "tasks_completed": 5,
+      "tests_passed": 114
+    },
+    "tags": ["data-source", "adapter", "eastmoney", "akshare", "streaming"]
+  },
+  {
+    "session_id": "WFS-synapse-p6-factor-engine",
+    "description": "P6 因子研究引擎 — FactorSpec+Registry, FactorEngine, IC/RankIC Auditor, 13传统因子, 因子组合优化, IC衰减分析, 事件因子集成",
+    "archived_at": "2026-05-19T19:30:00Z",
+    "archive_path": ".workflow/archives/WFS-synapse-p6-factor-engine",
+    "metrics": {
+      "tasks_completed": 7,
+      "tests_passed": 230
+    },
+    "tags": ["factor-engine", "IC-RankIC", "portfolio-optimization", "event-factor", "traditional-factors"]
+  },
+  {
+    "session_id": "WFS-synapse-p1-market-semantics",
+    "description": "P1 Market Semantics Foundation — TradingCalendar, Ex-Right Adjustment, Northbound Flow, Index Constituent",
+    "archived_at": "2026-05-19T21:00:00Z",
+    "archive_path": ".workflow/archives/WFS-synapse-p1-market-semantics",
+    "metrics": {
+      "tasks_completed": 6,
+      "tests_passed": 1078
+    },
+    "tags": ["market-semantics", "trading-calendar", "ex-right-adjustment", "northbound-flow", "index-constituent"]
+  },
+  {
+    "session_id": "WFS-synapse-p1-2-watchlist",
+    "description": "P1-2 Daily Watchlist Generator — 基于 P1 Market Semantics 和 P5 DataSource 的每日关注列表生成器",
+    "archived_at": "2026-05-19T23:00:00+08:00",
+    "archive_path": ".workflow/archives/WFS-synapse-p1-2-watchlist",
+    "metrics": {
+      "tasks_completed": 7,
+      "tests_passed": 183,
+      "coverage": 0.97
+    },
+    "tags": ["watchlist", "scoring", "event-driven", "portfolio-aware", "market-semantics"],
+    "lessons": {
+      "successes": [
+        "Parallel execution of IMPL-3/4/5 saved time",
+        "Phased approach with clear dependencies worked well",
+        "All conflicts resolved before implementation"
+      ],
+      "challenges": [],
+      "watch_patterns": []
+    }
+  }
+]

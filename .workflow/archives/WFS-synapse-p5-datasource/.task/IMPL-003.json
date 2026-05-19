@@ -1,0 +1,52 @@
+{
+  "id": "IMPL-003",
+  "title": "akshare adapter（龙虎榜 + 资金面）",
+  "description": "实现 AkshareAdapter，基于 akshare 库接入龙虎榜、资金面等数据。参考 UZI-Skill fetcher 模式。akshare 为可选依赖。",
+  "wave": 2,
+  "depends_on": ["IMPL-001"],
+  "status": "completed",
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T00:00:00"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T00:01:00"
+    }
+  ],
+  "meta": {
+    "type": "feature",
+    "complexity": "medium",
+    "execution_group": "parallel"
+  },
+  "convergence": {
+    "verification": [
+      "akshare 未安装时优雅降级（ImportError）",
+      "fetch() 返回标准化 MarketData 列表",
+      "龙虎榜数据正确解析",
+      "资金面数据（北向/融资融券/大宗交易）正确解析",
+      "tests/unit/test_akshare_adapter.py 存在且全部通过"
+    ],
+    "definition_of_done": [
+      "synapse/event/adapters/akshare_adapter.py 创建",
+      "支持龙虎榜 + 资金面两个维度",
+      "akshare 未安装时返回空 + 警告日志",
+      "tests/unit/test_akshare_adapter.py 创建，覆盖正常/降级场景",
+      "py -m pytest -p no:asyncio tests/unit/test_akshare_adapter.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "实现 AkshareAdapter(DataSource)",
+      "fetch_lhb(ticker): ak.stock_lhb_detail_em()",
+      "fetch_capital_flow(ticker): ak.stock_individual_fund_flow()",
+      "try/except ImportError 优雅降级",
+      "参考 D:\\AI\\UZI-Skill\\skills\\deep-analysis\\scripts\\fetch_lhb.py 模式",
+      "同步编写 tests/unit/test_akshare_adapter.py：mock akshare，验证解析逻辑、降级逻辑"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_akshare_adapter.py -v"
+  }
+}

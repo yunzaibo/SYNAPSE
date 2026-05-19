@@ -1,0 +1,40 @@
+{
+  "id": "IMPL-1",
+  "title": "WatchlistEntry Schema Extension",
+  "feature": "F-021",
+  "phase": 1,
+  "status": "completed",
+  "priority": "High",
+  "description": "Extend WatchlistEntry dataclass with priority_score and reason fields, add validation, update serialization, add round-trip tests.",
+  "depends_on": [],
+  "acceptance_criteria": [
+    "WatchlistEntry has priority_score: float = 0.0 field",
+    "WatchlistEntry has reason: str = '' field",
+    "__post_init__ validates priority_score in [0.0, 1.0]",
+    "to_dict() includes priority_score and reason",
+    "from_dict() handles missing fields with defaults (Lazy Upcast)",
+    "Round-trip test passes: to_dict() → from_dict() → compare"
+  ],
+  "files_to_modify": [
+    "synapse/core/schemas/watchlist.py",
+    "tests/unit/test_schemas.py"
+  ],
+  "files_to_create": [],
+  "implementation_notes": [
+    "Do NOT add frozen=True (deferred to P2+)",
+    "priority_score validates in __post_init__ with ValueError if out of range",
+    "reason is plain string at schema level; 10-200 chars enforced by scoring engine",
+    "Follow existing to_dict/from_dict pattern in watchlist.py"
+  ],
+  "convergence": {
+    "definition_of_done": "Schema extended, validated, serialized, tested",
+    "verification": "pytest tests/unit/test_schemas.py -k watchlist"
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "completed",
+      "changed_at": "2026-05-19T18:29:46.426143+08:00"
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-05-19T21:50:00+08:00",
+  "session_id": "WFS-synapse-p1-2-watchlist",
+  "feature_mode": true,
+  "features": [
+    {
+      "id": "F-021",
+      "slug": "watchlist-schema-extension",
+      "name": "WatchlistEntry schema 新增 priority_score 和 reason 字段",
+      "priority": "High",
+      "spec_path": "feature-specs/F-021-watchlist-schema-extension.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on priority_score float [0.0, 1.0] with __post_init__ validation",
+          "All roles agree on Lazy Upcast pattern for backward compatibility",
+          "All roles agree on schema version bump from 1.0 to 2.0"
+        ],
+        "conflicts": [
+          {
+            "topic": "Frozen Dataclass applicability",
+            "resolution": "Do NOT add frozen=True to WatchlistEntry in P1-2; defer to separate refactoring task",
+            "confidence": "[SUGGESTED]"
+          }
+        ],
+        "cross_refs": ["Depends on existing BaseSchema", "Integrates with F-022, F-026, F-028"]
+      }
+    },
+    {
+      "id": "F-022",
+      "slug": "signal-scoring-engine",
+      "name": "基于 Signal、Event、Position 等多维度数据计算优先级分数",
+      "priority": "High",
+      "spec_path": "feature-specs/F-022-signal-scoring-engine.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on pipeline architecture",
+          "All roles agree on weighted sum aggregation",
+          "All roles agree on deterministic scoring",
+          "All roles agree on graceful degradation"
+        ],
+        "conflicts": [
+          {
+            "topic": "Scoring dimensions count",
+            "resolution": "采用 4 维模型（含 market）",
+            "confidence": "[DECISION NEEDED]"
+          },
+          {
+            "topic": "Default weights values",
+            "resolution": "采用 system-architect 的 4 维权重",
+            "confidence": "[DECISION NEEDED]"
+          },
+          {
+            "topic": "Weight validation behavior",
+            "resolution": "采用 auto-normalize with warning",
+            "confidence": "[DECISION NEEDED]"
+          }
+        ],
+        "cross_refs": ["Depends on F-021", "Integrates with F-023, F-024, F-025, F-027, F-028"]
+      }
+    },
+    {
+      "id": "F-023",
+      "slug": "event-driven-filtering",
+      "name": "基于 Event lifecycle decay model 的时间衰减评分机制",
+      "priority": "High",
+      "spec_path": "feature-specs/F-023-event-driven-filtering.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on reusing existing apply_category_decay()",
+          "All roles agree on exponential decay",
+          "All roles agree on DecayScore as value object"
+        ],
+        "conflicts": [],
+        "cross_refs": ["Integrates with F-022, F-024, F-027"]
+      }
+    },
+    {
+      "id": "F-024",
+      "slug": "portfolio-aware-scoring",
+      "name": "基于 Position thesis_status 和 attention_state 的持仓感知机制",
+      "priority": "High",
+      "spec_path": "feature-specs/F-024-portfolio-aware-scoring.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on thesis_status and attention_state as scoring multipliers",
+          "All roles agree on ThesisAttentionMap as lookup dict"
+        ],
+        "conflicts": [
+          {
+            "topic": "ThesisAttentionMap structure",
+            "resolution": "采用 data-architect 的 tuple 结构",
+            "confidence": "[SUGGESTED]"
+          }
+        ],
+        "cross_refs": ["Depends on Position schema", "Integrates with F-022, F-027"]
+      }
+    },
+    {
+      "id": "F-025",
+      "slug": "market-semantics-validation",
+      "name": "集成 P1-1 Market Semantics（TradingCalendar、NorthboundFlow、IndexConstituent）",
+      "priority": "Medium",
+      "spec_path": "feature-specs/F-025-market-semantics-validation.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on TradingCalendar as gate",
+          "All roles agree on NorthboundFlow as boost signal",
+          "All roles agree on IndexConstituent as scope filter"
+        ],
+        "conflicts": [],
+        "cross_refs": ["Depends on P1-1 Market Semantics", "Integrates with F-022, F-027"]
+      }
+    },
+    {
+      "id": "F-026",
+      "slug": "ranking-and-filtering",
+      "name": "基于 priority_score 的排序和过滤机制",
+      "priority": "Medium",
+      "spec_path": "feature-specs/F-026-ranking-and-filtering.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on stable sort by priority_score descending",
+          "All roles agree on configurable top-N cutoff",
+          "All roles agree on dedup by ticker"
+        ],
+        "conflicts": [],
+        "cross_refs": ["Depends on F-021, F-022", "Integrates with F-027"]
+      }
+    },
+    {
+      "id": "F-027",
+      "slug": "personalization-config",
+      "name": "支持用户配置评分权重和过滤规则",
+      "priority": "Low",
+      "spec_path": "feature-specs/F-027-personalization-config.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on YAML-only configuration",
+          "All roles agree on config as first-class dependency",
+          "All roles agree on defaults that work without user intervention"
+        ],
+        "conflicts": [
+          {
+            "topic": "MVP scope inclusion",
+            "resolution": "采用 product-manager 的建议，将 F-027 推迟到迭代 2",
+            "confidence": "[DECISION NEEDED]"
+          },
+          {
+            "topic": "YAML schema structure",
+            "resolution": "采用扁平结构",
+            "confidence": "[DECISION NEEDED]"
+          },
+          {
+            "topic": "Weight validation on invalid config",
+            "resolution": "采用 warning + fallback to defaults",
+            "confidence": "[DECISION NEEDED]"
+          }
+        ],
+        "cross_refs": ["Depends on F-022, F-026", "Integrates with F-028"]
+      }
+    },
+    {
+      "id": "F-028",
+      "slug": "watchlist-tests",
+      "name": "扩展 test_projection.py，添加 scoring/ranking/filtering 测试",
+      "priority": "High",
+      "spec_path": "feature-specs/F-028-watchlist-tests.md",
+      "contributing_roles": ["system-architect", "data-architect", "product-manager"],
+      "cross_cutting_refs": {
+        "consensus": [
+          "All roles agree on extending existing test_projection.py",
+          "All roles agree on round-trip serialization tests",
+          "All roles agree on scoring determinism tests",
+          "All roles agree on test coverage > 80%"
+        ],
+        "conflicts": [
+          {
+            "topic": "Test priority",
+            "resolution": "保持 Must-priority",
+            "confidence": "[SUGGESTED]"
+          }
+        ],
+        "cross_refs": ["Depends on F-021, F-022, F-026", "Integrates with F-027"]
+      }
+    }
+  ],
+  "cross_cutting_specs": [
+    "system-architect/analysis-cross-cutting.md",
+    "data-architect/analysis-cross-cutting.md",
+    "product-manager/analysis-cross-cutting.md"
+  ],
+  "complexity_score": {
+    "feature_count": 8,
+    "unresolved_conflicts": 6,
+    "participating_roles": 3,
+    "cross_feature_dependencies": 5,
+    "total_score": 7,
+    "assessment": "REVIEW_RECOMMENDED"
+  }
+}

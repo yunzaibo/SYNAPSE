@@ -1,0 +1,20 @@
+{
+  "id": "IMPL-006",
+  "title": "Regression Verification & Cleanup",
+  "description": "Run full test suite to verify all existing tests pass and new modules work correctly. Check for privacy leaks (hardcoded paths), verify type hints follow project conventions, confirm docstrings match implementation. Generate test report.",
+  "type": "code-developer",
+  "depends_on": ["IMPL-005"],
+  "convergence": [
+    "py -m pytest -p no:asyncio passes with 0 failures",
+    "No hardcoded user paths in any source file",
+    "All new modules have consistent docstrings and type hints",
+    "Code follows project conventions: __future__.annotations, frozen dataclass slots=True, to_dict/from_dict pattern",
+    "CHANGELOG.md updated if applicable",
+    "Clean test report generated"
+  ],
+  "focus_paths": [
+    "synapse/core/market/",
+    "tests/unit/",
+    "CHANGELOG.md"
+  ]
+}

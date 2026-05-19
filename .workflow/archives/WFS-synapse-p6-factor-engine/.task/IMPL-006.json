@@ -1,0 +1,34 @@
+{
+  "id": "IMPL-006",
+  "title": "Factor Decay Analysis",
+  "description": "IC 衰减分析 + 半衰期计算，评估因子预测能力的时间特性。",
+  "wave": 3,
+  "depends_on": ["IMPL-003"],
+  "meta": {
+    "type": "feature",
+    "complexity": "low",
+    "execution_group": "parallel"
+  },
+  "convergence": {
+    "verification": [
+      "IC 衰减曲线计算正确",
+      "半衰期计算正确",
+      "衰减分类逻辑实现"
+    ],
+    "definition_of_done": [
+      "synapse/factor/decay.py 创建",
+      "compute_ic_decay / compute_decay_half_life 实现",
+      "tests/unit/test_factor_decay.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/factor/decay.py",
+      "实现 compute_ic_decay",
+      "实现 compute_decay_half_life",
+      "实现衰减分类",
+      "同步编写 tests/unit/test_factor_decay.py"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_factor_decay.py -v"
+  }
+}

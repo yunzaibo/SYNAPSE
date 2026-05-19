@@ -1,0 +1,45 @@
+{
+  "id": "IMPL-4",
+  "title": "Portfolio-Aware Scoring",
+  "feature": "F-024",
+  "phase": 3,
+  "status": "completed",
+  "priority": "High",
+  "description": "Implement score_portfolio_boost() using Position thesis_status and attention_state.",
+  "depends_on": [
+    "IMPL-2"
+  ],
+  "acceptance_criteria": [
+    "score_portfolio_boost() function implemented",
+    "ThesisAttentionMap = dict[str, tuple[ThesisStatus, AttentionState]]",
+    "Thesis status boosts: INVALIDATED > WEAKENED > ACTIVE",
+    "Attention state boosts: RISING > FADING > STABLE",
+    "Missing positions contribute 0.0"
+  ],
+  "files_to_modify": [
+    "synapse/core/projection/scoring/engine.py"
+  ],
+  "files_to_create": [
+    "synapse/core/projection/scoring/portfolio_scorer.py"
+  ],
+  "implementation_notes": [
+    "ThesisAttentionMap: ticker → (ThesisStatus, AttentionState)",
+    " thesis_invalidated_boost = 0.5 (highest priority)",
+    " thesis_weakened_boost = 0.35",
+    " thesis_active_boost = 0.15 (lowest)",
+    " attention_rising_boost = 0.25",
+    " attention_fading_boost = 0.10",
+    " attention_stable_boost = 0.05"
+  ],
+  "convergence": {
+    "definition_of_done": "Portfolio scoring implemented and tested",
+    "verification": "pytest tests/unit/test_projection.py -k portfolio_scoring"
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T18:43:46.320768+08:00"
+    }
+  ]
+}

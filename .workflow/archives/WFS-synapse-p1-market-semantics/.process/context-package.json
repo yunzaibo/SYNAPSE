@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "session_id": "WFS-synapse-p1-market-semantics",
+    "task_description": "P1 Market Semantics Foundation — TradingCalendar, Ex-Right Adjustment, Northbound Flow, Index Constituent",
+    "timestamp": "2026-05-19T20:30:00Z",
+    "complexity": "Medium",
+    "exploration_count": 0,
+    "source": "brainstorm-artifacts"
+  },
+  "project_context": {
+    "name": "SYNAPSE",
+    "type": "AI-native Quant Research OS for A-share market",
+    "language": "Python",
+    "framework": "dataclass-based, no web framework",
+    "architecture_patterns": [
+      "dataclass with to_dict/from_dict",
+      "Enum for type discrimination",
+      "ABC for extension points",
+      "Parquet/CSV for local storage",
+      "DataSource adapter pattern"
+    ],
+    "existing_modules": {
+      "calendar.py": "162 lines, is_trading_day/next_trading_day/trading_days_between, hardcoded CHINA_HOLIDAYS 2024-2026",
+      "semantics.py": "110 lines, SymbolType enum, PRICE_LIMITS dict, price_limit/validate_t1_settlement/is_suspended",
+      "data_loader.py": "102 lines, load_daily from CSV/Parquet, load_daily_from_api stub"
+    }
+  },
+  "prioritized_context": {
+    "user_intent": {
+      "goal": "P1 Market Semantics Foundation — A-share market semantics layer",
+      "scope": "4 independent modules: TradingCalendar, Ex-Right, Northbound Flow, Index Constituent",
+      "key_constraints": ["All additive, zero breaking changes", "Follow existing conventions", "Parquet storage"]
+    },
+    "priority_tiers": {
+      "critical": [
+        {"path": "synapse/core/market/calendar.py", "relevance": 0.95, "rationale": "Existing calendar to extend with TradingCalendar frozen dataclass"},
+        {"path": "synapse/core/market/semantics.py", "relevance": 0.90, "rationale": "Existing SymbolType/price_limit to remain unchanged"},
+        {"path": "synapse/core/market/data_loader.py", "relevance": 0.90, "rationale": "Gains adj_type parameter, add load_adjusted_daily()"},
+        {"path": "synapse/core/schemas/base.py", "relevance": 0.85, "rationale": "BaseSchema.market_context pattern to follow"}
+      ],
+      "high": [
+        {"path": "synapse/event/datasource.py", "relevance": 0.80, "rationale": "DataSource ABC for northbound/constituent adapter integration"},
+        {"path": "synapse/factor/engine.py", "relevance": 0.75, "rationale": "FactorEngine consumes adjusted prices, uses constituent for universe filtering"}
+      ],
+      "medium": [
+        {"path": "tests/unit/test_market_calendar.py", "relevance": 0.70, "rationale": "Existing tests must pass unchanged"},
+        {"path": "tests/unit/test_market_semantics.py", "relevance": 0.70, "rationale": "Existing tests must pass unchanged"}
+      ],
+      "low": []
+    },
+    "dependency_order": ["F-017", "F-018", "F-019", "F-020"],
+    "sorting_rationale": "All 4 features are independent (no inter-dependencies). Order by dependency on existing code: calendar first (most existing code), then adjustment (extends data_loader), then northbound and constituent (new modules with adapter dependencies)."
+  },
+  "brainstorm_artifacts": {
+    "guidance_specification": ".brainstorming/guidance-specification.md",
+    "role_analyses": [
+      ".brainstorming/system-architect/analysis.md",
+      ".brainstorming/data-architect/analysis.md",
+      ".brainstorming/subject-matter-expert/analysis.md"
+    ],
+    "feature_specs": [
+      ".brainstorming/feature-specs/F-017-trading-calendar.md",
+      ".brainstorming/feature-specs/F-018-ex-right-adjustment.md",
+      ".brainstorming/feature-specs/F-019-northbound-flow.md",
+      ".brainstorming/feature-specs/F-020-index-constituent.md"
+    ],
+    "feature_index": ".brainstorming/feature-index.json",
+    "synthesis_changelog": ".brainstorming/synthesis-changelog.md"
+  },
+  "conflict_detection": {
+    "risk_level": "low",
+    "rationale": "All 4 modules are additive to existing code. No breaking changes. No conflicts between modules (independent). Existing tests serve as regression safety net.",
+    "potential_conflicts": []
+  },
+  "exploration_results": {
+    "exploration_count": 0,
+    "aggregated_insights": {
+      "critical_files": [
+        {"path": "synapse/core/market/calendar.py", "rationale": "Core module to extend"},
+        {"path": "synapse/core/market/data_loader.py", "rationale": "Gains adj_type parameter"},
+        {"path": "synapse/core/market/semantics.py", "rationale": "Unchanged, but referenced by all new modules"}
+      ],
+      "constraints": [
+        "Existing is_trading_day/next_trading_day/trading_days_between API must not change",
+        "data_loader.py load_daily() default behavior must not change",
+        "All new modules follow frozen dataclass pattern with slots=True",
+        "Price calculations must use ROUND_HALF_UP for A-share compliance",
+        "All data includes source field for provenance tracking"
+      ]
+    }
+  }
+}

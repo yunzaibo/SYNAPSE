@@ -1,0 +1,42 @@
+{
+  "id": "IMPL-007",
+  "title": "Event Factor Integration",
+  "description": "事件信号 → 因子值转换，集成 P3 事件系统 + P4 社交情绪。",
+  "status": "completed",
+  "status_history": [
+    {"from": "pending", "to": "in_progress", "changed_at": "2026-05-19T16:00:00"},
+    {"from": "in_progress", "to": "completed", "changed_at": "2026-05-19T16:10:00"}
+  ],
+  "wave": 4,
+  "depends_on": ["IMPL-001"],
+  "meta": {
+    "type": "feature",
+    "complexity": "medium",
+    "execution_group": "main"
+  },
+  "convergence": {
+    "verification": [
+      "EventFactor 基类定义",
+      "至少 3 种事件因子实现",
+      "enrich_with_events 桥接函数",
+      "point-in-time 校验"
+    ],
+    "definition_of_done": [
+      "synapse/factor/factors/event_factor.py 创建",
+      "集成 P3 Event + P4 Social Sentiment",
+      "tests/unit/test_event_factors.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/factor/factors/event_factor.py",
+      "实现 EventFactor 基类",
+      "实现 sentiment_factor (P4 SocialMediaSignal)",
+      "实现 capital_flow_factor (P3 CapitalFlow)",
+      "实现 policy_factor (P3 Policy)",
+      "实现 enrich_with_events 桥接",
+      "同步编写 tests/unit/test_event_factors.py"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_event_factors.py -v"
+  }
+}

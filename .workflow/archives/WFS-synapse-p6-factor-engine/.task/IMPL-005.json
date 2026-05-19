@@ -1,0 +1,45 @@
+{
+  "id": "IMPL-005",
+  "title": "Factor Portfolio Optimizer",
+  "description": "因子组合优化：等权、IC 加权、风险平价三种方法。",
+  "wave": 3,
+  "depends_on": [
+    "IMPL-003"
+  ],
+  "meta": {
+    "type": "feature",
+    "complexity": "medium",
+    "execution_group": "parallel"
+  },
+  "convergence": {
+    "verification": [
+      "三种优化方法实现",
+      "权重总和为 1",
+      "换手率计算正确",
+      "约束条件检查（行业暴露 < 30%）"
+    ],
+    "definition_of_done": [
+      "synapse/factor/portfolio.py 创建",
+      "FactorPortfolio dataclass 定义",
+      "tests/unit/test_factor_portfolio.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/factor/portfolio.py",
+      "实现 equal_weight / ic_weighted / risk_parity",
+      "实现 FactorPortfolio dataclass",
+      "实现换手率计算和约束检查",
+      "同步编写 tests/unit/test_factor_portfolio.py"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_factor_portfolio.py -v"
+  },
+  "status": "completed",
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T15:54:33.640531"
+    }
+  ]
+}

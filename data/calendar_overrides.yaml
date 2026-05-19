@@ -1,0 +1,15 @@
+# Calendar Overrides — optional YAML-based holiday/trading day overrides
+#
+# Usage: Call load_holidays("yaml") to merge these with the hardcoded set.
+# Fields:
+#   extra_holidays       — additional non-trading days (ISO format YYYY-MM-DD)
+#   extra_trading_days   — weekend days designated as trading days (compensation)
+#   early_close          — dates with PM-only session (half-days)
+#
+# Example:
+# extra_holidays:
+#   - "2026-12-31"   # custom year-end holiday
+
+extra_holidays: []
+extra_trading_days: []
+early_close: []

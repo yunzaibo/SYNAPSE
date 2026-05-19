@@ -1,0 +1,37 @@
+{
+  "id": "IMPL-005",
+  "title": "单元测试 + 集成测试",
+  "description": "完整的测试覆盖：DataSource ABC、两个 adapter、StreamingIngestion 集成、错误处理。",
+  "wave": 4,
+  "depends_on": ["IMPL-004"],
+  "meta": {
+    "type": "test",
+    "complexity": "medium",
+    "execution_group": "main"
+  },
+  "convergence": {
+    "verification": [
+      "全部测试通过（py -m pytest -p no:asyncio）",
+      "测试覆盖 > 80%",
+      "Mock 测试不依赖真实网络",
+      "集成测试验证完整 pipeline"
+    ],
+    "definition_of_done": [
+      "tests/unit/test_datasource.py",
+      "tests/unit/test_eastmoney_adapter.py",
+      "tests/unit/test_akshare_adapter.py",
+      "tests/integration/test_datasource_pipeline.py",
+      "全量测试通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "DataSource ABC 测试：接口验证、类型检查",
+      "EastMoneyAdapter 测试：mock requests，验证解析逻辑",
+      "AkshareAdapter 测试：mock akshare，验证降级逻辑",
+      "集成测试：DataSource → StreamBuffer → StreamingIngestion 完整流程",
+      "运行全量测试套件确认无回归"
+    ],
+    "test_command": "py -m pytest -p no:asyncio --tb=short"
+  }
+}

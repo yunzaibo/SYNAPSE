@@ -12,12 +12,19 @@ from typing import Optional
 
 import pandas as pd
 
+from synapse.core.market.adjustment import (
+    AdjustmentType,
+    adjust_prices,
+    get_adjustment_factors,
+)
+
 
 def load_daily(
     symbol: str,
     start: date,
     end: date,
     data_dir: str | Path = "data/market",
+    adj_type: AdjustmentType = AdjustmentType.NONE,
 ) -> pd.DataFrame:
     """Load daily OHLCV data for a symbol.
 
@@ -29,9 +36,11 @@ def load_daily(
         start: Start date (inclusive).
         end: End date (inclusive).
         data_dir: Directory containing market data files.
+        adj_type: Price adjustment type (default: NONE, no adjustment).
 
     Returns:
         DataFrame with columns: [date, open, high, low, close, volume].
+        When adj_type != NONE, also includes adj_open, adj_high, adj_low, adj_close.
         Filtered to the date range [start, end].
 
     Raises:
@@ -70,6 +79,11 @@ def load_daily(
 
     # Sort by date
     df = df.sort_values("date").reset_index(drop=True)
+
+    # Apply price adjustment if requested
+    if adj_type != AdjustmentType.NONE:
+        factors = get_adjustment_factors(symbol, start, end)
+        df = adjust_prices(df, factors, adj_type)
 
     return df
 

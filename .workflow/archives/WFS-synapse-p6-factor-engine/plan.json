@@ -1,0 +1,51 @@
+{
+  "session_id": "WFS-synapse-p6-factor-engine",
+  "title": "P6 因子研究引擎",
+  "created_at": "2026-05-19T18:30:00Z",
+  "complexity": "high",
+  "execution_model": "phased",
+  "total_tasks": 7,
+  "waves": [
+    {
+      "wave": 1,
+      "tasks": ["IMPL-001"],
+      "parallel": false,
+      "description": "Foundation — FactorSpec & Registry"
+    },
+    {
+      "wave": 2,
+      "tasks": ["IMPL-002", "IMPL-003"],
+      "parallel": true,
+      "description": "Core Engine — FactorEngine + IC/RankIC Auditor"
+    },
+    {
+      "wave": 3,
+      "tasks": ["IMPL-004", "IMPL-005", "IMPL-006"],
+      "parallel": true,
+      "description": "Factor Library — Traditional Factors + Portfolio + Decay"
+    },
+    {
+      "wave": 4,
+      "tasks": ["IMPL-007"],
+      "parallel": false,
+      "description": "Event Integration — Event Factors + P3/P4 Bridge"
+    }
+  ],
+  "task_ids": [
+    "IMPL-001", "IMPL-002", "IMPL-003", "IMPL-004",
+    "IMPL-005", "IMPL-006", "IMPL-007"
+  ],
+  "critical_path": ["IMPL-001", "IMPL-002", "IMPL-004"],
+  "shared_context": {
+    "source_dirs": ["synapse/factor/"],
+    "test_pattern": "tests/unit/test_factor_*.py",
+    "test_command": "py -m pytest -p no:asyncio tests/unit/ -v",
+    "dependencies": ["P3 event system", "P4 social sentiment", "P5 DataSource adapters"]
+  },
+  "recommended_execution": {
+    "strategy": "phased",
+    "waves_first": [1, 2, 3, 4],
+    "parallel_within_wave": true,
+    "note": "Wave 1 sequential, Wave 2+3 parallel, Wave 4 sequential"
+  }
+}

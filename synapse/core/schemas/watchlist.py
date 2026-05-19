@@ -79,12 +79,22 @@ class WatchlistEntry(BaseSchema):
     # --- Risk Hint ---
     risk_hint: str = ""
 
+    # --- Priority ---
+    priority_score: float = 0.0
+    reason: str = ""
+
     # --- Trigger Type ---
     trigger_type: TriggerType = TriggerType.EVENT_ATTENTION
 
     # --- Links ---
     linked_thesis_id: Optional[str] = None
     linked_event_id: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        if not (0.0 <= self.priority_score <= 1.0):
+            raise ValueError(
+                f"priority_score must be in [0.0, 1.0], got {self.priority_score}"
+            )
 
     def to_dict(self) -> dict:
         d = super().to_dict()
@@ -98,6 +108,8 @@ class WatchlistEntry(BaseSchema):
             "research_angle": self.research_angle,
             "action": self.action,
             "risk_hint": self.risk_hint,
+            "priority_score": self.priority_score,
+            "reason": self.reason,
             "trigger_type": self.trigger_type.value,
             "linked_thesis_id": self.linked_thesis_id,
             "linked_event_id": self.linked_event_id,
@@ -118,6 +130,8 @@ class WatchlistEntry(BaseSchema):
             research_angle=data.get("research_angle", ""),
             action=data.get("action", "值得关注"),
             risk_hint=data.get("risk_hint", ""),
+            priority_score=float(data.get("priority_score", 0.0)),
+            reason=data.get("reason", ""),
             trigger_type=TriggerType(data.get("trigger_type", "event_attention")),
             linked_thesis_id=data.get("linked_thesis_id"),
             linked_event_id=data.get("linked_event_id"),

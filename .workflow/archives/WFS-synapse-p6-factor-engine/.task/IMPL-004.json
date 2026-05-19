@@ -1,0 +1,42 @@
+{
+  "id": "IMPL-004",
+  "status": "completed",
+  "status_history": [{"from": "in_progress", "to": "completed", "changed_at": "2026-05-19T00:00:00"}],
+  "title": "Traditional Factors",
+  "description": "5 种传统因子实现：动量(3)、价值(3)、质量(3)、波动率(2)、流动性(2)，共 13 个因子。",
+  "wave": 3,
+  "depends_on": ["IMPL-001", "IMPL-002"],
+  "meta": {
+    "type": "feature",
+    "complexity": "high",
+    "execution_group": "parallel"
+  },
+  "convergence": {
+    "verification": [
+      "13 个因子全部注册到 FactorRegistry",
+      "每个因子的 FactorSpec 定义完整",
+      "计算逻辑正确（对比参考值）",
+      "A-share 特殊处理（涨跌停、停牌）"
+    ],
+    "definition_of_done": [
+      "synapse/factor/factors/momentum.py 创建",
+      "synapse/factor/factors/value.py 创建",
+      "synapse/factor/factors/quality.py 创建",
+      "synapse/factor/factors/volatility.py 创建",
+      "synapse/factor/factors/liquidity.py 创建",
+      "tests/unit/test_traditional_factors.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/factor/factors/ 目录 + __init__.py",
+      "实现 momentum.py: momentum_1m, momentum_3m, momentum_6m_1m",
+      "实现 value.py: ep, bp, sp",
+      "实现 quality.py: roe, gross_margin, debt_to_asset",
+      "实现 volatility.py: realized_vol_20d, idiosyncratic_vol",
+      "实现 liquidity.py: turnover_20d, amihud_illiquidity",
+      "同步编写 tests/unit/test_traditional_factors.py"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_traditional_factors.py -v"
+  }
+}

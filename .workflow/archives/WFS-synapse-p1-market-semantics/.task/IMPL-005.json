@@ -1,0 +1,18 @@
+{
+  "id": "IMPL-005",
+  "title": "Market Package Integration & Exports",
+  "description": "Update synapse/core/market/__init__.py to export all new public symbols from calendar.py (TradingSession, TradingCalendar, add_trading_days, etc.), adjustment.py (AdjustmentType, adjust_prices, etc.), northbound.py (NorthChannel, load_northbound_flow, etc.), and constituent.py (IndexCode, load_constituents, etc.). Ensure clean public API with __all__.",
+  "type": "code-developer",
+  "depends_on": ["IMPL-001", "IMPL-002", "IMPL-003", "IMPL-004"],
+  "convergence": [
+    "__init__.py imports all new public classes and functions",
+    "__all__ list includes all new exports",
+    "All symbols importable from synapse.core.market",
+    "No import errors or circular dependencies",
+    "Existing exports (is_trading_day, load_daily, etc.) still accessible",
+    "Full test suite passes after integration"
+  ],
+  "focus_paths": [
+    "synapse/core/market/__init__.py"
+  ]
+}

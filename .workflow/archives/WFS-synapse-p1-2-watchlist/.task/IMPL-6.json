@@ -1,0 +1,47 @@
+{
+  "id": "IMPL-6",
+  "title": "Ranking & Filtering",
+  "feature": "F-026",
+  "phase": 4,
+  "status": "completed",
+  "priority": "Medium",
+  "description": "Implement ranking by priority_score and filtering with top-N, min_score, dedup.",
+  "depends_on": [
+    "IMPL-1",
+    "IMPL-2"
+  ],
+  "acceptance_criteria": [
+    "rank_entries() sorts by priority_score descending",
+    "Tie-breaking uses ticker alphabetical order",
+    "filter_entries() applies top-N cutoff",
+    "filter_entries() applies min_priority_score threshold",
+    "filter_entries() deduplicates by ticker (highest score wins)",
+    "generate_daily() integrates ranking and filtering"
+  ],
+  "files_to_modify": [
+    "synapse/core/projection/watchlist_generator.py"
+  ],
+  "files_to_create": [],
+  "implementation_notes": [
+    "Use sorted() with key=lambda x: (-x.priority_score, x.ticker)",
+    "Dedup strategy: keep highest score per ticker",
+    "Default max_entries=20, min_priority_score=0.1",
+    "Filter by trigger_type if exclude_triggers configured"
+  ],
+  "convergence": {
+    "definition_of_done": "Ranking and filtering implemented and tested",
+    "verification": "pytest tests/unit/test_projection.py -k ranking"
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T18:51:20.983495+08:00"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T18:53:48.846162+08:00"
+    }
+  ]
+}

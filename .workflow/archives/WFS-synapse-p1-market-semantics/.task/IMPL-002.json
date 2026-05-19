@@ -1,0 +1,27 @@
+{
+  "id": "IMPL-002",
+  "title": "Ex-Right Adjustment Module (F-018)",
+  "description": "Create synapse/core/market/adjustment.py with AdjustmentType enum, AdjustmentEvent and AdjustmentFactors frozen dataclasses. Implement forward/backward price adjustment using Decimal with ROUND_HALF_UP. Integrate with data_loader.py via optional adj_type parameter (default NONE for backward compatibility). Parquet storage in data/adjustments/.",
+  "type": "code-developer",
+  "depends_on": [],
+  "convergence": [
+    "AdjustmentType enum: FORWARD, BACKWARD, NONE",
+    "AdjustmentEvent frozen dataclass: date, factor, event_type, cash_dividend, stock_dividend",
+    "AdjustmentFactors frozen dataclass: symbol, events, cumulative tuple",
+    "get_adjustment_factors loads from Parquet or returns empty factors on missing file",
+    "adjust_prices adds adj_open/adj_high/adj_low/adj_close columns non-destructively",
+    "adjust_single_price for single price point adjustment",
+    "All Decimal calculations use ROUND_HALF_UP",
+    "Invalid factor (< 0 or > 10) logs warning and skips event",
+    "data_loader.py load_daily() gains adj_type: AdjustmentType = NONE parameter",
+    "Default adj_type=NONE preserves all existing load_daily() behavior",
+    "New unit tests: forward/backward adjustment, round-half-up, missing file, invalid factor, adj_type parameter",
+    "All existing tests pass unchanged"
+  ],
+  "focus_paths": [
+    "synapse/core/market/adjustment.py",
+    "synapse/core/market/data_loader.py",
+    "tests/unit/test_market_adjustment.py",
+    "data/adjustments/"
+  ]
+}

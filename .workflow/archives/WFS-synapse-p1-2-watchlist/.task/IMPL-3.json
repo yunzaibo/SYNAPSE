@@ -1,0 +1,35 @@
+{
+  "id": "IMPL-3",
+  "title": "Event-Driven Scoring",
+  "feature": "F-023",
+  "phase": 3,
+  "status": "completed",
+  "priority": "High",
+  "description": "Implement score_event_decay() using existing apply_category_decay() from event/lifecycle.py.",
+  "depends_on": [
+    "IMPL-2"
+  ],
+  "acceptance_criteria": [
+    "score_event_decay() function implemented",
+    "Reuses apply_category_decay() from event/lifecycle.py",
+    "DecayScore value object with score and reason",
+    "Newer events rank higher, stale events decay",
+    "Missing events contribute 0.0"
+  ],
+  "files_to_modify": [
+    "synapse/core/projection/scoring/engine.py"
+  ],
+  "files_to_create": [
+    "synapse/core/projection/scoring/event_scorer.py"
+  ],
+  "implementation_notes": [
+    "Reuse CATEGORY_HALF_LIVES from event/lifecycle.py",
+    "DecayScore: score (float), reason (str)",
+    "Event age computed from event.created_at to target_date",
+    "Use existing compute_decay() for decay calculation"
+  ],
+  "convergence": {
+    "definition_of_done": "Event scoring implemented and tested",
+    "verification": "pytest tests/unit/test_projection.py -k event_scoring"
+  }
+}
