@@ -114,7 +114,16 @@
   },
   "features": [],
   "development_index": {
-    "feature": [],
+    "feature": [
+      {
+        "title": "P3 Event-Driven Extensions — F-007/F-008/F-009",
+        "sub_feature": "event",
+        "date": "2026-05-19",
+        "description": "Sentiment viral propagation (R0, cascade), capital flow divergence scoring, cross-event correlation engine with 8x8 affinity matrix",
+        "status": "completed",
+        "session_id": "WFS-synapse-p3-event-driven"
+      }
+    ],
     "enhancement": [],
     "bugfix": [
       {
@@ -130,13 +139,14 @@
     "docs": []
   },
   "statistics": {
-    "total_features": 0,
-    "total_sessions": 1,
-    "last_updated": "2026-05-18T18:00:00Z"
+    "total_features": 1,
+    "total_sessions": 2,
+    "last_updated": "2026-05-19T16:00:00+08:00"
   },
   "_metadata": {
     "initialized_by": "cli-explore-agent",
     "analysis_timestamp": "2026-05-18T14:00:00Z",
-    "analysis_mode": "deep-scan"
+    "analysis_mode": "deep-scan",
+    "last_updated": "2026-05-19T03:19:49.116136+00:00"
   }
 }

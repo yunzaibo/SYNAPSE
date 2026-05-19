@@ -95,3 +95,4 @@ SYNAPSE positions as Chinese AI-native Financial Research System. Initial market
 用户选择：输入验证 + 无代码密钥 + 路径验证 + 安全 YAML
 
 </spec-entry>
+- [decision:architecture] Feature 隔离：每个新 feature 独立模块文件（sentiment.py, divergence.py, correlation.py），无跨 feature 耦合 (2026-05-19)

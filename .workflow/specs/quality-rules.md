@@ -38,3 +38,4 @@ keywords:
 用户选择：最低测试覆盖率 + 禁止跳过测试 + Lint 必须通过 + 类型检查通过
 
 </spec-entry>
+- [rule:algorithm] 浮点除法防零：使用 epsilon=1e-9 作为分母加数，防止 both-flows-zero 场景的除零错误 (2026-05-19)

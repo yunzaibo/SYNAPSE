@@ -1,0 +1,39 @@
+{
+  "summary": "Implementation plan for F-007 Sentiment Propagation, F-008 Capital Flow Divergence, F-009 Cross-Event Correlation. 5 tasks across 2 execution waves, creating 3 new modules + 3 test files with 24 total tests.",
+  "approach": "Parallel implementation of F-007 and F-008 (independent features, separate files), followed by F-009 (depends on both). Each feature gets its own module file (sentiment.py, divergence.py, correlation.py) and test file. No existing files are modified -- all changes are additive. DAG property preserved by using single-direction edges for correlation.",
+  "task_ids": [
+    "IMPL-001",
+    "IMPL-002",
+    "IMPL-003",
+    "IMPL-004",
+    "IMPL-005"
+  ],
+  "task_count": 5,
+  "complexity": "Medium",
+  "estimated_time": "3-4 hours (Wave 5: 1.5h parallel, Wave 6: 1h correlation, Tests: 1h)",
+  "recommended_execution": "Phased",
+  "shared_context": {
+    "tech_stack": [
+      "Python 3.11",
+      "pytest",
+      "dataclasses",
+      "math",
+      "uuid"
+    ],
+    "conventions": [
+      "snake_case methods",
+      "PascalCase classes",
+      "to_dict()/from_dict() round-trip",
+      "class-based test grouping",
+      "pytest.approx for floats"
+    ]
+  },
+  "_metadata": {
+    "timestamp": "2026-05-19T10:51:51.175982",
+    "source": "action-planning-agent",
+    "planning_mode": "agent-based",
+    "plan_type": "feature",
+    "schema_version": "2.0",
+    "session_id": "WFS-synapse-p3-event-driven"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "session_id": "WFS-synapse-p3-event-driven",
+  "project": "SYNAPSE P3 Event-Driven Research Contracts",
+  "status": "active",
+  "type": "workflow",
+  "created_at": "2026-05-18T21:00:00+08:00",
+  "execution_started_at": "2026-05-19T23:00:00+08:00",
+  "execution_mode": "auto",
+  "topic": {
+    "goal": "Expand P3 event-driven feature specs — sentiment propagation, capital flow tracking, cross-event correlation",
+    "scope": "Sentiment viral propagation, capital flow divergence signals, cross-event correlation engine",
+    "context": "P3 enhancement completed (5 tasks, 561 tests). Building on existing detectors, decay, settlement lifecycle."
+  },
+  "selected_roles": [
+    "system-architect",
+    "data-architect",
+    "subject-matter-expert"
+  ],
+  "phase_completed": "artifacts"
+}

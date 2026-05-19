@@ -1,0 +1,122 @@
+{
+  "session_id": "WFS-synapse-p3-event-driven",
+  "project": "SYNAPSE P3 Event-Driven Research Contracts",
+  "created_at": "2026-05-18T21:30:00+08:00",
+  "total_features": 9,
+  "total_estimated_tests": 95,
+  "features": [
+    {
+      "id": "F-001",
+      "slug": "event-schema-registry",
+      "title": "Event Schema Registry",
+      "component": "#8",
+      "file": "feature-specs/F-001-event-schema-registry.md",
+      "estimated_tests": 12,
+      "priority": 1,
+      "dependencies": [],
+      "status": "ready"
+    },
+    {
+      "id": "F-002",
+      "slug": "event-detection-engine",
+      "title": "Event Detection Engine",
+      "component": "#9",
+      "file": "feature-specs/F-002-event-detection-engine.md",
+      "estimated_tests": 15,
+      "priority": 2,
+      "dependencies": ["F-001"],
+      "status": "ready"
+    },
+    {
+      "id": "F-003",
+      "slug": "propagation-graph",
+      "title": "Event Propagation Graph",
+      "component": "#10",
+      "file": "feature-specs/F-003-propagation-graph.md",
+      "estimated_tests": 18,
+      "priority": 3,
+      "dependencies": ["F-001"],
+      "status": "ready"
+    },
+    {
+      "id": "F-004",
+      "slug": "impact-analyzer",
+      "title": "Event Impact Analyzer",
+      "component": "#11",
+      "file": "feature-specs/F-004-impact-analyzer.md",
+      "estimated_tests": 8,
+      "priority": 4,
+      "dependencies": ["F-003"],
+      "status": "ready"
+    },
+    {
+      "id": "F-005",
+      "slug": "event-review-integration",
+      "title": "Event-Review Integration",
+      "component": "#12",
+      "file": "feature-specs/F-005-event-review-integration.md",
+      "estimated_tests": 10,
+      "priority": 5,
+      "dependencies": ["F-001", "F-002"],
+      "status": "ready"
+    },
+    {
+      "id": "F-006",
+      "slug": "event-cli",
+      "title": "Event CLI Subcommands",
+      "component": "#13",
+      "file": "feature-specs/F-006-event-cli.md",
+      "estimated_tests": 8,
+      "priority": 6,
+      "dependencies": ["F-001", "F-002", "F-003", "F-004"],
+      "status": "ready"
+    },
+    {
+      "id": "F-007",
+      "slug": "sentiment-propagation",
+      "title": "Sentiment Viral Propagation",
+      "component": "#14",
+      "file": "feature-specs/F-007-sentiment-propagation.md",
+      "estimated_tests": 8,
+      "priority": 7,
+      "dependencies": ["F-001", "F-003"],
+      "status": "proposed"
+    },
+    {
+      "id": "F-008",
+      "slug": "capital-flow-divergence",
+      "title": "Capital Flow Divergence Tracking",
+      "component": "#15",
+      "file": "feature-specs/F-008-capital-flow-divergence.md",
+      "estimated_tests": 6,
+      "priority": 8,
+      "dependencies": ["F-001", "F-003"],
+      "status": "proposed"
+    },
+    {
+      "id": "F-009",
+      "slug": "cross-event-correlation",
+      "title": "Cross-Event Correlation Engine",
+      "component": "#16",
+      "file": "feature-specs/F-009-cross-event-correlation.md",
+      "estimated_tests": 10,
+      "priority": 9,
+      "dependencies": ["F-001", "F-003", "F-007", "F-008"],
+      "status": "proposed"
+    }
+  ],
+  "execution_groups": {
+    "wave_1": ["F-001"],
+    "wave_2": ["F-002", "F-003"],
+    "wave_3": ["F-004", "F-005"],
+    "wave_4": ["F-006"],
+    "wave_5": ["F-007", "F-008"],
+    "wave_6": ["F-009"]
+  },
+  "role_analyses": [
+    "system-architect",
+    "data-architect",
+    "subject-matter-expert",
+    "test-strategist"
+  ]
+}

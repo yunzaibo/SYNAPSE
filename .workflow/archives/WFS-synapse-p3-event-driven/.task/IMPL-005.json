@@ -1,0 +1,125 @@
+{
+  "id": "IMPL-005",
+  "title": "F-009 Cross-Event Correlation tests",
+  "description": "Write 10 tests covering EventCorrelation schema round-trip, affinity matrix lookups, correlation score calculation, amplification/dampening classification, combined impact formula, find_correlations integration, add_correlation_edges DAG safety, single event (no correlation), all-same-type events, and window boundary filtering.",
+  "status": "completed",
+  "type": "test-gen",
+  "scope": "tests/unit/test_cross_event_correlation.py",
+  "action": "Implement",
+  "depends_on": [
+    "IMPL-004"
+  ],
+  "focus_paths": [
+    "tests/unit/test_cross_event_correlation.py",
+    "synapse/event/correlation.py"
+  ],
+  "convergence": {
+    "criteria": [
+      "1 new test file created",
+      "10 correlation tests passing",
+      "All tests use class-based grouping (TestCrossEventCorrelation)",
+      "Float assertions use pytest.approx",
+      "DAG safety test verifies no cycles after add_correlation_edges"
+    ],
+    "verification": "py -m pytest tests/unit/test_cross_event_correlation.py -p no:asyncio -q",
+    "definition_of_done": "10 tests passing for cross-event correlation engine"
+  },
+  "files": [
+    {
+      "path": "tests/unit/test_cross_event_correlation.py",
+      "action": "create",
+      "change": "10 tests: schema round-trip, affinity matrix self/symmetric, correlation score, amplification/dampening, combined impact, find_correlations, add_correlation_edges no cycles, single event"
+    }
+  ],
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Write correlation engine tests (10 tests)",
+      "description": "Create test_cross_event_correlation.py with TestCrossEventCorrelation class containing 10 tests.",
+      "modification_points": [
+        "Create tests/unit/test_cross_event_correlation.py (~180 lines)",
+        "10 test methods",
+        "Helper: _make_event_pairs()",
+        "Helper: _make_test_graph()"
+      ],
+      "logic_flow": [
+        "Import pytest, EventCorrelation, EVENT_TYPE_AFFINITY, compute_correlation_score, classify_amplification, compute_combined_impact, find_correlations, add_correlation_edges, PropagationGraph",
+        "Test schema round-trip",
+        "Test affinity matrix diagonal = 1.0 and symmetry",
+        "Test correlation score formula",
+        "Test amplification and dampening",
+        "Test combined impact formulas",
+        "Test find_correlations with 3 events",
+        "Test add_correlation_edges no cycles",
+        "Test single event -> no correlations"
+      ],
+      "depends_on": [],
+      "output": "correlation_tests"
+    }
+  ],
+  "pre_analysis": [
+    {
+      "step": "load_context_package",
+      "action": "Load context package",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json)"
+      ],
+      "output_to": "context_package",
+      "on_error": "fail"
+    },
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load F-009 feature spec",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-009-cross-event-correlation.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p3-event-driven/.brainstorming/feature-specs/F-009-cross-event-correlation.md",
+      "feature_id": "F-009",
+      "priority": "highest",
+      "usage": "Testing strategy for correlation engine"
+    }
+  ],
+  "inherited": {
+    "from": "IMPL-004",
+    "context": [
+      "EventCorrelation API",
+      "EVENT_TYPE_AFFINITY matrix",
+      "compute_correlation_score signature"
+    ]
+  },
+  "context_package_path": ".workflow/active/WFS-synapse-p3-event-driven/.process/context-package.json",
+  "cli_execution": {
+    "id": "WFS-synapse-p3-event-driven-IMPL-005",
+    "strategy": "resume",
+    "resume_from": "WFS-synapse-p3-event-driven-IMPL-004",
+    "merge_from": []
+  },
+  "meta": {
+    "type": "test-gen",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": null,
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    },
+    "test_framework": "pytest",
+    "coverage_target": "80%"
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T11:16:13.496051"
+    }
+  ]
+}
