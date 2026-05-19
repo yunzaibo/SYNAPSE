@@ -1,0 +1,14 @@
+{
+  "session_id": "WFS-synapse-p2-backtest",
+  "project": "SYNAPSE",
+  "topic": "P2 Long-Short Quintile Backtest Engine",
+  "status": "completed",
+  "type": "workflow",
+  "created_at": "2026-05-19T23:30:00+08:00",
+  "completed_at": "2026-05-20T01:30:00+08:00",
+  "execution_mode": "auto",
+  "selected_roles": ["system-architect", "data-architect", "subject-matter-expert"],
+  "phase_completed": "synthesis",
+  "conflicts_resolved": 0,
+  "conflicts_unresolved": 0
+}

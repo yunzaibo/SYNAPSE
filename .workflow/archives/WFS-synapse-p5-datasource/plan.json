@@ -1,0 +1,20 @@
+{
+  "session_id": "WFS-synapse-p5-datasource",
+  "title": "P5-1 真实数据源接入",
+  "created_at": "2026-05-19T12:30:00Z",
+  "complexity": "Medium",
+  "task_count": 5,
+  "task_ids": ["IMPL-001", "IMPL-002", "IMPL-003", "IMPL-004", "IMPL-005"],
+  "recommended_execution": "Phased",
+  "waves": [
+    {"wave": 1, "tasks": ["IMPL-001"], "parallel": false},
+    {"wave": 2, "tasks": ["IMPL-002", "IMPL-003"], "parallel": true},
+    {"wave": 3, "tasks": ["IMPL-004"], "parallel": false},
+    {"wave": 4, "tasks": ["IMPL-005"], "parallel": false}
+  ],
+  "shared_context": {
+    "test_command": "py -m pytest -p no:asyncio",
+    "project_root": "D:\\Study2\\SYNAPSE",
+    "session_path": ".workflow/active/WFS-synapse-p5-datasource"
+  }
+}

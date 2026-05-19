@@ -126,6 +126,55 @@ class TestWatchlistEntry:
         assert d["type"] == "sector_resonance"
         assert d["strength"] == "medium"
 
+    def test_priority_score_defaults(self):
+        wl = WatchlistEntry(id="wl_p1")
+        assert wl.priority_score == 0.0
+        assert wl.reason == ""
+
+    def test_priority_score_validation(self):
+        with pytest.raises(ValueError, match="priority_score must be in"):
+            WatchlistEntry(id="wl_bad", priority_score=-0.1)
+        with pytest.raises(ValueError, match="priority_score must be in"):
+            WatchlistEntry(id="wl_bad", priority_score=1.1)
+
+    def test_priority_score_boundary(self):
+        wl_lo = WatchlistEntry(id="wl_lo", priority_score=0.0)
+        assert wl_lo.priority_score == 0.0
+        wl_hi = WatchlistEntry(id="wl_hi", priority_score=1.0)
+        assert wl_hi.priority_score == 1.0
+
+    def test_round_trip_with_priority(self):
+        wl = WatchlistEntry(
+            id="wl_pr1",
+            ticker="600519",
+            symbol="贵州茅台",
+            priority_score=0.85,
+            reason="技术面突破关键阻力位",
+            signals=[WatchlistSignal(type=SignalType.ATTENTION_SPIKE, strength=SignalStrength.STRONG)],
+        )
+        d = wl.to_dict()
+        assert d["priority_score"] == 0.85
+        assert d["reason"] == "技术面突破关键阻力位"
+        wl2 = WatchlistEntry.from_dict(d)
+        assert wl2.priority_score == 0.85
+        assert wl2.reason == "技术面突破关键阻力位"
+        assert wl2.id == "wl_pr1"
+        assert wl2.ticker == "600519"
+
+    def test_round_trip_lazy_upcast_missing_fields(self):
+        data = {
+            "id": "wl_lazy",
+            "ticker": "000858",
+            "created_at": "2026-05-19T09:00:00+08:00",
+            "updated_at": "2026-05-19T09:00:00+08:00",
+        }
+        wl = WatchlistEntry.from_dict(data)
+        assert wl.priority_score == 0.0
+        assert wl.reason == ""
+        d = wl.to_dict()
+        assert d["priority_score"] == 0.0
+        assert d["reason"] == ""
+
 
 # --- Thesis Tests ---
 

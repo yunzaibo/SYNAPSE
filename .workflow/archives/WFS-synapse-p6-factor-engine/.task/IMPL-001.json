@@ -1,0 +1,49 @@
+{
+  "id": "IMPL-001",
+  "title": "FactorSpec & Registry",
+  "description": "定义 FactorSpec 数据模型 + FactorRegistry 注册机制 + BaseFactor ABC。所有因子的基础。",
+  "wave": 1,
+  "depends_on": [],
+  "meta": {
+    "type": "feature",
+    "complexity": "medium",
+    "execution_group": "main"
+  },
+  "convergence": {
+    "verification": [
+      "FactorSpec 定义完整（factor_id, name, category, inputs, lookback_days 等）",
+      "FactorRegistry 实现 register/unregister/get/list",
+      "BaseFactor ABC 定义清晰（factor_id, spec, compute, required_columns）",
+      "注册时校验 factor_id 非空且不重复"
+    ],
+    "definition_of_done": [
+      "synapse/factor/spec.py 创建",
+      "synapse/factor/registry.py 创建",
+      "synapse/factor/base.py 创建",
+      "tests/unit/test_factor_spec.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/factor/spec.py — FactorSpec dataclass",
+      "创建 synapse/factor/registry.py — FactorRegistry 类",
+      "创建 synapse/factor/base.py — BaseFactor ABC",
+      "同步编写 tests/unit/test_factor_spec.py",
+      "运行测试验证"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_factor_spec.py -v"
+  },
+  "status": "completed",
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T15:31:46.989721"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T15:34:23.025372"
+    }
+  ]
+}

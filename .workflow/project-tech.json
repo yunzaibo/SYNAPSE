@@ -116,12 +116,60 @@
   "development_index": {
     "feature": [
       {
+        "title": "P5-1 真实数据源接入 — DataSource ABC + 东方财富/akshare adapters",
+        "sub_feature": "data-source",
+        "date": "2026-05-19",
+        "description": "DataSource ABC unified interface, EastMoneyAdapter (quotes + capital flow), AkshareAdapter (LHB + capital flow), adapter_fetch_fn pipeline integration",
+        "status": "completed",
+        "session_id": "WFS-synapse-p5-datasource"
+      },
+      {
         "title": "P3 Event-Driven Extensions — F-007/F-008/F-009",
         "sub_feature": "event",
         "date": "2026-05-19",
         "description": "Sentiment viral propagation (R0, cascade), capital flow divergence scoring, cross-event correlation engine with 8x8 affinity matrix",
         "status": "completed",
         "session_id": "WFS-synapse-p3-event-driven"
+      },
+      {
+        "title": "P6 因子研究引擎 — FactorSpec+Registry, FactorEngine, IC/RankIC Auditor, 13传统因子, 因子组合优化, IC衰减分析, 事件因子集成",
+        "sub_feature": "factor-engine",
+        "date": "2026-05-19",
+        "description": "FactorSpec dataclass, FactorRegistry, BaseFactor ABC, FactorEngine (batch/all/PIT validation), IC/RankIC/ICIR computation with A/B/C/D ratings, 13 traditional factors (moment/value/quality/vol/liquidity), portfolio optimizer (equal/IC-weighted/risk-parity), IC decay analysis with half-life, event factor integration (sentiment/capital flow/policy)",
+        "status": "completed",
+        "session_id": "WFS-synapse-p6-factor-engine"
+      },
+      {
+        "title": "P1 Market Semantics Foundation — TradingCalendar, Ex-Right Adjustment, Northbound Flow, Index Constituent",
+        "sub_feature": "market-semantics",
+        "date": "2026-05-19",
+        "description": "TradingCalendar frozen dataclass with bisect-based O(log n) T+N arithmetic, Ex-Right price adjustment (forward/backward, Decimal ROUND_HALF_UP), Northbound flow momentum/signal producer, Index constituent point-in-time tracking, 1078 tests passed",
+        "status": "completed",
+        "session_id": "WFS-synapse-p1-market-semantics"
+      },
+      {
+        "title": "P1-2 Daily Watchlist Generator — 4-dimension scoring, event-driven filtering, portfolio-aware scoring, market semantics validation",
+        "sub_feature": "watchlist",
+        "date": "2026-05-19",
+        "description": "WatchlistEntry schema extension (priority_score, reason), ScoringEngine with pipeline architecture, 4-dimension weighted sum (signal=0.35, event=0.30, portfolio=0.20, market=0.15), event-driven decay scoring, portfolio-aware thesis/attention scoring, market semantics validation, ranking/filtering, 183 tests, 97% coverage",
+        "status": "completed",
+        "session_id": "WFS-synapse-p1-2-watchlist"
+      },
+      {
+        "title": "P2 Long-Short Quintile Backtest Engine — 5分位回测、8项指标、因子IC分析、组合收益归因、与P6 FactorEngine集成",
+        "sub_feature": "backtest-engine",
+        "date": "2026-05-20",
+        "description": "QuintileSorter, MetricsCalculator (single-pass), ICAnalyzer (RankIC/ICIR), AttributionEngine (Barra-style OLS), LongShortSpread, Parquet persistence with schema versioning, BacktestEngine with DI, 223 tests, 98% coverage",
+        "status": "completed",
+        "session_id": "WFS-synapse-p2-backtest"
+      },
+      {
+        "title": "P4 Chinese Financial NLP Layer — 8个NLP模块: NER引擎、情感词典、财报解析、新闻情感分类、事件抽取、研报摘要、政策理解、P3集成",
+        "sub_feature": "nlp",
+        "date": "2026-05-20",
+        "description": "NEREngine (5 entity types + ticker linking), SentimentLexicon (515+ terms + negation/degree), AnnouncementParser (24 regex patterns), SentimentClassifier (bullish/bearish/neutral + aspects), EventExtractor (5 event types + P3 mapping), ReportSummarizer (5 ratings + target price), PolicyUnderstander (3 issuing bodies + 8 sectors), 6 BaseDetector P3 integrations",
+        "status": "completed",
+        "session_id": "WFS-synapse-p4-nlp"
       }
     ],
     "enhancement": [],
@@ -139,14 +187,14 @@
     "docs": []
   },
   "statistics": {
-    "total_features": 1,
-    "total_sessions": 2,
-    "last_updated": "2026-05-19T16:00:00+08:00"
+    "total_features": 7,
+    "total_sessions": 8,
+    "last_updated": "2026-05-20T04:30:00+08:00"
   },
   "_metadata": {
     "initialized_by": "cli-explore-agent",
     "analysis_timestamp": "2026-05-18T14:00:00Z",
     "analysis_mode": "deep-scan",
-    "last_updated": "2026-05-19T03:19:49.116136+00:00"
+    "last_updated": "2026-05-20T04:30:00.000000+00:00"
   }
 }

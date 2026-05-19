@@ -21,6 +21,8 @@ EVENT_TYPES: dict[str, str] = {
     "policy_change": "Regulatory policy changes, CSRC/PBOC announcements, sector-specific regulations",
     "macro_shift": "Macroeconomic regime shifts, GDP/CPI/PMI trend changes, rate cycle transitions",
     "social_sentiment": "Social media sentiment signals — Weibo, Xueqiu, Eastmoney guba, news comment sentiment",
+    "ner_enrichment": "NER entity enrichment — company, person, institution, metric recognition",
+    "event_extraction": "Extracted structured events — earnings forecast, M&A, equity change, policy change, dividend",
 }
 
 
@@ -37,7 +39,8 @@ SOURCE_PRIORITY: dict[str, int] = {
     "exchange_data": 1,
     "wind": 1,
     "news": 2,
-    "manual": 3,
+    "nlp": 3,
+    "manual": 4,
 }
 
 
@@ -51,6 +54,7 @@ EVENT_CATEGORY_MAP: dict[str, list[str]] = {
     "market_data": ["sentiment", "capital_flow", "macro_shift"],
     "social": ["social_sentiment"],
     "thematic": ["theme"],
+    "nlp_enrichment": ["ner_enrichment", "event_extraction"],
 }
 
 

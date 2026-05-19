@@ -1,0 +1,25 @@
+{
+  "id": "IMPL-001",
+  "title": "TradingCalendar Enhancement (F-017)",
+  "description": "Upgrade synapse/core/market/calendar.py with TradingSession and TradingCalendar frozen dataclasses, binary search T+N arithmetic, session awareness (AM/PM), optional YAML holiday override, and file-based cache. Preserve existing is_trading_day/next_trading_day/trading_days_between API unchanged.",
+  "type": "code-developer",
+  "depends_on": [],
+  "convergence": [
+    "TradingSession and TradingCalendar frozen dataclasses implemented with slots=True",
+    "add_trading_days uses bisect on sorted tuple for O(log n) lookup",
+    "is_trading_day/next_trading_day/trading_days_between signatures and behavior unchanged",
+    "Optional data/calendar_overrides.yaml loading with hardcoded fallback",
+    "CHINA_TRADING_DAYS override set for holiday-shifted trading days",
+    "Cache format: data/market/calendar/{year}.json",
+    "is_trading_session(date, session) for AM/PM check",
+    "trading_sessions_between(start, end) returns list[TradingSession]",
+    "trading_day_offset(d, target) returns int",
+    "New unit tests: add_trading_days symmetry, binary search correctness, session checks, override loading",
+    "All existing tests pass unchanged"
+  ],
+  "focus_paths": [
+    "synapse/core/market/calendar.py",
+    "tests/unit/test_market_calendar.py",
+    "data/market/calendar/"
+  ]
+}

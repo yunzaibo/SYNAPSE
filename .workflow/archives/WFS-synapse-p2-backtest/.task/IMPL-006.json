@@ -1,0 +1,207 @@
+{
+  "id": "IMPL-006",
+  "title": "Backtest Engine Core (Event-driven Orchestration with DI)",
+  "description": "Refactor BacktestEngine into event-driven architecture with dependency injection. Orchestrates full pipeline: quintile sorting -> portfolio simulation -> metrics -> IC analysis -> attribution. Integrates with P1 TradingCalendar and P6 FactorEngine data contracts.",
+  "status": "pending",
+  "type": "feature",
+  "scope": "synapse/backtest",
+  "action": "Implement",
+  "depends_on": ["IMPL-001", "IMPL-002", "IMPL-003", "IMPL-004", "IMPL-005"],
+  "focus_paths": ["synapse/backtest/engine.py", "synapse/backtest/config.py", "tests/unit/test_backtest_engine.py"],
+
+  "convergence": {
+    "criteria": [
+      "BacktestEngine accepts DI components: verify by py -m pytest tests/unit/test_backtest_engine.py -p no:asyncio (exit code 0)",
+      "Full pipeline produces BacktestResult: verify by integration test",
+      "Legacy run_backtest() preserved: verify by backward compatibility test",
+      "TradingCalendar integration for rebalance dates: verify by calendar test",
+      "PIT data access enforced: verify by validation tests"
+    ],
+    "verification": "py -m pytest tests/unit/test_backtest_engine.py -p no:asyncio",
+    "definition_of_done": "BacktestEngine orchestrates full pipeline with DI, produces frozen BacktestResult, preserves legacy interface"
+  },
+
+  "files": [
+    {"path": "synapse/backtest/engine.py", "action": "modify", "change": "Refactor BacktestEngine with DI constructor, run() method, BacktestRequest dataclass, preserve legacy run_backtest()"},
+    {"path": "synapse/backtest/config.py", "action": "modify", "change": "Extend BacktestConfig with new fields (n_quintiles, ic_window, enable_attribution, etc.)"},
+    {"path": "synapse/backtest/__init__.py", "action": "modify", "change": "Export BacktestEngine, BacktestRequest, and all new components"},
+    {"path": "tests/unit/test_backtest_engine.py", "action": "modify", "change": "Extend tests for new BacktestEngine interface: DI, full pipeline, legacy compatibility"}
+  ],
+
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Extend BacktestConfig with new fields",
+      "description": "Add new configuration fields to BacktestConfig: n_quintiles (int, default 5), ic_window (int, default 20), ic_min_periods (int, default 10), enable_attribution (bool, default True), enable_ic_analysis (bool, default True), output_dir (str, default 'backtests/'). Validate in __post_init__: n_quintiles >= 2, rebalance_frequency in ('daily', 'weekly', 'monthly').",
+      "modification_points": [
+        "Add 6 new fields to BacktestConfig dataclass",
+        "Add validation rules in __post_init__: n_quintiles >= 2, rebalance_frequency validation",
+        "Preserve existing fields: universe, benchmark, start_date, end_date, rebalance_frequency, transaction_cost_bps, slippage_bps, position_limit"
+      ],
+      "logic_flow": [
+        "Add n_quintiles, ic_window, ic_min_periods, enable_attribution, enable_ic_analysis, output_dir fields",
+        "Add __post_init__ validation for new fields",
+        "Preserve backward compatibility with existing callers"
+      ],
+      "depends_on": [0],
+      "output": "Extended BacktestConfig"
+    },
+    {
+      "step": 2,
+      "title": "Implement BacktestRequest and refactored BacktestEngine",
+      "description": "Create BacktestRequest frozen dataclass (factor_values DataFrame, forward_returns Series, config BacktestConfig, optional benchmark_returns). Refactor BacktestEngine with DI constructor accepting sorter, metrics_calc, ic_analyzer, attribution. Implement run() method: generate rebalance dates via TradingCalendar, for each date call sorter.sort(), simulate portfolio returns with CostModel, compute metrics via MetricsCalculator, optionally run ICAnalyzer and AttributionEngine, assemble frozen BacktestResult. Preserve legacy run_backtest() as wrapper.",
+      "modification_points": [
+        "Create BacktestRequest frozen dataclass in engine.py",
+        "Refactor BacktestEngine.__init__() to accept DI components: sorter, metrics_calc, ic_analyzer, attribution",
+        "Implement run() method: full pipeline orchestration",
+        "Preserve legacy run_backtest() method as backward-compatible wrapper",
+        "Generate rebalance dates using TradingCalendar.trading_days_between()"
+      ],
+      "logic_flow": [
+        "Create BacktestRequest with factor_values, forward_returns, config, benchmark_returns",
+        "Refactor BacktestEngine.__init__(sorter, metrics_calc, ic_analyzer, attribution)",
+        "Implement run(): (1) generate rebalance dates, (2) for each date: sort -> simulate -> accumulate returns, (3) compute metrics, (4) compute IC, (5) compute attribution, (6) assemble BacktestResult",
+        "Add run_backtest() wrapper that creates default DI components and delegates to run()"
+      ],
+      "depends_on": [0],
+      "output": "Refactored BacktestEngine"
+    },
+    {
+      "step": 3,
+      "title": "Implement CostModel extraction",
+      "description": "Extract transaction cost calculation from engine into CostModel class. Constructor accepts transaction_cost_bps and slippage_bps. compute_cost() takes old_positions, new_positions, total_stocks and returns cost as fraction of portfolio value.",
+      "modification_points": [
+        "Create CostModel class in engine.py (or cost_model.py if preferred)",
+        "Extract cost calculation logic from existing run_backtest()",
+        "compute_cost() returns: turnover_ratio * (cost_bps + slippage_bps) / 10000"
+      ],
+      "logic_flow": [
+        "Extract cost computation from existing engine code",
+        "Create CostModel with __init__(transaction_cost_bps, slippage_bps)",
+        "Implement compute_cost(old_positions, new_positions, total_stocks) -> float"
+      ],
+      "depends_on": [0],
+      "output": "CostModel class"
+    },
+    {
+      "step": 4,
+      "title": "Write unit tests for refactored BacktestEngine",
+      "description": "Extend tests/unit/test_backtest_engine.py with tests for: DI component injection, full pipeline with synthetic data, legacy run_backtest() backward compatibility, TradingCalendar integration, PIT validation, CostModel accuracy.",
+      "modification_points": [
+        "Test DI injection: create engine with mock components, verify run() uses them",
+        "Test full pipeline: synthetic factor data -> BacktestResult with all fields populated",
+        "Test legacy interface: run_backtest() produces BacktestResult with BacktestMetrics",
+        "Test TradingCalendar integration: rebalance dates match calendar",
+        "Test CostModel: cost deduction matches expected formula",
+        "Test edge case: empty factor data returns failed BacktestResult"
+      ],
+      "logic_flow": [
+        "Create mock components for DI testing",
+        "Run full pipeline with synthetic data and verify all output fields",
+        "Test legacy interface produces compatible results",
+        "Verify cost calculation accuracy"
+      ],
+      "depends_on": [1],
+      "output": "Extended test_backtest_engine.py"
+    }
+  ],
+
+  "pre_analysis": [
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature spec for F-030 engine core and system-architect analysis",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-030-backtest-engine-core.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/system-architect/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_engine",
+      "action": "Analyze existing BacktestEngine and TradingCalendar integration points",
+      "commands": [
+        "Read(synapse/backtest/engine.py)",
+        "Read(synapse/backtest/config.py)",
+        "Read(synapse/core/market/calendar.py)"
+      ],
+      "output_to": "existing_engine",
+      "on_error": "fail"
+    }
+  ],
+
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-030-backtest-engine-core.md",
+      "feature_id": "F-030",
+      "priority": "highest",
+      "usage": "BacktestEngine DI architecture, data flow pipeline, and BacktestRequest specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/system-architect/analysis.md",
+      "priority": "high",
+      "usage": "Three-layer architecture, core interfaces, data flow, error handling, and performance targets (Sections 1-9)"
+    }
+  ],
+
+  "inherited": {
+    "from": "IMPL-001, IMPL-002, IMPL-003, IMPL-004, IMPL-005",
+    "context": [
+      "QuintileSorter, MetricsCalculator, ICAnalyzer, AttributionEngine from previous tasks",
+      "All frozen dataclasses from result.py"
+    ]
+  },
+
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-006",
+    "strategy": "merge_fork",
+    "merge_from": [
+      "WFS-synapse-p2-backtest-IMPL-002",
+      "WFS-synapse-p2-backtest-IMPL-003",
+      "WFS-synapse-p2-backtest-IMPL-004",
+      "WFS-synapse-p2-backtest-IMPL-005"
+    ]
+  },
+
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+
+  "reference": {
+    "existing_engine": "synapse/backtest/engine.py - BacktestEngine.run_backtest() must preserve",
+    "existing_config": "synapse/backtest/config.py - BacktestConfig must extend",
+    "p1_calendar": "synapse/core/market/calendar.py - TradingCalendar.trading_days_between()"
+  },
+
+  "rationale": {
+    "why_di": "Enables unit testing with mock components, swapping sorting strategies, optional IC/attribution",
+    "why_preserve_legacy": "Existing callers of run_backtest() must not break",
+    "why_event_driven": "Formalizes implicit event model, enables independent component testing"
+  },
+
+  "risks": [
+    {"risk": "DI complexity increases constructor parameters", "mitigation": "Use dataclass-based config, provide sensible defaults for optional components"},
+    {"risk": "Legacy wrapper may not cover all edge cases", "mitigation": "Map legacy parameters to BacktestRequest, add integration tests for legacy path"}
+  ],
+
+  "test": {
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_backtest_engine.py -p no:asyncio",
+      "run_existing": "py -m pytest tests/ -p no:asyncio --tb=short"
+    }
+  }
+}

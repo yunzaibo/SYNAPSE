@@ -1,0 +1,48 @@
+{
+  "id": "IMPL-003",
+  "title": "IC/RankIC Auditor",
+  "description": "IC/RankIC 计算 + 审计报告生成 + ICIR 评级。",
+  "wave": 2,
+  "depends_on": [
+    "IMPL-001"
+  ],
+  "meta": {
+    "type": "feature",
+    "complexity": "medium",
+    "execution_group": "parallel"
+  },
+  "convergence": {
+    "verification": [
+      "IC 计算正确（对比 pandas corr）",
+      "RankIC 计算正确（Spearman）",
+      "ICIR 评级标准 A/B/C/D 实现",
+      "滚动 IC 计算支持自定义窗口",
+      "审计报告生成完整"
+    ],
+    "definition_of_done": [
+      "synapse/factor/audit.py 创建",
+      "FactorAuditReport dataclass 定义",
+      "IC/RankIC/ICIR 计算函数实现",
+      "tests/unit/test_factor_audit.py 全量通过"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/factor/audit.py",
+      "实现 compute_ic / compute_rank_ic",
+      "实现 compute_rolling_ic",
+      "实现 FactorAuditReport dataclass",
+      "实现 ICIR 评级逻辑",
+      "同步编写 tests/unit/test_factor_audit.py"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_factor_audit.py -v"
+  },
+  "status": "completed",
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T15:41:30.038966"
+    }
+  ]
+}

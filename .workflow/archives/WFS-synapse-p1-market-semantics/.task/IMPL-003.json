@@ -1,0 +1,27 @@
+{
+  "id": "IMPL-003",
+  "title": "Northbound Flow Module (F-019)",
+  "description": "Create synapse/core/market/northbound.py with NorthChannel enum (HGT/SGT), NorthboundFlow frozen dataclass. Implement load from Parquet monthly files, fetch via DataSource adapter, rolling momentum computation, and signal producers for watchlist integration. Data definitions only, no real-time streaming in P1.",
+  "type": "code-developer",
+  "depends_on": [],
+  "convergence": [
+    "NorthChannel enum: HGT (沪股通) and SGT (深股通)",
+    "NorthboundFlow frozen dataclass: date, channel, buy_amount, sell_amount, net_amount, total_buy, total_sell, quota_used_pct",
+    "load_northbound_flow returns DataFrame matching NorthboundFlow fields from data/market/northbound/ Parquet",
+    "fetch_northbound_flow works with DataSource adapter supporting data_type='northbound_flow'",
+    "northbound_momentum computes rolling sum over configurable window",
+    "northbound_to_signals returns list compatible with watchlist integration",
+    "index_change_to_signals for index constituent changes",
+    "Missing local file raises FileNotFoundError with clear path guidance",
+    "API failure logs warning, returns empty DataFrame (never None)",
+    "All data includes source field for provenance tracking",
+    "New unit tests: load, momentum, signals, missing file error, empty DataFrame on failure",
+    "All existing tests pass unchanged"
+  ],
+  "focus_paths": [
+    "synapse/core/market/northbound.py",
+    "synapse/event/datasource.py",
+    "tests/unit/test_market_northbound.py",
+    "data/market/northbound/"
+  ]
+}

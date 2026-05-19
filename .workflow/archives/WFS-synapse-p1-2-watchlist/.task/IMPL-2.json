@@ -1,0 +1,55 @@
+{
+  "id": "IMPL-2",
+  "title": "Scoring Engine Core",
+  "feature": "F-022",
+  "phase": 2,
+  "status": "completed",
+  "priority": "High",
+  "description": "Implement scoring engine with 4-dimension weighted sum model, pipeline architecture, and generate_daily() integration.",
+  "depends_on": [
+    "IMPL-1"
+  ],
+  "acceptance_criteria": [
+    "ScoringEngine class with pipeline architecture",
+    "ScoredEntry, ScoringResult, ScoringContext types defined",
+    "aggregate_scores() implements weighted sum formula",
+    "Default weights: signal=0.35, event=0.30, portfolio=0.20, market=0.15",
+    "Auto-normalize with warning when weights != 1.0",
+    "generate_daily() returns list[WatchlistEntry] with priority_score and reason",
+    "Scoring is deterministic (identical inputs → identical outputs)",
+    "Missing data contributes 0.0 (except market: 0.5 neutral)"
+  ],
+  "files_to_modify": [
+    "synapse/core/projection/watchlist_generator.py"
+  ],
+  "files_to_create": [
+    "synapse/core/projection/scoring/__init__.py",
+    "synapse/core/projection/scoring/engine.py",
+    "synapse/core/projection/scoring/types.py",
+    "synapse/core/projection/scoring/aggregator.py"
+  ],
+  "implementation_notes": [
+    "Pipeline: ScoringFunction = Callable[[WatchlistEntry, ScoringContext], tuple[float, str]]",
+    "ScoredEntry: entry, total_score, component_scores, reason",
+    "ScoringResult: entries, target_date, generation_timestamp, config_hash",
+    "ScoringContext: events, signals, positions, target_date, config, market_data",
+    "generate_daily() accepts optional market_data parameter",
+    "Use logging.warning for auto-normalization"
+  ],
+  "convergence": {
+    "definition_of_done": "Engine implemented, generate_daily() works, determinism verified",
+    "verification": "pytest tests/unit/test_projection.py -k scoring"
+  },
+  "status_history": [
+    {
+      "from": "pending",
+      "to": "in_progress",
+      "changed_at": "2026-05-19T18:33:50.834944"
+    },
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T18:37:33.293631"
+    }
+  ]
+}

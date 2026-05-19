@@ -1,0 +1,24 @@
+{
+  "session_id": "WFS-synapse-p1-market-semantics",
+  "project": "SYNAPSE P1 Market Semantics Foundation",
+  "status": "active",
+  "type": "workflow",
+  "created_at": "2026-05-19T20:00:00Z",
+  "selected_roles": ["system-architect", "data-architect", "subject-matter-expert"],
+  "terminology": {
+    "TradingCalendar": "A股交易日历，含周末+法定节假日检测",
+    "T+1 Settlement": "T日买入，T+1日方可卖出",
+    "PriceLimit": "涨跌停板，按板块不同 ±5%/10%/20%/30%",
+    "Suspension": "停牌处理，需记录停牌日期集合",
+    "ExRight/Adjustment": "复权处理，前复权/后复权/不复权",
+    "NorthboundFlow": "北向资金（沪股通/深股通）净流入",
+    "IndexConstituent": "指数成分股列表（沪深300、中证500等）",
+    "SymbolType": "A股标的类型：主板/创业板/科创板/ST/北交所"
+  },
+  "non_goals": [
+    "不做实时行情推送（P5 DataSource 已覆盖）",
+    "不做自动交易执行",
+    "不做完整回测框架（已有 synapse/backtest）",
+    "不做国际市场语义（仅 A 股）"
+  ]
+}

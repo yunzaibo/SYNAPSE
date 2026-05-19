@@ -1,0 +1,87 @@
+{
+  "session_id": "WFS-synapse-p6-factor-engine",
+  "title": "P6 因子研究引擎",
+  "created_at": "2026-05-19T18:30:00Z",
+  "total_features": 7,
+  "features": [
+    {
+      "id": "F-010",
+      "slug": "factorspec-registry",
+      "title": "FactorSpec & Registry",
+      "priority": "P0",
+      "status": "draft",
+      "file": "F-010-factorspec-registry.md",
+      "dependencies": []
+    },
+    {
+      "id": "F-011",
+      "slug": "factorengine-core",
+      "title": "FactorEngine Core",
+      "priority": "P0",
+      "status": "draft",
+      "file": "F-011-factorengine-core.md",
+      "dependencies": ["F-010"]
+    },
+    {
+      "id": "F-012",
+      "slug": "ic-rankic-auditor",
+      "title": "IC/RankIC Auditor",
+      "priority": "P0",
+      "status": "draft",
+      "file": "F-012-ic-rankic-auditor.md",
+      "dependencies": ["F-010"]
+    },
+    {
+      "id": "F-013",
+      "slug": "traditional-factors",
+      "title": "Traditional Factors",
+      "priority": "P1",
+      "status": "draft",
+      "file": "F-013-traditional-factors.md",
+      "dependencies": ["F-010", "F-011"]
+    },
+    {
+      "id": "F-014",
+      "slug": "factor-portfolio-optimizer",
+      "title": "Factor Portfolio Optimizer",
+      "priority": "P1",
+      "status": "draft",
+      "file": "F-014-factor-portfolio-optimizer.md",
+      "dependencies": ["F-012"]
+    },
+    {
+      "id": "F-015",
+      "slug": "factor-decay-analysis",
+      "title": "Factor Decay Analysis",
+      "priority": "P2",
+      "status": "draft",
+      "file": "F-015-factor-decay-analysis.md",
+      "dependencies": ["F-012"]
+    },
+    {
+      "id": "F-016",
+      "slug": "event-factor-integration",
+      "title": "Event Factor Integration",
+      "priority": "P2",
+      "status": "draft",
+      "file": "F-016-event-factor-integration.md",
+      "dependencies": ["F-010", "P3-Event", "P4-Social"]
+    }
+  ],
+  "dependency_graph": {
+    "F-010": [],
+    "F-011": ["F-010"],
+    "F-012": ["F-010"],
+    "F-013": ["F-010", "F-011"],
+    "F-014": ["F-012"],
+    "F-015": ["F-012"],
+    "F-016": ["F-010"]
+  },
+  "execution_waves": [
+    {"wave": 1, "features": ["F-010"], "parallel": false},
+    {"wave": 2, "features": ["F-011", "F-012"], "parallel": true},
+    {"wave": 3, "features": ["F-013", "F-014", "F-015"], "parallel": true},
+    {"wave": 4, "features": ["F-016"], "parallel": false}
+  ],
+  "roles_analyzed": ["system-architect", "data-architect", "subject-matter-expert"]
+}

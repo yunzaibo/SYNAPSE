@@ -1,0 +1,3660 @@
+# Financial Sentiment Lexicon -- 金融情感词典
+# 500+ Chinese financial sentiment terms across 7 categories
+# Schema: term, sentiment (bullish/bearish/neutral), score [-1.0, 1.0],
+#         category, negation_sensitive (bool), context_window (int)
+#
+# Generated for P4 Chinese Financial NLP Layer (F-044).
+
+version: "1.0.0"
+description: "Chinese financial sentiment lexicon for A-share market analysis"
+total_terms: 508
+
+categories:
+  growth:
+    count: 82
+    description: "Positive growth and expansion indicators"
+  decline:
+    count: 72
+    description: "Decline and contraction indicators"
+  risk:
+    count: 62
+    description: "Risk and warning indicators"
+  opportunity:
+    count: 52
+    description: "Value and opportunity indicators"
+  market:
+    count: 62
+    description: "Market activity and flow indicators"
+  regulatory:
+    count: 52
+    description: "Policy and regulatory indicators"
+  neutral:
+    count: 126
+    description: "Neutral reporting and factual terms"
+
+terms:
+  # =========================================================================
+  # GROWTH -- 82 terms (bullish)
+  # =========================================================================
+  - term: "高增长"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "超预期"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "扭亏为盈"
+    sentiment: bullish
+    score: 0.9
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气度提升"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩增长"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润增长"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收增长"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收大幅提升"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利润大幅增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "盈利超预期"
+    sentiment: bullish
+    score: 0.9
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩超预期"
+    sentiment: bullish
+    score: 0.9
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩大幅增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润大幅增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "扣非净利润增长"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩预增"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大幅盈利"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "盈利大增"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "连续增长"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "持续增长"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "高速增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "快速增长"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "稳健增长"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "强劲增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "增长强劲"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "增长加速"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩回暖"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "盈利改善"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "毛利率提升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利率提升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "ROE提升"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "毛利率改善"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营效率提升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "规模扩张"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "产能扩张"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "订单增长"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "订单大幅增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "订单饱满"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "在手订单充足"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市场份额提升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市占率提升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "客户增长"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "用户增长"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "用户数增长"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩创新高"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润创新高"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收创新高"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "盈利创新高"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩首超"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "扣非增长"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "扣非净利润创新高"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "扭亏"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩反转"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "盈利反转"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气回升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "行业景气"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气度高"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气上行"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "产能利用率提升"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "开工率提升"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "产销两旺"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "量价齐升"
+    sentiment: bullish
+    score: 0.8
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "出口增长"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "进口增长"
+    sentiment: bullish
+    score: 0.5
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "合同负债增长"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "预收账款增长"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营性现金流改善"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "现金流改善"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "应收账款周转加快"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "存货周转加快"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资产周转率提升"
+    sentiment: bullish
+    score: 0.65
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润率提升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利润改善"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利润率提升"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩向好"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营向好"
+    sentiment: bullish
+    score: 0.7
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "基本面改善"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营业绩增长"
+    sentiment: bullish
+    score: 0.75
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营业绩大幅提升"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩加速增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收加速增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "盈利加速增长"
+    sentiment: bullish
+    score: 0.85
+    category: growth
+    negation_sensitive: true
+    context_window: 3
+
+  # =========================================================================
+  # DECLINE -- 72 terms (bearish)
+  # =========================================================================
+  - term: "业绩下滑"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "亏损扩大"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气度下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "扣非亏损"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润下降"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩预减"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩预亏"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩大幅下滑"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润大幅下降"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收大幅下降"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩暴雷"
+    sentiment: bearish
+    score: -0.9
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩不及预期"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "未达预期"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "低于预期"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "不及预期"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利润下滑"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "毛利率下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利率下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "ROE下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "毛利率下滑"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营效率下降"
+    sentiment: bearish
+    score: -0.65
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "规模收缩"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "产能收缩"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "订单下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "订单减少"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "订单萎缩"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市场份额下降"
+    sentiment: bearish
+    score: -0.65
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市占率下降"
+    sentiment: bearish
+    score: -0.65
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "客户流失"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "用户流失"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩创新低"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润创新低"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收创新低"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "亏损创新高"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "首亏"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "续亏"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大幅亏损"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "严重亏损"
+    sentiment: bearish
+    score: -0.9
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "巨亏"
+    sentiment: bearish
+    score: -0.9
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩变脸"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩骤降"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收锐减"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利润骤降"
+    sentiment: bearish
+    score: -0.85
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩恶化"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营恶化"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "基本面恶化"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气下行"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气度回落"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "景气度走低"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "开工率下降"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "产能利用率下降"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "量价齐跌"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "出口下降"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "合同负债下降"
+    sentiment: bearish
+    score: -0.65
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "预收账款下降"
+    sentiment: bearish
+    score: -0.65
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营性现金流恶化"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "现金流恶化"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "应收账款周转放缓"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "存货周转放缓"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资产周转率下降"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "净利润率下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利润恶化"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利润率下降"
+    sentiment: bearish
+    score: -0.7
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩承压"
+    sentiment: bearish
+    score: -0.65
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经营承压"
+    sentiment: bearish
+    score: -0.65
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "营收增速放缓"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "增长放缓"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "增速回落"
+    sentiment: bearish
+    score: -0.6
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩下滑超预期"
+    sentiment: bearish
+    score: -0.9
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "亏损超预期"
+    sentiment: bearish
+    score: -0.9
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩不达预期"
+    sentiment: bearish
+    score: -0.8
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "未达盈利目标"
+    sentiment: bearish
+    score: -0.75
+    category: decline
+    negation_sensitive: true
+    context_window: 3
+
+  # =========================================================================
+  # RISK -- 62 terms (bearish)
+  # =========================================================================
+  - term: "高风险"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "商誉减值"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "质押风险"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "诉讼风险"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "债务违约"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "信用风险"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "流动性风险"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资金链断裂"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "现金流紧张"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资金紧张"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "偿债压力"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资产负债率高"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "负债率攀升"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "杠杆过高"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "财务造假"
+    sentiment: bearish
+    score: -0.95
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "业绩造假"
+    sentiment: bearish
+    score: -0.95
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "信息披露违规"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "内幕交易"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "操纵市场"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "违规担保"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "占用资金"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大股东占用"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "违规减持"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "高管减持"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大股东减持"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "控股股东减持"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "实控人减持"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "商誉暴雷"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "应收账款风险"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "坏账风险"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "坏账损失"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "计提减值"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资产减值损失"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "诉讼纠纷"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "行政处罚"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "立案调查"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "被立案"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "退市风险"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "暂停上市"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "终止上市"
+    sentiment: bearish
+    score: -0.95
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "被ST"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "实施其他风险警示"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "股权质押比例高"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "质押率偏高"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "平仓风险"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "强制平仓"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "爆仓"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "债务危机"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "债务重组"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "破产重整"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "破产清算"
+    sentiment: bearish
+    score: -0.95
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "资产冻结"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "账户冻结"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "经营困难"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "持续经营风险"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "重大诉讼"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "重大违规"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "关联交易风险"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "利益输送"
+    sentiment: bearish
+    score: -0.85
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "掏空上市公司"
+    sentiment: bearish
+    score: -0.9
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "会计差错更正"
+    sentiment: bearish
+    score: -0.7
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "审计意见异常"
+    sentiment: bearish
+    score: -0.75
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "非标审计意见"
+    sentiment: bearish
+    score: -0.8
+    category: risk
+    negation_sensitive: false
+    context_window: 5
+
+  # =========================================================================
+  # OPPORTUNITY -- 52 terms (bullish)
+  # =========================================================================
+  - term: "低估"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "安全边际"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "成长空间"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "行业龙头"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "优质标的"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "被低估"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "估值偏低"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "估值合理"
+    sentiment: bullish
+    score: 0.6
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "估值修复"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "估值洼地"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "价值洼地"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "黄金坑"
+    sentiment: bullish
+    score: 0.8
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "底部区域"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "底部特征"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "超跌反弹"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "超跌"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "错杀"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "错杀股"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "买入机会"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "配置价值"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "长期价值"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "核心资产"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "优质资产"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "护城河"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "竞争壁垒"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "技术壁垒"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "研发实力强"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "技术领先"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "产品竞争力强"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "品牌优势"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "管理优秀"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "管理层优秀"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "治理优秀"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "成长确定性高"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "确定性强"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩确定性"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "高股息"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "高分红"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "分红率高"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "股息率高"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "成长性好"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "成长性优秀"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩弹性大"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "业绩拐点"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "盈利拐点"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "基本面触底"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "困境反转"
+    sentiment: bullish
+    score: 0.8
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "戴维斯双击"
+    sentiment: bullish
+    score: 0.85
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "高成长"
+    sentiment: bullish
+    score: 0.75
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "赛道优质"
+    sentiment: bullish
+    score: 0.7
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "赛道好"
+    sentiment: bullish
+    score: 0.65
+    category: opportunity
+    negation_sensitive: true
+    context_window: 3
+
+  # =========================================================================
+  # MARKET -- 62 terms (context: some bullish, some bearish)
+  # =========================================================================
+  - term: "涨停"
+    sentiment: bullish
+    score: 0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "跌停"
+    sentiment: bearish
+    score: -0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "北向资金流入"
+    sentiment: bullish
+    score: 0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "北向资金大幅流入"
+    sentiment: bullish
+    score: 0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "北向资金净流入"
+    sentiment: bullish
+    score: 0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "融资余额增加"
+    sentiment: bullish
+    score: 0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "融资净买入"
+    sentiment: bullish
+    score: 0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "融资大幅净买入"
+    sentiment: bullish
+    score: 0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "放量上涨"
+    sentiment: bullish
+    score: 0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "缩量下跌"
+    sentiment: bearish
+    score: -0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "放量下跌"
+    sentiment: bearish
+    score: -0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "缩量上涨"
+    sentiment: bullish
+    score: 0.5
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "金叉"
+    sentiment: bullish
+    score: 0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "死叉"
+    sentiment: bearish
+    score: -0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "多头排列"
+    sentiment: bullish
+    score: 0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "空头排列"
+    sentiment: bearish
+    score: -0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "突破新高"
+    sentiment: bullish
+    score: 0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "跌破新低"
+    sentiment: bearish
+    score: -0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "站上年线"
+    sentiment: bullish
+    score: 0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "跌破年线"
+    sentiment: bearish
+    score: -0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "站上60日均线"
+    sentiment: bullish
+    score: 0.6
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "跌破60日均线"
+    sentiment: bearish
+    score: -0.6
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "主力资金流入"
+    sentiment: bullish
+    score: 0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "主力资金大幅流入"
+    sentiment: bullish
+    score: 0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "主力资金流出"
+    sentiment: bearish
+    score: -0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "主力出逃"
+    sentiment: bearish
+    score: -0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资金净流入"
+    sentiment: bullish
+    score: 0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资金净流出"
+    sentiment: bearish
+    score: -0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大单净流入"
+    sentiment: bullish
+    score: 0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大单净流出"
+    sentiment: bearish
+    score: -0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "北向资金流出"
+    sentiment: bearish
+    score: -0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "北向资金大幅流出"
+    sentiment: bearish
+    score: -0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "融资余额下降"
+    sentiment: bearish
+    score: -0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "融资净卖出"
+    sentiment: bearish
+    score: -0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "连板"
+    sentiment: bullish
+    score: 0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "断板"
+    sentiment: bearish
+    score: -0.6
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "地天板"
+    sentiment: bullish
+    score: 0.85
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "天地板"
+    sentiment: bearish
+    score: -0.85
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大盘反弹"
+    sentiment: bullish
+    score: 0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大盘暴跌"
+    sentiment: bearish
+    score: -0.85
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大盘大涨"
+    sentiment: bullish
+    score: 0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大盘大跌"
+    sentiment: bearish
+    score: -0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市场情绪高涨"
+    sentiment: bullish
+    score: 0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市场情绪低迷"
+    sentiment: bearish
+    score: -0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市场情绪回暖"
+    sentiment: bullish
+    score: 0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "市场情绪转冷"
+    sentiment: bearish
+    score: -0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "涨停潮"
+    sentiment: bullish
+    score: 0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "跌停潮"
+    sentiment: bearish
+    score: -0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "百股涨停"
+    sentiment: bullish
+    score: 0.85
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "百股跌停"
+    sentiment: bearish
+    score: -0.85
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "抄底"
+    sentiment: bullish
+    score: 0.65
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "割肉"
+    sentiment: bearish
+    score: -0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "追涨"
+    sentiment: bullish
+    score: 0.5
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "杀跌"
+    sentiment: bearish
+    score: -0.7
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "恐慌性抛售"
+    sentiment: bearish
+    score: -0.85
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "恐慌情绪蔓延"
+    sentiment: bearish
+    score: -0.8
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "踏空"
+    sentiment: bearish
+    score: -0.5
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "满仓"
+    sentiment: bullish
+    score: 0.6
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "空仓"
+    sentiment: bearish
+    score: -0.5
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "情绪冰点"
+    sentiment: bearish
+    score: -0.75
+    category: market
+    negation_sensitive: true
+    context_window: 3
+
+  # =========================================================================
+  # REGULATORY -- 52 terms (context: some bullish, some bearish)
+  # =========================================================================
+  - term: "政策利好"
+    sentiment: bullish
+    score: 0.8
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "监管收紧"
+    sentiment: bearish
+    score: -0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "IPO放缓"
+    sentiment: bullish
+    score: 0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "降准降息"
+    sentiment: bullish
+    score: 0.75
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "降准"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "降息"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "定向降准"
+    sentiment: bullish
+    score: 0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "MLF降息"
+    sentiment: bullish
+    score: 0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "LPR下调"
+    sentiment: bullish
+    score: 0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "货币政策宽松"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "财政政策发力"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "财政刺激"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "经济刺激"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "政策支持"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "政策扶持"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "产业政策"
+    sentiment: bullish
+    score: 0.5
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "税收优惠"
+    sentiment: bullish
+    score: 0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "减税降费"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "新能源政策"
+    sentiment: bullish
+    score: 0.5
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "半导体政策"
+    sentiment: bullish
+    score: 0.5
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "数字经济政策"
+    sentiment: bullish
+    score: 0.5
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "资本市场改革"
+    sentiment: bullish
+    score: 0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "注册制改革"
+    sentiment: bullish
+    score: 0.6
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "退市新规"
+    sentiment: bearish
+    score: -0.6
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "监管趋严"
+    sentiment: bearish
+    score: -0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "严监管"
+    sentiment: bearish
+    score: -0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "监管处罚"
+    sentiment: bearish
+    score: -0.75
+    category: regulatory
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "窗口指导"
+    sentiment: bearish
+    score: -0.5
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "限售股解禁"
+    sentiment: bearish
+    score: -0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "解禁潮"
+    sentiment: bearish
+    score: -0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "新股发行加速"
+    sentiment: bearish
+    score: -0.6
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "IPO提速"
+    sentiment: bearish
+    score: -0.55
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "再融资收紧"
+    sentiment: bearish
+    score: -0.6
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "定增收紧"
+    sentiment: bearish
+    score: -0.6
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "融资收紧"
+    sentiment: bearish
+    score: -0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "货币政策收紧"
+    sentiment: bearish
+    score: -0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "加息"
+    sentiment: bearish
+    score: -0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "缩表"
+    sentiment: bearish
+    score: -0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "政策收紧"
+    sentiment: bearish
+    score: -0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "政策收紧预期"
+    sentiment: bearish
+    score: -0.65
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "房地产调控"
+    sentiment: bearish
+    score: -0.6
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "房地产限制"
+    sentiment: bearish
+    score: -0.6
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "限购"
+    sentiment: bearish
+    score: -0.55
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "限贷"
+    sentiment: bearish
+    score: -0.55
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "环保督查"
+    sentiment: bearish
+    score: -0.55
+    category: regulatory
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "反垄断调查"
+    sentiment: bearish
+    score: -0.7
+    category: regulatory
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "反垄断处罚"
+    sentiment: bearish
+    score: -0.75
+    category: regulatory
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "行业整顿"
+    sentiment: bearish
+    score: -0.6
+    category: regulatory
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "行业清理"
+    sentiment: bearish
+    score: -0.65
+    category: regulatory
+    negation_sensitive: false
+    context_window: 5
+
+  - term: "政策暖风"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "政策红包"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "政策加码"
+    sentiment: bullish
+    score: 0.7
+    category: regulatory
+    negation_sensitive: true
+    context_window: 3
+
+  # =========================================================================
+  # NEUTRAL -- 126 terms (neutral reporting/factual)
+  # =========================================================================
+  - term: "公告"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "披露"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "召开"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "审议"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "通过"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "表决"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "选举"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "聘任"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "解聘"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "辞职"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "离任"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "上任"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "备案"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "登记"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "过户"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "配股"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "除权"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "除息"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "分红"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "送股"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "转增"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "增发"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "配售"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "承销"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "保荐"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "申报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "审核"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "反馈"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "回复"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "变更"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "更正"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "补充"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "修订"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "更新"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "调整"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "转让"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "收购"
+    sentiment: neutral
+    score: 0.1
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "并购"
+    sentiment: neutral
+    score: 0.1
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "重组"
+    sentiment: neutral
+    score: 0.05
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "整合"
+    sentiment: neutral
+    score: 0.05
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "剥离"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "出售"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "买入"
+    sentiment: neutral
+    score: 0.1
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "卖出"
+    sentiment: neutral
+    score: -0.1
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "持有"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "增持"
+    sentiment: bullish
+    score: 0.65
+    category: neutral
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "减持"
+    sentiment: bearish
+    score: -0.65
+    category: neutral
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "回购"
+    sentiment: bullish
+    score: 0.65
+    category: neutral
+    negation_sensitive: true
+    context_window: 3
+
+  - term: "大宗交易"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "协议转让"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "竞价交易"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "集合竞价"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "连续竞价"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "停牌"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "复牌"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "临时停牌"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "全天停牌"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "例行停牌"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "交易日"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "开盘"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "收盘"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "早盘"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "午盘"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "尾盘"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "盘中"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "盘后"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "券商研报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "分析师"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "评级"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "目标价"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "研报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "调研"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "调研纪要"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "业绩说明会"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "股东大会"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "董事会"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "监事会"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "年报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "季报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "中报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "半年报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "快报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "预告"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "业绩快报"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "业绩预告"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "定期报告"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "临时公告"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "重大事项"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "重大资产重组"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "重大资产出售"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "对外投资"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "对外担保"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "委托理财"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "闲置资金"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "募集资金"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "募集资金用途"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "变更募资用途"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 3
+
+  - term: "保荐机构"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "律师事务所"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "会计师事务所"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "审计报告"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "内部控制"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "治理结构"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "股权结构"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "股本变动"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "股东人数"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "十大股东"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "十大流通股东"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "机构持仓"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "基金持仓"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "社保持仓"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "QFII持仓"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "限售条件"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "锁定期"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "解禁日期"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "股东大会决议"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "董事会决议"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "监事会决议"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "独立董事意见"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "关联交易"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "日常关联交易"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "预计日常关联交易"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "会计政策变更"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "会计估计变更"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "前期差错更正"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "追溯重述"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "权益分派"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "利润分配"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 2
+
+  - term: "每股收益"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "每股净资产"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "每股经营现金流"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "总股本"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "流通股本"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "总市值"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1
+
+  - term: "流通市值"
+    sentiment: neutral
+    score: 0.0
+    category: neutral
+    negation_sensitive: false
+    context_window: 1

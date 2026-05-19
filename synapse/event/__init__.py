@@ -26,6 +26,14 @@ if TYPE_CHECKING:
         PolicyChangeDetector,
         MacroShiftDetector,
     )
+    from synapse.event.nlp_detectors import (
+        AnnouncementDetector,
+        ResearchReportDetector,
+        NewsSentimentDetector,
+        PolicyDetector_NLP,
+        NERDetector,
+        EventExtractionDetector,
+    )
     from synapse.event.dedup import DeduplicationEngine
     from synapse.event.taxonomy import (
         EVENT_TYPES,
@@ -51,6 +59,13 @@ __all__ = [
     "CorporateActionDetector",
     "PolicyChangeDetector",
     "MacroShiftDetector",
+    # NLP detectors (IMPL-008 / F-043)
+    "AnnouncementDetector",
+    "ResearchReportDetector",
+    "NewsSentimentDetector",
+    "PolicyDetector_NLP",
+    "NERDetector",
+    "EventExtractionDetector",
     # Deduplication (IMPL-003)
     "DeduplicationEngine",
     # Taxonomy
@@ -100,6 +115,13 @@ def __getattr__(name: str):
     ):
         from synapse.event import detectors
         return getattr(detectors, name)
+    if name in (
+        "AnnouncementDetector", "ResearchReportDetector",
+        "NewsSentimentDetector", "PolicyDetector_NLP",
+        "NERDetector", "EventExtractionDetector",
+    ):
+        from synapse.event import nlp_detectors
+        return getattr(nlp_detectors, name)
     if name in ("DeduplicationEngine",):
         from synapse.event.dedup import DeduplicationEngine
         return DeduplicationEngine

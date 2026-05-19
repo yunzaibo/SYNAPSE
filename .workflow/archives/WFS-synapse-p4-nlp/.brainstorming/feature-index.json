@@ -1,0 +1,108 @@
+{
+  "session_id": "WFS-synapse-p4-nlp",
+  "generated_at": "2026-05-20T02:30:00+08:00",
+  "total_features": 8,
+  "roles_analyzed": ["system-architect", "data-architect", "subject-matter-expert"],
+  "features": [
+    {
+      "id": "F-037",
+      "slug": "financial-announcement-parser",
+      "title": "Financial Announcement Parser",
+      "description": "Structured extraction from earnings reports and company filings",
+      "priority": "High",
+      "related_roles": ["system-architect", "data-architect", "subject-matter-expert"],
+      "file": "feature-specs/F-037-financial-announcement-parser.md"
+    },
+    {
+      "id": "F-038",
+      "slug": "research-report-summarizer",
+      "title": "Research Report Summarizer",
+      "description": "Key viewpoint and thesis extraction from analyst reports",
+      "priority": "High",
+      "related_roles": ["system-architect", "subject-matter-expert"],
+      "file": "feature-specs/F-038-research-report-summarizer.md"
+    },
+    {
+      "id": "F-039",
+      "slug": "news-sentiment-classifier",
+      "title": "News Sentiment Classifier",
+      "description": "Bullish/bearish/neutral classification for Chinese financial news",
+      "priority": "High",
+      "related_roles": ["system-architect", "data-architect", "subject-matter-expert"],
+      "file": "feature-specs/F-039-news-sentiment-classifier.md"
+    },
+    {
+      "id": "F-040",
+      "slug": "policy-document-understander",
+      "title": "Policy Document Understander",
+      "description": "Structured extraction from regulatory documents (PBOC, CSRC, State Council)",
+      "priority": "Medium",
+      "related_roles": ["subject-matter-expert", "data-architect"],
+      "file": "feature-specs/F-040-policy-document-understander.md"
+    },
+    {
+      "id": "F-041",
+      "slug": "financial-ner-engine",
+      "title": "Financial NER Engine",
+      "description": "Named entity recognition for companies, persons, products, institutions",
+      "priority": "High",
+      "related_roles": ["system-architect", "data-architect"],
+      "file": "feature-specs/F-041-financial-ner-engine.md"
+    },
+    {
+      "id": "F-042",
+      "slug": "event-extraction-engine",
+      "title": "Event Extraction Engine",
+      "description": "Structured event extraction from unstructured text (earnings forecasts, M&A, equity changes)",
+      "priority": "High",
+      "related_roles": ["system-architect", "subject-matter-expert"],
+      "file": "feature-specs/F-042-event-extraction-engine.md"
+    },
+    {
+      "id": "F-043",
+      "slug": "nlp-p3-event-integration",
+      "title": "NLP-P3 Event Integration",
+      "description": "BaseDetector implementations connecting NLP outputs to P3 event engine",
+      "priority": "High",
+      "related_roles": ["system-architect", "data-architect"],
+      "file": "feature-specs/F-043-nlp-p3-event-integration.md"
+    },
+    {
+      "id": "F-044",
+      "slug": "financial-sentiment-lexicon",
+      "title": "Financial Sentiment Lexicon",
+      "description": "Domain-specific sentiment dictionary with 500+ financial terms",
+      "priority": "Medium",
+      "related_roles": ["subject-matter-expert", "data-architect"],
+      "file": "feature-specs/F-044-financial-sentiment-lexicon.md"
+    }
+  ],
+  "execution_waves": [
+    {
+      "wave": 1,
+      "name": "Foundation",
+      "features": ["F-041", "F-044"],
+      "rationale": "NER engine and sentiment lexicon are prerequisites for other NLP tasks"
+    },
+    {
+      "wave": 2,
+      "name": "Core NLP Tasks",
+      "features": ["F-037", "F-039", "F-042"],
+      "rationale": "Core NLP capabilities that consume foundation layer"
+    },
+    {
+      "wave": 3,
+      "name": "Advanced Analysis",
+      "features": ["F-038", "F-040"],
+      "rationale": "Higher-level analysis tasks building on core NLP"
+    },
+    {
+      "wave": 4,
+      "name": "Integration",
+      "features": ["F-043"],
+      "rationale": "P3 event engine integration (depends on all NLP tasks)"
+    }
+  ],
+  "estimated_tests": 180,
+  "estimated_coverage": 0.90
+}

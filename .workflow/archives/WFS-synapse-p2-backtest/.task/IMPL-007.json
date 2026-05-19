@@ -1,0 +1,148 @@
+{
+  "id": "IMPL-007",
+  "title": "Backtest Result Persistence (Parquet Storage)",
+  "description": "Implement Parquet-based persistence for backtest results with schema versioning, columnar query support, and lazy upcast for backward compatibility.",
+  "status": "pending",
+  "type": "feature",
+  "scope": "synapse/backtest",
+  "action": "Implement",
+  "depends_on": ["IMPL-001", "IMPL-002"],
+  "focus_paths": ["synapse/backtest/persistence.py", "tests/unit/test_persistence.py"],
+
+  "convergence": {
+    "criteria": [
+      "Results persisted in Parquet format: verify by py -m pytest tests/unit/test_persistence.py -p no:asyncio (exit code 0)",
+      "Columnar queries work: verify by query API test",
+      "Schema versioning in metadata: verify by metadata inspection test",
+      "Lazy upcast for backward compatibility: verify by schema evolution test"
+    ],
+    "verification": "py -m pytest tests/unit/test_persistence.py -p no:asyncio",
+    "definition_of_done": "BacktestResult can be persisted to Parquet and loaded with schema versioning and query support"
+  },
+
+  "files": [
+    {"path": "synapse/backtest/persistence.py", "action": "create", "change": "Parquet read/write for BacktestResult, query API, schema versioning"},
+    {"path": "tests/unit/test_persistence.py", "action": "create", "change": "Unit tests for persistence: save/load roundtrip, query API, schema versioning, edge cases"}
+  ],
+
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Implement Parquet persistence module",
+      "description": "Create synapse/backtest/persistence.py with functions: save_result(result: BacktestResult, path: str) -> None, load_result(path: str) -> BacktestResult, query_results(start_date, end_date, factor_name) -> list[BacktestResult]. Use pd.DataFrame.to_parquet() with compression and schema version in Parquet metadata. Implement directory structure: results/{factor_id}/{run_id}.parquet, quintile_returns/{factor_id}/{run_id}.parquet, ic_analysis/{factor_id}/{run_id}.parquet.",
+      "modification_points": [
+        "Create save_result(): convert BacktestResult to DataFrames, write to Parquet with schema_version in metadata",
+        "Create load_result(): read Parquet, reconstruct BacktestResult with lazy upcast for old schemas",
+        "Create query_results(): filter Parquet files by date range and factor name",
+        "Implement schema versioning in Parquet metadata (schema_version key)"
+      ],
+      "logic_flow": [
+        "Convert BacktestResult to_dict() -> DataFrame for metrics summary",
+        "Convert quintile_returns to DataFrame for per-quintile returns",
+        "Write each DataFrame to separate Parquet file with schema_version in metadata",
+        "For loading: read Parquet, check schema_version, apply lazy upcast if needed",
+        "For querying: glob Parquet files, filter by metadata fields"
+      ],
+      "depends_on": [0],
+      "output": "persistence.py module"
+    },
+    {
+      "step": 2,
+      "title": "Write unit tests for persistence",
+      "description": "Create tests/unit/test_persistence.py with 6+ test cases: save/load roundtrip, schema version metadata, query by date range, query by factor name, lazy upcast for old schema, edge cases (empty result, missing directory).",
+      "modification_points": [
+        "Test save/load roundtrip: BacktestResult -> Parquet -> BacktestResult matches",
+        "Test schema_version in Parquet metadata",
+        "Test query_results filters by date range correctly",
+        "Test query_results filters by factor_name correctly",
+        "Test lazy upcast: old schema version loads with defaults",
+        "Test edge case: empty quintile_returns"
+      ],
+      "logic_flow": [
+        "Create synthetic BacktestResult with known fields",
+        "Save to Parquet, load back, verify all fields match",
+        "Query by date range and verify correct results returned",
+        "Test schema version is preserved in metadata"
+      ],
+      "depends_on": [1],
+      "output": "tests/unit/test_persistence.py"
+    }
+  ],
+
+  "pre_analysis": [
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature spec for F-034 persistence and data-architect analysis",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-034-backtest-result-persistence.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/data-architect/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    }
+  ],
+
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-034-backtest-result-persistence.md",
+      "feature_id": "F-034",
+      "priority": "medium",
+      "usage": "Parquet storage structure, query API, and schema versioning specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/data-architect/analysis.md",
+      "priority": "high",
+      "usage": "Storage layer architecture, Parquet schemas, serialization patterns (Section 2)"
+    }
+  ],
+
+  "inherited": {
+    "from": "IMPL-001, IMPL-002",
+    "context": ["BacktestResult and PerformanceMetrics frozen dataclasses from result.py"]
+  },
+
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-007",
+    "strategy": "resume",
+    "resume_from": "WFS-synapse-p2-backtest-IMPL-002"
+  },
+
+  "meta": {
+    "type": "feature",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+
+  "reference": {
+    "p1_pattern": "synapse/core/market/adjustment.py - Parquet storage pattern",
+    "schema_versioning": "Weak Schema + Lazy Upcast pattern from ADR-005"
+  },
+
+  "rationale": {
+    "why_parquet": "Consistent with P1 market data storage, enables fast analytical queries on return/IC series",
+    "why_schema_versioning": "Backward compatibility with existing BacktestMetrics schema"
+  },
+
+  "risks": [
+    {"risk": "Parquet file size grows with long backtests", "mitigation": "Use compression (snappy), separate quintile_returns from summary"},
+    {"risk": "Schema evolution breaks old files", "mitigation": "Lazy upcast: old schemas load with default values for new fields"}
+  ],
+
+  "test": {
+    "commands": {
+      "run_tests": "py -m pytest tests/unit/test_persistence.py -p no:asyncio"
+    }
+  }
+}

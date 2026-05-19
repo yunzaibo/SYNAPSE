@@ -1,0 +1,44 @@
+{
+  "id": "IMPL-7",
+  "title": "Watchlist Tests",
+  "feature": "F-028",
+  "phase": 5,
+  "status": "completed",
+  "priority": "High",
+  "description": "Extend test_projection.py with comprehensive tests for scoring, ranking, filtering, and serialization.",
+  "depends_on": [
+    "IMPL-1",
+    "IMPL-2",
+    "IMPL-6"
+  ],
+  "acceptance_criteria": [
+    "Test coverage >= 80% for scoring, ranking, filtering code",
+    "Scoring determinism tests pass",
+    "Ranking/sorting tests pass",
+    "Filtering tests pass",
+    "Schema round-trip tests pass",
+    "All existing tests pass (no regressions)"
+  ],
+  "files_to_modify": [
+    "tests/unit/test_projection.py"
+  ],
+  "files_to_create": [],
+  "implementation_notes": [
+    "Follow existing TestWatchlistGenerator pattern",
+    "Use pytest fixtures for mock data",
+    "Test determinism: same inputs → same outputs",
+    "Test edge cases: empty data, single entry, ties",
+    "Test serialization round-trip for new fields"
+  ],
+  "convergence": {
+    "definition_of_done": "All tests pass, coverage >= 80%",
+    "verification": "py -m pytest tests/unit/test_projection.py -p no:asyncio --cov=synapse/core/projection"
+  },
+  "status_history": [
+    {
+      "from": "in_progress",
+      "to": "completed",
+      "changed_at": "2026-05-19T19:01:27.214054+08:00"
+    }
+  ]
+}

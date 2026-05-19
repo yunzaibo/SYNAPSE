@@ -1,0 +1,34 @@
+{
+  "id": "IMPL-5",
+  "title": "Market Semantics Scoring",
+  "feature": "F-025",
+  "phase": 3,
+  "status": "completed",
+  "priority": "Medium",
+  "description": "Implement score_market_context() using TradingCalendar, NorthboundFlow, IndexConstituent.",
+  "depends_on": ["IMPL-2"],
+  "acceptance_criteria": [
+    "score_market_context() function implemented",
+    "TradingCalendar validates target_date is trading day",
+    "NorthboundFlow boosts score for large inflows",
+    "IndexConstituent filters universe to tracked indices",
+    "Missing market data returns neutral 0.5"
+  ],
+  "files_to_modify": [
+    "synapse/core/projection/scoring/engine.py",
+    "synapse/core/projection/watchlist_generator.py"
+  ],
+  "files_to_create": [
+    "synapse/core/projection/scoring/market_scorer.py"
+  ],
+  "implementation_notes": [
+    "Use is_trading_day() for validation (returns empty list if not trading day)",
+    "Use northbound_to_signals() for northbound flow signals",
+    "Use constituent_tickers() for universe filtering",
+    "Market data unavailability returns (0.5, 'Market data unavailable')"
+  ],
+  "convergence": {
+    "definition_of_done": "Market scoring implemented and tested",
+    "verification": "pytest tests/unit/test_projection.py -k market_scoring"
+  }
+}

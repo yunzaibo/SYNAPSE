@@ -1,0 +1,27 @@
+{
+  "id": "IMPL-004",
+  "title": "Index Constituent Module (F-020)",
+  "description": "Create synapse/core/market/constituent.py with IndexCode enum (CSI300/CSI500/CSI1000/SSE50), ConstituentSnapshot and ConstituentChange frozen dataclasses. Implement point-in-time snapshot loading, change detection, and membership checks. Parquet/CSV snapshot files in data/market/index/{code}/.",
+  "type": "code-developer",
+  "depends_on": [],
+  "convergence": [
+    "IndexCode enum: CSI300 (000300.SH), CSI500 (000905.SH), CSI1000 (000852.SH), SSE50 (000016.SH), CUSTOM",
+    "ConstituentSnapshot frozen dataclass: index_code, date, members (frozenset), weights (dict or None)",
+    "ConstituentChange frozen dataclass: date, ticker, action (add/remove), index_code, reason",
+    "load_constituents resolves to latest snapshot <= target date",
+    "load_constituent_changes returns changes sorted by date",
+    "is_member works correctly for all supported indices",
+    "constituent_tickers returns frozenset[str]",
+    "Missing index directory raises FileNotFoundError with path suggestion",
+    "Empty members file returns snapshot with empty frozenset",
+    "Future date request uses latest available, logs info",
+    "File layout: data/market/index/{code}/members.csv and changes.csv",
+    "New unit tests: load, membership, changes, empty members, future date, missing directory",
+    "All existing tests pass unchanged"
+  ],
+  "focus_paths": [
+    "synapse/core/market/constituent.py",
+    "tests/unit/test_market_constituent.py",
+    "data/market/index/"
+  ]
+}

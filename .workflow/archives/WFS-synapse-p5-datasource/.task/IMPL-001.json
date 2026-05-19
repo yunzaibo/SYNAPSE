@@ -1,0 +1,33 @@
+{
+  "id": "IMPL-001",
+  "title": "DataSource adapter protocol",
+  "description": "定义 DataSource ABC，统一 fetch(tickers) -> list[dict] 接口。所有数据源适配器必须实现此协议。",
+  "wave": 1,
+  "depends_on": [],
+  "meta": {
+    "type": "feature",
+    "complexity": "low",
+    "execution_group": "main"
+  },
+  "convergence": {
+    "verification": [
+      "DataSource ABC 定义完整（fetch, fetch_batch 方法）",
+      "EastMoneyAdapter 和 AkshareAdapter 可作为子类实现",
+      "类型提示完整，通过 mypy 检查"
+    ],
+    "definition_of_done": [
+      "synapse/event/datasource.py 创建",
+      "DataSource ABC 导出到 __init__.py",
+      "单元测试覆盖 ABC 实例化和接口验证"
+    ]
+  },
+  "implementation": {
+    "steps": [
+      "创建 synapse/event/datasource.py",
+      "定义 DataSource ABC（fetch, fetch_batch, source_name 属性）",
+      "定义标准化返回格式 MarketData dataclass",
+      "更新 __init__.py 导出"
+    ],
+    "test_command": "py -m pytest -p no:asyncio tests/unit/test_datasource.py -v"
+  }
+}

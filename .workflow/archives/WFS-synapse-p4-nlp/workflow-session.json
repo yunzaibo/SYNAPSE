@@ -1,0 +1,13 @@
+{
+  "session_id": "WFS-synapse-p4-nlp",
+  "project": "P4 Chinese Financial NLP Layer",
+  "status": "active",
+  "execution_started_at": "2026-05-20T03:00:00+08:00",
+  "type": "workflow",
+  "created_at": "2026-05-20T02:00:00+08:00",
+  "execution_mode": "auto",
+  "topic": "P4 Chinese Financial NLP Layer — 中文金融NLP层：财报解析、研报摘要、新闻情感分析、政策文本理解、金融实体识别、事件抽取、与P3事件引擎集成",
+  "selected_roles": ["system-architect", "data-architect", "subject-matter-expert"],
+  "terminology": {},
+  "non_goals": []
+}

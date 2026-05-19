@@ -1,0 +1,199 @@
+{
+  "id": "IMPL-008",
+  "title": "End-to-End Integration Tests (P1/P6 Integration)",
+  "description": "Write end-to-end integration tests covering full backtest pipeline with P1/P6 integration, data contract validation, edge cases, and performance benchmarks. Target >=90% code coverage.",
+  "status": "pending",
+  "type": "test-gen",
+  "scope": "tests/integration",
+  "action": "Implement",
+  "depends_on": ["IMPL-006", "IMPL-007"],
+  "focus_paths": ["tests/integration/test_backtest_pipeline.py", "tests/integration/test_p6_integration.py"],
+
+  "convergence": {
+    "criteria": [
+      "End-to-end pipeline tests pass: verify by py -m pytest tests/integration/ -p no:asyncio (exit code 0)",
+      "P6 FactorEngine data contract validated: verify by contract test",
+      "P1 TradingCalendar integration validated: verify by calendar test",
+      "Edge cases covered (missing data, empty universe): verify by edge case tests",
+      "Code coverage >=90%: verify by py -m pytest --cov=synapse/backtest --cov-report=term-missing"
+    ],
+    "verification": "py -m pytest tests/integration/ tests/unit/ -p no:asyncio --cov=synapse/backtest --cov-report=term-missing",
+    "definition_of_done": "All integration tests pass, P1/P6 contracts validated, code coverage >=90%"
+  },
+
+  "files": [
+    {"path": "tests/integration/test_backtest_pipeline.py", "action": "create", "change": "End-to-end pipeline tests with synthetic data and mock FactorEngine"},
+    {"path": "tests/integration/test_p6_integration.py", "action": "create", "change": "P6 FactorEngine data contract validation tests"},
+    {"path": "tests/integration/test_p1_calendar_integration.py", "action": "create", "change": "P1 TradingCalendar integration tests"}
+  ],
+
+  "implementation": [
+    {
+      "step": 1,
+      "title": "Create end-to-end pipeline tests",
+      "description": "Create tests/integration/test_backtest_pipeline.py with 5+ test cases: full pipeline with synthetic factor data producing BacktestResult, all components (sorter, metrics, IC, attribution) exercised, data flow validation from factor input to final result, deterministic results with same input, performance benchmark (< 3s for 300 stocks, 5 years, monthly).",
+      "modification_points": [
+        "Create test_full_pipeline(): synthetic factor DataFrame -> BacktestEngine.run() -> BacktestResult with all fields populated",
+        "Create test_deterministic_results(): same input produces identical BacktestResult",
+        "Create test_component_composition(): verify each component (sorter, metrics, IC, attribution) is called correctly",
+        "Create test_performance_benchmark(): 300 stocks, 5 years monthly completes in < 3s",
+        "Create test_error_handling(): graceful degradation when component fails"
+      ],
+      "logic_flow": [
+        "Create synthetic factor DataFrame (MultiIndex date, ticker) with 300 stocks, 5 years of monthly data",
+        "Create synthetic forward returns aligned with factor data",
+        "Instantiate BacktestEngine with all DI components",
+        "Run backtest and verify BacktestResult has all required fields",
+        "Verify metrics are within reasonable ranges",
+        "Test performance benchmark with time assertion"
+      ],
+      "depends_on": [0],
+      "output": "test_backtest_pipeline.py"
+    },
+    {
+      "step": 2,
+      "title": "Create P6 FactorEngine integration tests",
+      "description": "Create tests/integration/test_p6_integration.py with 4+ test cases: FactorEngine.compute_batch output format compatible with BacktestEngine input, factor_values MultiIndex (date, ticker) validation, factor_id column selection, edge cases (empty factor output, all-NaN factors).",
+      "modification_points": [
+        "Create test_factor_engine_output_format(): verify DataFrame format matches BacktestEngine expectations",
+        "Create test_factor_values_multindex(): verify MultiIndex (date, ticker) structure",
+        "Create test_factor_id_column_selection(): verify correct column extraction",
+        "Create test_edge_case_empty_output(): graceful handling of empty FactorEngine output",
+        "Create test_edge_case_all_nan(): graceful handling of all-NaN factor values"
+      ],
+      "logic_flow": [
+        "Create mock FactorEngine that produces DataFrame in compute_batch() format",
+        "Verify BacktestEngine accepts this format without transformation",
+        "Test edge cases with empty/NaN factor outputs"
+      ],
+      "depends_on": [0],
+      "output": "test_p6_integration.py"
+    },
+    {
+      "step": 3,
+      "title": "Create P1 TradingCalendar integration tests",
+      "description": "Create tests/integration/test_p1_calendar_integration.py with 3+ test cases: rebalance dates match TradingCalendar output, monthly rebalance uses first trading day of month, non-trading days excluded from rebalance schedule.",
+      "modification_points": [
+        "Create test_rebalance_dates_match_calendar(): verify rebalance dates are valid trading days",
+        "Create test_monthly_rebalance_first_day(): verify monthly rebalance uses first trading day",
+        "Create test_non_trading_days_excluded(): verify no rebalance on weekends/holidays"
+      ],
+      "logic_flow": [
+        "Use real TradingCalendar from P1",
+        "Generate rebalance dates for a test period",
+        "Verify all rebalance dates are valid trading days",
+        "Verify monthly rebalance uses first trading day of each month"
+      ],
+      "depends_on": [0],
+      "output": "test_p1_calendar_integration.py"
+    },
+    {
+      "step": 4,
+      "title": "Run code coverage analysis",
+      "description": "Run pytest with --cov=synapse/backtest to measure code coverage. Target >=90%. Identify uncovered lines and add targeted tests if needed.",
+      "modification_points": [
+        "Run py -m pytest tests/ -p no:asyncio --cov=synapse/backtest --cov-report=term-missing",
+        "Analyze coverage report for uncovered lines",
+        "Add targeted tests for any uncovered critical paths",
+        "Verify final coverage >=90%"
+      ],
+      "logic_flow": [
+        "Run coverage analysis",
+        "Identify gaps in coverage",
+        "Add tests for uncovered paths if needed",
+        "Verify >=90% coverage"
+      ],
+      "depends_on": [1],
+      "output": "Coverage report and additional tests if needed"
+    }
+  ],
+
+  "pre_analysis": [
+    {
+      "step": "load_brainstorm_artifacts",
+      "action": "Load feature spec for F-036 integration tests and system-architect analysis",
+      "commands": [
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-036-backtest-integration-tests.md)",
+        "Read(.workflow/active/WFS-synapse-p2-backtest/.brainstorming/system-architect/analysis.md)"
+      ],
+      "output_to": "brainstorm_context",
+      "on_error": "skip_optional"
+    },
+    {
+      "step": "analyze_existing_tests",
+      "action": "Analyze existing test structure and test data patterns",
+      "commands": [
+        "bash(find tests/ -name '*.py' -type f | head -20)",
+        "Read(synapse/backtest/__init__.py)"
+      ],
+      "output_to": "existing_tests",
+      "on_error": "skip_optional"
+    }
+  ],
+
+  "artifacts": [
+    {
+      "type": "feature_spec",
+      "source": "brainstorm_feature_specs",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/feature-specs/F-036-backtest-integration-tests.md",
+      "feature_id": "F-036",
+      "priority": "medium",
+      "usage": "Test categories, test data requirements, and acceptance criteria specification"
+    },
+    {
+      "type": "individual_role_analysis",
+      "source": "brainstorm_roles",
+      "path": ".workflow/active/WFS-synapse-p2-backtest/.brainstorming/system-architect/analysis.md",
+      "priority": "high",
+      "usage": "Testing strategy, test structure, key test scenarios (Section 8)"
+    }
+  ],
+
+  "inherited": {
+    "from": "IMPL-006, IMPL-007",
+    "context": ["BacktestEngine, all components, persistence module from previous tasks"]
+  },
+
+  "context_package_path": ".workflow/active/WFS-synapse-p2-backtest/.process/context-package.json",
+
+  "cli_execution": {
+    "id": "WFS-synapse-p2-backtest-IMPL-008",
+    "strategy": "resume",
+    "resume_from": "WFS-synapse-p2-backtest-IMPL-006"
+  },
+
+  "meta": {
+    "type": "test-gen",
+    "agent": "@code-developer",
+    "execution_group": null,
+    "module": "backtest",
+    "execution_config": {
+      "method": "agent",
+      "cli_tool": null,
+      "enable_resume": false
+    }
+  },
+
+  "reference": {
+    "test_framework": "pytest with -p no:asyncio for SYNAPSE",
+    "coverage_target": ">=90% for synapse/backtest module"
+  },
+
+  "rationale": {
+    "why_last": "Integration tests validate all components working together; must be written after all components exist",
+    "why_coverage_90": "Guidance specification requirement for comprehensive test coverage"
+  },
+
+  "risks": [
+    {"risk": "Test data generation complexity", "mitigation": "Use synthetic DataFrames with controlled values, reuse fixtures across test files"},
+    {"risk": "P1/P6 dependency in integration tests", "mitigation": "Use mock FactorEngine for unit-like integration tests, real TradingCalendar for calendar tests"}
+  ],
+
+  "test": {
+    "commands": {
+      "run_tests": "py -m pytest tests/integration/ -p no:asyncio",
+      "run_coverage": "py -m pytest tests/ -p no:asyncio --cov=synapse/backtest --cov-report=term-missing",
+      "run_all": "py -m pytest tests/unit/ tests/integration/ -p no:asyncio"
+    }
+  }
+}

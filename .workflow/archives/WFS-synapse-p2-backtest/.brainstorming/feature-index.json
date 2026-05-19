@@ -1,0 +1,85 @@
+{
+  "version": "1.0",
+  "session_id": "WFS-synapse-p2-backtest",
+  "project": "SYNAPSE",
+  "topic": "P2 Long-Short Quintile Backtest Engine",
+  "created_at": "2026-05-19T23:30:00+08:00",
+  "features": [
+    {
+      "id": "F-029",
+      "slug": "quintile-portfolio-sorting",
+      "name": "Quintile Portfolio Sorting",
+      "description": "5-quintile portfolio sorting with equal-weight allocation",
+      "priority": "High",
+      "related_roles": ["subject-matter-expert", "system-architect"],
+      "status": "draft"
+    },
+    {
+      "id": "F-030",
+      "slug": "backtest-engine-core",
+      "name": "Backtest Engine Core",
+      "description": "Event-driven backtest engine with dependency injection",
+      "priority": "High",
+      "related_roles": ["system-architect", "data-architect"],
+      "status": "draft"
+    },
+    {
+      "id": "F-031",
+      "slug": "performance-metrics",
+      "name": "Performance Metrics",
+      "description": "8 core performance metrics computation",
+      "priority": "High",
+      "related_roles": ["subject-matter-expert", "system-architect"],
+      "status": "draft"
+    },
+    {
+      "id": "F-032",
+      "slug": "factor-ic-analysis",
+      "name": "Factor IC Analysis",
+      "description": "Rolling IC/RankIC/ICIR computation with configurable window",
+      "priority": "High",
+      "related_roles": ["subject-matter-expert", "data-architect"],
+      "status": "draft"
+    },
+    {
+      "id": "F-033",
+      "slug": "return-attribution",
+      "name": "Return Attribution",
+      "description": "Barra-style factor model return attribution",
+      "priority": "Medium",
+      "related_roles": ["subject-matter-expert", "system-architect"],
+      "status": "draft"
+    },
+    {
+      "id": "F-034",
+      "slug": "backtest-result-persistence",
+      "name": "Backtest Result Persistence",
+      "description": "Parquet storage for backtest results with query support",
+      "priority": "Medium",
+      "related_roles": ["data-architect", "system-architect"],
+      "status": "draft"
+    },
+    {
+      "id": "F-035",
+      "slug": "long-short-spread",
+      "name": "Long-Short Spread",
+      "description": "Long-short portfolio spread calculation",
+      "priority": "High",
+      "related_roles": ["subject-matter-expert", "system-architect"],
+      "status": "draft"
+    },
+    {
+      "id": "F-036",
+      "slug": "backtest-integration-tests",
+      "name": "Backtest Integration Tests",
+      "description": "End-to-end integration tests with P1/P6",
+      "priority": "Medium",
+      "related_roles": ["system-architect", "data-architect"],
+      "status": "draft"
+    }
+  ],
+  "total_features": 8,
+  "high_priority": 5,
+  "medium_priority": 3,
+  "roles_used": ["system-architect", "data-architect", "subject-matter-expert"]
+}
